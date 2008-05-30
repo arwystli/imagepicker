@@ -1,0 +1,14 @@
+// $Id$
+
+Image Picker 5.x-1.x-dev, 2008-05-30
+------------------------------------
+By hutch, numerous changes by new maintainer
+fixed module path finding
+removed .htaccess file creation on install, not required
+fixed permissions
+added admin settings
+lots of cleanup and code comments
+
+Image Picker 5.x-1.x-dev, 2007-12-15
+------------------------------------
+Initial release of imagepicker module to HEAD
