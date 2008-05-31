@@ -117,7 +117,7 @@ function imagepicker_form_alter($form_id, &$form) {
 }
 
 function theme_imagepicker_iframe() {
-  return '<iframe id="imagepicker" style="width: ' . variable_get('imagepicker_advanced_iframe_width', "100%") . '; height: ' . variable_get('imagepicker_advanced_iframe_height', 500) . 'px; border: ' . variable_get('imagepicker_advanced_iframe_border', "0") . ';" src="'.url('imagepicker').'">Imagepicker requires iframe support.</iframe>';
+  return '<iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe>';
 }
 
 /**
@@ -181,11 +181,14 @@ function imagepicker_upload_form_validate($form_id, $form_values) {
       case 'file_upload':
         if (empty($_FILES['files']['name']['file_upload'])) {
           form_set_error($name, t('Image file field is required.'));
-        } elseif (!isset($_FILES['files']['tmp_name']['file_upload']) || !file_exists($_FILES['files']['tmp_name']['file_upload'])) {
+        }
+        elseif (!isset($_FILES['files']['tmp_name']['file_upload']) || !file_exists($_FILES['files']['tmp_name']['file_upload'])) {
           form_set_error($name, t('Error while uploading file.'));
-        } elseif (!image_get_info($_FILES['files']['tmp_name']['file_upload'])) {
+        }
+        elseif (!image_get_info($_FILES['files']['tmp_name']['file_upload'])) {
           form_set_error($name, t('Uploaded file is not an image.'));
-        } elseif (!imagepicker_get_uploaded_file_extension('file_upload')) {
+        }
+        elseif (!imagepicker_get_uploaded_file_extension('file_upload')) {
           form_set_error($name, t('Only .jpg, .gif and .png image files are accepted.'));
         }
         break;
@@ -213,87 +216,94 @@ function imagepicker_upload_form_submit($form_id, $form_values) {
 
   if (t('Upload') == $form_values['op']) {
     $destination = imagepicker_get_path(false, true);
-    $thumbsDir = $destination.'thumbs';
-    $browserDir = $destination.'browser';
+    $thumbsdir = $destination .'thumbs';
+    $browserdir = $destination .'browser';
 
-    if (file_check_directory($destination, true) && file_check_directory($thumbsDir, true) && file_check_directory($browserDir, true)) {
+    if (file_check_directory($destination, true) && file_check_directory($thumbsdir, true) && file_check_directory($browserdir, true)) {
       // Add DIRECTORY_SEPARATORS here because drupals' functions remove trailing slashes
       $destination .= DIRECTORY_SEPARATOR;
-      $thumbsDir = $thumbsDir.DIRECTORY_SEPARATOR;
-      $browserDir = $browserDir.DIRECTORY_SEPARATOR;
+      $thumbsdir = $thumbsdir . DIRECTORY_SEPARATOR;
+      $browserdir = $browserdir . DIRECTORY_SEPARATOR;
 
-      $maxThumbSize = $form_values['thumb'] ? $form_values['thumb'] : 100;
-      $scaleTo = $form_values['scale'] ? $form_values['scale'] : false;
+      $maxthumbsize = $form_values['thumb'] ? $form_values['thumb'] : 100;
+      $scaleto = $form_values['scale'] ? $form_values['scale'] : false;
 
-      if (!$scaleTo) {
+      if (!$scaleto) {
         // Use $path instead of original $destination variable cause this
         // variable's value will be changed during copying file, so we won't
         // loose it.
         $path = $destination;
-        $imageMoved = imagepicker_copy_uploaded_file($path, 'file_upload');
+        $imagemoved = imagepicker_copy_uploaded_file($path, 'file_upload');
         $file = basename($path);
-      } else {
+      }
+      else {
         $source = $_FILES['files']['tmp_name']['file_upload'];
         $file = imagepicker_get_uploaded_file_name($destination, 'file_upload');
-        $imageScaled = imagepicker_scale_image($source, $destination.$file, $scaleTo);
+        $imagescaled = imagepicker_scale_image($source, $destination . $file, $scaleto);
       }
 
-      if (!$scaleTo && $imageMoved || $scaleTo && $imageScaled) {
+      if (!$scaleto && $imagemoved || $scaleto && $imagescaled) {
 
         // Source file should still be an uploaded one, as scaled image
         // might have some watermarks etc. from drupal's filters/hooks.
         $source = $_FILES['files']['tmp_name']['file_upload'];
 
-        if (imagepicker_scale_image($source, $thumbsDir.$file, $maxThumbSize)) {
-          imagepicker_scale_image($source, $browserDir.$file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
-          $nextImgId = db_next_id('{imagepicker}_img_id');
+        if (imagepicker_scale_image($source, $thumbsdir . $file, $maxthumbsize)) {
+          imagepicker_scale_image($source, $browserdir . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
+          $nextimgid = db_next_id('{imagepicker}_img_id');
           $title = htmlspecialchars($form_values['title']);
           $description = htmlspecialchars($form_values['description']);
-          if (db_query("INSERT INTO {imagepicker} (img_id, uid, img_name, img_title, img_description) VALUES ('%d', '%d', '%s', '%s', '%s')", array($nextImgId, $user->uid, $file, $title, $description))) {
+          if (db_query("INSERT INTO {imagepicker} (img_id, uid, img_name, img_title, img_description) VALUES ('%d', '%d', '%s', '%s', '%s')", array($nextimgid, $user->uid, $file, $title, $description))) {
             drupal_set_message(t('Image was successfully uploaded.'));
-            drupal_goto('imagepicker/browse/'.$nextImgId, null, null, 302);
-          } else {
-            file_delete($thumbsDir.$file);
-            file_delete($browserDir.$file);
+            drupal_goto('imagepicker/browse/'. $nextimgid, null, null, 302);
+          }
+          else {
+            file_delete($thumbsdir . $file);
+            file_delete($browserdir . $file);
             drupal_set_message(t('Error while saving information to database for uploaded image.'), 'error');
           }
-        } else {
+        }
+        else {
           drupal_set_message(t('Error while creating a thumbnail for uploaded image.'), 'error');
         }
-      } else {
-        if (!$scaleTo && !$imageMoved) {
+      }
+      else {
+        if (!$scaleto && !$imagemoved) {
           drupal_set_message(t('Error while moving uploaded file to its destination.'), 'error');
-        } else {
+        }
+        else {
           drupal_set_message(t('Error while scaling uploaded file.'), 'error');
         }
       }
-      file_delete($destination.$file);
+      file_delete($destination . $file);
       drupal_goto('imagepicker', null, null, 302);
-    } else {
+    }
+    else {
       drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
       drupal_goto('imagepicker', null, null, 302);
     }
   }
 }
 
-function imagepicker_get_path($url = false, $userDir = false) {
+function imagepicker_get_path($url = false, $userdir = false) {
   global $user, $base_url;
 
-  $dirSep = !$url ? DIRECTORY_SEPARATOR : '/';
+  $dirsep = !$url ? DIRECTORY_SEPARATOR : '/';
 
   if (!$url) {
     $path = str_replace('/', DIRECTORY_SEPARATOR, getcwd());
-  } else {
+  }
+  else {
     $path = $base_url;
   }
 
-  $path .= $dirSep.file_directory_path().$dirSep.'imagepicker'.$dirSep;
+  $path .= $dirsep . file_directory_path() . $dirsep .'imagepicker'. $dirsep;
 
-  if ($userDir) {
-    $userName = !is_array($userDir) ? $user->name : $userDir['name'];
-    $firstLetter = strtolower(substr($userName, 0, 1));
-    $firstLetter = preg_match('/^[a-z]$/', $firstLetter) ? $firstLetter : 'others';
-    $path .= $firstLetter.$dirSep.$userName.$dirSep;
+  if ($userdir) {
+    $username = !is_array($userdir) ? $user->name : $userdir['name'];
+    $firstletter = strtolower(substr($username, 0, 1));
+    $firstletter = preg_match('/^[a-z]$/', $firstletter) ? $firstletter : 'others';
+    $path .= $firstletter . $dirsep . $username . $dirsep;
   }
 
   return $path;
@@ -309,7 +319,7 @@ function imagepicker_copy_uploaded_file(&$destination, $name) {
     $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
 
     $file = imagepicker_get_uploaded_file_name($destination, $name);
-    $destination = $destination.$file;
+    $destination = $destination . $file;
     return @rename($source, $destination);
   }
 
@@ -325,75 +335,79 @@ function imagepicker_get_uploaded_file_extension($name) {
       // Don't know if it's the same with IE6, but IE7 might give you a mime
       // type of image/pjpeg. So lets just treat this 'progressive jpg' as a
       // normal jpg image.
-    case 'image/jpeg': $fileExt = '.jpg'; break;
-    case 'image/gif': $fileExt = '.gif'; break;
-    case 'image/png': $fileExt = '.png'; break;
-    default: $fileExt = '';
+    case 'image/jpeg': $fileext = '.jpg'; break;
+    case 'image/gif': $fileext = '.gif'; break;
+    case 'image/png': $fileext = '.png'; break;
+    default: $fileext = '';
   }
 
-  return $fileExt;
+  return $fileext;
 }
 
 function imagepicker_get_uploaded_file_name($destination, $name) {
-  $fileExt = imagepicker_get_uploaded_file_extension($name);
+  $fileext = imagepicker_get_uploaded_file_extension($name);
 
   if (false !== strpos($_FILES['files']['name'][$name], '.')) {
-    $fileName = substr($_FILES['files']['name'][$name], 0, strrpos($_FILES['files']['name'][$name], '.'));
-  } else {
-    $fileName = $_FILES['files']['name'][$name];
+    $filename = substr($_FILES['files']['name'][$name], 0, strrpos($_FILES['files']['name'][$name], '.'));
+  }
+  else {
+    $filename = $_FILES['files']['name'][$name];
   }
 
-  $file = $fileName.$fileExt;
+  $file = $filename . $fileext;
   $i = 0;
-  while (file_exists($destination.$file)) {
+  while (file_exists($destination . $file)) {
     $i++;
-    $file = $fileName.'_'.$i.$fileExt;
+    $file = $filename .'_'. $i . $fileext;
   }
   return $file;
 }
 
 function imagepicker_get_image_path($img, $type = 'browser') {
-  $imgBaseDir = imagepicker_get_path(false, true);
+  $imgbasedir = imagepicker_get_path(false, true);
 
   switch ($type) {
     case 'browser':
-      if (file_exists($imgBaseDir.'browser'.DIRECTORY_SEPARATOR.$img['img_name'])) {
-        $imgPath = imagepicker_get_path(true, true).'browser/'.$img['img_name'];
-      } elseif (file_exists($imgBaseDir.'thumbs'.DIRECTORY_SEPARATOR.$img['img_name'])) {
-        $imgPath = imagepicker_get_path(true, true).'thumbs/'.$img['img_name'];
+      if (file_exists($imgbasedir .'browser'. DIRECTORY_SEPARATOR . $img['img_name'])) {
+        $imgpath = imagepicker_get_path(true, true) .'browser/'. $img['img_name'];
+      }
+      elseif (file_exists($imgbasedir .'thumbs'. DIRECTORY_SEPARATOR . $img['img_name'])) {
+        $imgpath = imagepicker_get_path(true, true) .'thumbs/'. $img['img_name'];
       }
       break;
 
     case 'full':
-      if (file_exists($imgBaseDir.$img['img_name'])) {
-        $imgPath = imagepicker_get_path(true, true).$img['img_name'];
+      if (file_exists($imgbasedir . $img['img_name'])) {
+        $imgpath = imagepicker_get_path(true, true) . $img['img_name'];
       }
       break;
 
     case 'thumb':
     default:
-      if (file_exists($imgBaseDir.'thumbs'.DIRECTORY_SEPARATOR.$img['img_name'])) {
-        $imgPath = imagepicker_get_path(true, true).'thumbs/'.$img['img_name'];
-      } elseif (file_exists($imgBaseDir.'browser'.DIRECTORY_SEPARATOR.$img['img_name'])) {
-        $imgPath = imagepicker_get_path(true, true).'browser/'.$img['img_name'];
+      if (file_exists($imgbasedir .'thumbs'. DIRECTORY_SEPARATOR . $img['img_name'])) {
+        $imgpath = imagepicker_get_path(true, true) .'thumbs/'. $img['img_name'];
+      }
+      elseif (file_exists($imgbasedir .'browser'. DIRECTORY_SEPARATOR . $img['img_name'])) {
+        $imgpath = imagepicker_get_path(true, true) .'browser/'. $img['img_name'];
       }
       break;
   }
 
-  return $imgPath ? $imgPath : '';
+  return $imgpath ? $imgpath : '';
 }
 
-function imagepicker_scale_image($source, $destination, $maxSize) {
+function imagepicker_scale_image($source, $destination, $maxsize) {
   $info = image_get_info($source);
 
-  $width = ($maxSize >= $info['width']) ? $info['width'] : $maxSize;
-  $height = ($maxSize >= $info['height']) ? $info['height'] : $maxSize;
+  $width = ($maxsize >= $info['width']) ? $info['width'] : $maxsize;
+  $height = ($maxsize >= $info['height']) ? $info['height'] : $maxsize;
 
   $aspect = $info['height'] / $info['width'];
   if ($aspect < $height / $width) {
     $width = (int)min($width, $info['width']);
     $height = (int)round($width * $aspect);
-  } else {
+  }
+  else {
     $height = (int)min($height, $info['height']);
     $width = (int)round($height / $aspect);
   }
@@ -409,31 +423,32 @@ function imagepicker_browse() {
 
   global $user, $base_url;
 
-  $imgList = db_query("SELECT * FROM {imagepicker} WHERE uid = '%d' ORDER BY img_date DESC", array($user->uid));
-  if (db_num_rows($imgList)) {
+  $imglist = db_query("SELECT * FROM {imagepicker} WHERE uid = '%d' ORDER BY img_date DESC", array($user->uid));
+  if (db_num_rows($imglist)) {
     $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
 
-    $content = '<div class="help">'.t('Hold the mouse over an image to view Title and Description, Click on it to use.').'</div>';
+    $content = '<div class="help">'. t('Hold the mouse over an image to view Title and Description, Click on it to use.') .'</div>';
     $content .= '<div class="clear-block">';
     $ct = 0;
-    while ($img = db_fetch_array($imgList)) {
-      $imgPath = imagepicker_get_image_path($img, 'browser');
-      if ($imgPath) {
-        $formLink = url('imagepicker/browse/'.$img['img_id']);
-        $tooltip = $img['img_title'].' '.$img['img_description'];
-        $content .= '<div class="imgp_holder"><a href="'.$formLink.'">';
-        $content .= '<img src="'.$imgPath.'" alt="'.$img['img_title'].'" title="'.$tooltip.'" />';
+    while ($img = db_fetch_array($imglist)) {
+      $imgpath = imagepicker_get_image_path($img, 'browser');
+      if ($imgpath) {
+        $formlink = url('imagepicker/browse/'. $img['img_id']);
+        $tooltip = $img['img_title'] .' '. $img['img_description'];
+        $content .= '<div class="imgp_holder"><a href="'. $formlink .'">';
+        $content .= '<img src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $tooltip .'" />';
         $content .= '</a></div>';
         $ct++;
-        if ( $browsercols > 0 && $ct >= $browsercols ) {
-			$content .= '</div><div class="clear-block">';
-			$ct = 0;
+        if ($browsercols > 0 && $ct >= $browsercols) {
+          $content .= '</div><div class="clear-block">';
+          $ct = 0;
         }
       }
     }
     $content .= '</div>';
-  } else {
-    $content = '<div class="messages">'.t('You do not have any uploaded images').'</div>';
+  }
+  else {
+    $content = '<div class="messages">'. t('You do not have any uploaded images') .'</div>';
   }
 
   theme('imagepicker', $content);
@@ -442,36 +457,40 @@ function imagepicker_browse() {
 function imagepicker_image_select() {
   global $user;
 
-  $result = db_query("SELECT * FROM {imagepicker} WHERE uid = '%d' AND img_id = '%d' LIMIT 1", array($user->uid, arg(2)));
+  $result = db_query_range("SELECT * FROM {imagepicker} WHERE uid = '%d' AND img_id = '%d'", $user->uid, arg(2), 0, 1);
   if (db_num_rows($result)) {
     $img = db_fetch_array($result);
     drupal_add_js(imagepicker_js($img), 'inline');
-    $imgPath = imagepicker_get_image_path($img, 'browser');
-    $content = '<div class="help">'.t('Choose the settings you want, place the cursor in the Body box above and Insert image.').'</div>';
-    if ( $img['img_title'] ) {
-      $content .= '<div id="imgp_img_holder_title">'.$img['img_title'].'</div>';
+    $imgpath = imagepicker_get_image_path($img, 'browser');
+    $content = '<div class="help">'. t('Choose the settings you want, place the cursor in the Body box above and Insert image.') .'</div>';
+    if ($img['img_title']) {
+      $content .= '<div id="imgp_img_holder_title">'. $img['img_title'] .'</div>';
     }
-    if ( $img['img_description'] ) {
-      $content .= '<div id="imgp_img_holder_description">'.$img['img_description'].'</div>';
+    if ($img['img_description']) {
+      $content .= '<div id="imgp_img_holder_description">'. $img['img_description'] .'</div>';
     }
     $content .= '<div id="imgp_img_holder">';
-    $content .= '<img id="imgp_img" src="'.$imgPath.'" alt="'.$img['img_title'].'" title="'.$img['img_title'].'" />';
+    $content .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_title'] .'" />';
     $content .= '</div>';
     $content .= drupal_get_form('imagepicker_image_form');
+  }
+  else {
+    drupal_set_message(t('Image  not found.'), 'error');
+    $content = '';
   }
 
   theme('imagepicker', $content);
 }
 
 function imagepicker_image_form() {
-  $showOptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
-  $linkOptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page'));
-  $alignOptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
+  $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
+  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page'));
+  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
   $form['align'] = array(
     '#type' => 'radios',
     '#title' => t('Align'),
     '#default_value' => 'none',
-    '#options' => $alignOptions,
+    '#options' => $alignoptions,
     '#description' => '',
     '#prefix' => '<div class="imgp_img_options">',
     '#suffix' => '</div>'
@@ -481,7 +500,7 @@ function imagepicker_image_form() {
     '#id' => 'show',
     '#title' => t('Show'),
     '#default_value' => 'full',
-    '#options' => $showOptions,
+    '#options' => $showoptions,
     '#description' => '',
     '#prefix' => '<div class="imgp_img_options">',
     '#suffix' => '</div>'
@@ -490,7 +509,7 @@ function imagepicker_image_form() {
     '#type' => 'radios',
     '#title' => t('Link'),
     '#default_value' => 'none',
-    '#options' => $linkOptions,
+    '#options' => $linkoptions,
     '#description' => '',
     '#prefix' => '<div class="imgp_img_options">',
     '#suffix' => '</div>'
@@ -522,29 +541,37 @@ function imagepicker_image_form_submit($form_id, $form_values) {
     imagepicker_image_delete();
   }
   elseif ($form_values['op'] == t('Edit image')) {
-    drupal_goto('imagepicker/edit/'.arg(2), null, null, 302);
+    drupal_goto('imagepicker/edit/'. arg(2), null, null, 302);
   }
 }
 
 function imagepicker_image_delete() {
   global $user;
 
-  $img = db_fetch_array(db_query("SELECT uid, img_name FROM {imagepicker} WHERE img_id = '%d' LIMIT 1", array(arg(2))));
-  if ($img['uid'] != $user->uid) {
-    drupal_set_message(t('This image does not belong to you.'), 'error');
-    watchdog('imagepicker', t('User uid %d attempted to delete image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
-  } else {
-    $destination = imagepicker_get_path(false, true);
-    $thumbsDir = $destination.'thumbs'.DIRECTORY_SEPARATOR;
-    $browserDir = $destination.'browser'.DIRECTORY_SEPARATOR;
-    file_delete($destination.$img['img_name']);
-    file_delete($thumbsDir.$img['img_name']);
-    file_delete($browserDir.$img['img_name']);
-    if (db_query("DELETE FROM {imagepicker} WHERE uid = '%d' AND img_id = '%d' LIMIT 1", array($user->uid, arg(2)))) {
-      drupal_set_message(t('Image was successfully deleted'));
-    } else {
-      drupal_set_message(t('Error while trying to delete your image from database.'));
+  $result = db_query_range("SELECT uid, img_name FROM {imagepicker} WHERE img_id = '%d'", arg(2), 0, 1);
+  if (db_num_rows($result)) {
+    $img = db_fetch_array($result);
+    if ($img['uid'] != $user->uid) {
+      drupal_set_message(t('This image does not belong to you.'), 'error');
+      watchdog('imagepicker', t('User uid %d attempted to delete image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
     }
+    else {
+      $destination = imagepicker_get_path(false, true);
+      $thumbsdir = $destination .'thumbs'. DIRECTORY_SEPARATOR;
+      $browserdir = $destination .'browser'. DIRECTORY_SEPARATOR;
+      file_delete($destination . $img['img_name']);
+      file_delete($thumbsdir . $img['img_name']);
+      file_delete($browserdir . $img['img_name']);
+      if (db_query("DELETE FROM {imagepicker} WHERE uid = '%d' AND img_id = '%d'", array($user->uid, arg(2)))) {
+        drupal_set_message(t('Image was successfully deleted'));
+      }
+      else {
+        drupal_set_message(t('Error while trying to delete your image from database.'));
+      }
+    }
+  }
+  else {
+    drupal_set_message(t('Image  not found.'), 'error');
   }
 
   drupal_goto('imagepicker/browse', null, null, 302);
@@ -556,15 +583,23 @@ function imagepicker_image_delete() {
 function imagepicker_image_edit() {
   global $user, $base_url;
 
-  $img = db_fetch_array(db_query("SELECT * FROM {imagepicker} WHERE img_id = '%d' LIMIT 1", array(arg(2))));
-  if ($img['uid'] != $user->uid) {
-    drupal_set_message(t('This image does not belong to you.'), 'error');
-    watchdog('imagepicker', t('User uid %d attempted to edit image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
+  $result = db_query_range("SELECT * FROM {imagepicker} WHERE img_id = '%d'", arg(2), 0, 1);
+  if (db_num_rows($result)) {
+    $img = db_fetch_array($result);
+    if ($img['uid'] != $user->uid) {
+      drupal_set_message(t('This image does not belong to you.'), 'error');
+      watchdog('imagepicker', t('User uid %d attempted to edit image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
+      $content = '';
+    }
+    else {
+      $imgsrc = imagepicker_get_image_path($img, 'browser');
+      $content = '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
+      $content .= drupal_get_form('imagepicker_edit_form', $img);
+    }
+  }
+  else {
+    drupal_set_message(t('Image  not found.'), 'error');
     $content = '';
-  } else {
-    $imgSrc = imagepicker_get_image_path($img, 'browser');
-    $content = '<div id="imgp_img_holder"><img src="'.$imgSrc.'" alt="'.check_plain($img['img_title']).'" /></div>';
-    $content .= drupal_get_form('imagepicker_edit_form', $img);
   }
 
   theme('imagepicker', $content);
@@ -606,24 +641,32 @@ function imagepicker_edit_form(&$img) {
 function imagepicker_edit_form_submit($form_id, $form_values) {
   global $user;
 
-  $img = db_fetch_array(db_query("SELECT uid, img_id FROM {imagepicker} WHERE img_id = '%d' LIMIT 1", array(arg(2))));
-  if ($img['uid'] == $user->uid) {
-    if (t('Submit') == $form_values['op']) {
-      $title = htmlspecialchars($form_values['title']);
-      $description = htmlspecialchars($form_values['description']);
-      if (db_query("UPDATE {imagepicker} SET img_title = '%s', img_description = '%s' WHERE img_id = '%d' LIMIT 1", array($title, $description, arg(2)))) {
-        drupal_set_message(t('Image was successfully updated.'));
-      } else {
-        drupal_set_message(t('Error while updating image.'));
+  $result = db_query_range("SELECT uid, img_name FROM {imagepicker} WHERE img_id = '%d'", arg(2), 0, 1);
+  if (db_num_rows($result)) {
+    $img = db_fetch_array($result);
+    if ($img['uid'] == $user->uid) {
+      if (t('Submit') == $form_values['op']) {
+        $title = htmlspecialchars($form_values['title']);
+        $description = htmlspecialchars($form_values['description']);
+        if (db_query("UPDATE {imagepicker} SET img_title = '%s', img_description = '%s' WHERE img_id = '%d'", array($title, $description, arg(2)))) {
+          drupal_set_message(t('Image was successfully updated.'));
+        }
+        else {
+          drupal_set_message(t('Error while updating image.'));
+        }
+        drupal_goto('imagepicker/browse/'. $img['img_id'], null, null, 302);
       }
-      drupal_goto('imagepicker/browse/'.$img['img_id'], null, null, 302);
     }
-  } else {
-    drupal_set_message(t('This image does not belong to you.'), 'error');
-    watchdog('imagepicker', t('User uid %d attempted to edit image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
+    else {
+      drupal_set_message(t('This image does not belong to you.'), 'error');
+      watchdog('imagepicker', t('User uid %d attempted to edit image belonging to user uid %d'), array($user->uid, $img['uid']), WATCHDOG_WARNING);
+    }
+  }
+  else {
+    drupal_set_message(t('Image  not found.'), 'error');
   }
 
-  drupal_goto('imagepicker/browse/'.arg(2), null, null, 302);
+  drupal_goto('imagepicker/browse/'. arg(2), null, null, 302);
 }
 
 /**
@@ -632,26 +675,33 @@ function imagepicker_edit_form_submit($form_id, $form_values) {
 function imagepicker_image_page() {
   global $base_url;
 
-  $img = db_fetch_array(db_query("SELECT i.*, u.name FROM {imagepicker} AS i JOIN {users} AS u USING (uid) WHERE img_id = '%d' LIMIT 1", array(arg(2))));
-
-  if (!is_array($img) || !count($img)) {
-    drupal_set_message(t('Image not found.'), 'error');
-    $content = '';
-  } else {
-    $path = drupal_get_path('module', 'imagepicker');
-    drupal_add_css( $path . '/imagepicker.css');
-    drupal_set_title($img['img_title']);
-    $imgSrc = imagepicker_get_path(true, $img).$img['img_name'];
-    $content = '
+  $result = db_query_range("SELECT i.*, u.name FROM {imagepicker} AS i JOIN {users} AS u USING (uid) WHERE img_id = '%d'", arg(2), 0, 1);
+  if (db_num_rows($result)) {
+    $img = db_fetch_array($result);
+    if (!is_array($img) || !count($img)) {
+      drupal_set_message(t('Image not found.'), 'error');
+      $content = '';
+    }
+    else {
+      $path = drupal_get_path('module', 'imagepicker');
+      drupal_add_css($path .'/imagepicker.css');
+      drupal_set_title($img['img_title']);
+      $imgsrc = imagepicker_get_path(true, $img) . $img['img_name'];
+      $content = '
       <div id="imgp_page">
-        <div id="imgp_page_img"><a href="'.$imgSrc.'" alt="'.$img['img_title'].'" target="_blank"><img src="'.$imgSrc.'" alt="'.$img['img_title'].'" /></a></div>
-        <div>'.nl2br($img['img_description']).'</div>
+        <div id="imgp_page_img"><a href="'. $imgsrc .'" alt="'. $img['img_title'] .'" target="_blank"><img src="'. $imgsrc .'" alt="'. $img['img_title'] .'" /></a></div>
+        <div>'. nl2br($img['img_description']) .'</div>
 ';
-        if (variable_get('imagepicker_default_pagelink', 1)) {
-          $content .= '        <div><a href="#" onclick="history.back()">'.t('Return to page').'</a></div>
+      if (variable_get('imagepicker_default_pagelink', 1)) {
+        $content .= '        <div><a href="#" onclick="history.back()">'. t('Return to page') .'</a></div>
 ';
-        }
-        $content .= '      </div>';
+      }
+      $content .= '      </div>';
+    }
+  }
+  else {
+    drupal_set_message(t('Image  not found.'), 'error');
+    $content = '';
   }
 
   echo theme('page', $content);
@@ -660,7 +710,7 @@ function imagepicker_image_page() {
 function theme_imagepicker(&$content) {
   $head_title = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
   $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css( $path . '/imagepicker.css');
+  drupal_add_css($path .'/imagepicker.css');
   $styles = drupal_get_css();
   $scripts = drupal_get_js();
   $tabs = theme('menu_local_tasks');
@@ -674,19 +724,14 @@ function theme_imagepicker(&$content) {
 // and show them all paths... So lets strip these messages if there are any.
 function imagepicker_strip_messages($msg) {
   if ($msg) {
-    $dirSep = (DIRECTORY_SEPARATOR == '\\') ? '\\\\' : '\/';
-    $pattern = '/<li>.*'.$dirSep.'imagepicker'.$dirSep.'.*<\/li>/i';
+    $dirsep = (DIRECTORY_SEPARATOR == '\\') ? '\\\\' : '\/';
+    $pattern = '/<li>.*'. $dirsep .'imagepicker'. $dirsep .'.*<\/li>/i';
     $msg = preg_replace($pattern, '', $msg);
   }
   return $msg;
 }
 
 function imagepicker_js($img) {
-  global $user;
-
-  $imgDir = imagepicker_get_path(true, true);
-  $thumbsDir = $imgDir.'thumbs/';
-  $browserDir = $imgDir.'browser/';
 
   return "
   function imagepickerInsert(button) {
@@ -697,10 +742,10 @@ function imagepicker_js($img) {
       var imgpLink = 'file';
       var imgpAlign = 'none';
       var imgpImagePath;
-      var imgpImageTitle = '".($img['img_title'] ? addslashes($img['img_title']) : t('Image'))."';
-      var imgpFileLink = '".imagepicker_get_image_path($img, 'full')."';
-      var imgpThumbLink = '".imagepicker_get_image_path($img, 'thumb')."';
-      var imgpPageLink = '".url('imagepicker/image/'.$img['img_id'])."';
+      var imgpImageTitle = '". ($img['img_title'] ? addslashes($img['img_title']) : t('Image')) ."';
+      var imgpFileLink = '". imagepicker_get_image_path($img, 'full') ."';
+      var imgpThumbLink = '". imagepicker_get_image_path($img, 'thumb') ."';
+      var imgpPageLink = '". url('imagepicker/image/'. $img['img_id']) ."';
       var imgpImageElement;
       var imgpLinkElement;
       var imgpImageStyle;
@@ -752,7 +797,8 @@ function imagepicker_js($img) {
       // Create an image or span (containing title) HTML string
       if (imgpImagePath) {
         imgpImageElement = '<img src=\"'+imgpImagePath+'\" alt=\"'+imgpImageTitle+'\" ' + imgpImageStyle + ' \/>';
-      } else {
+      }
+      else {
         imgpImageElement = '<span>'+imgpImageTitle+'<\/span>'
       }
 
@@ -776,7 +822,8 @@ function imagepicker_js($img) {
       var isTinyMCE = win.document.getElementById('mce_editor_0');
       if (isTinyMCE) {
         win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
-      } else {
+      }
+      else {
         var nodeBody = win.document.getElementById('edit-body');
         if (nodeBody) {
           insertAtCursor(nodeBody, imgpInsertion);
@@ -811,7 +858,8 @@ function imagepicker_js($img) {
       var endPos = myField.selectionEnd;
       myField.value = myField.value.substring(0, startPos)+ myValue + myField.value.substring(endPos, myField.value.length);
 
-    } else {
+    }
+    else {
       myField.value += myValue;
     }
   }
@@ -873,7 +921,7 @@ function imagepicker_settings() {
   $form['imagepicker_advanced'] = array(
     '#type' => 'fieldset',
     '#title' => t('Advanced imagepicker settings'),
-    '#description' => t('You can alter the default styling of the iframe here,<br/>useful if the iframe is not fitting in with your theme.'),
+    '#description' => t('You can alter the default styling of the iframe here,<br />useful if the iframe is not fitting in with your theme.'),
     '#collapsible' => FALSE,
   );
   $form['imagepicker_advanced']['imagepicker_advanced_iframe_width'] = array(
@@ -928,7 +976,7 @@ function imagepicker_settings_validate($form_id, $form_values) {
   if (! is_numeric($form_values['imagepicker_default_browser_thumbnail_size'])) {
     form_set_error('imagepicker_default_browser_thumbnail_size', t('The Browser Thumbnail field must be a number'));
   }
-  if ( strlen($form_values['imagepicker_default_scale']) && ! is_numeric($form_values['imagepicker_default_scale'])) {
+  if (strlen($form_values['imagepicker_default_scale']) && ! is_numeric($form_values['imagepicker_default_scale'])) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
   }
   if (! is_numeric($form_values['imagepicker_advanced_iframe_height'])) {
