@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-05-31
+------------------------------------
+by hutch, brought module up to drupal coding standards
+
 Image Picker 5.x-1.x-dev, 2008-05-30
 ------------------------------------
 By hutch, numerous changes by new maintainer
