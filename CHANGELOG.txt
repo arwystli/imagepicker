@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-06-06
+------------------------------------
+by hutch, #266621 fixed bug in support for comments
+
 Image Picker 5.x-1.x-dev, 2008-06-04
 ------------------------------------
 by hutch, #266621 added support for comments
