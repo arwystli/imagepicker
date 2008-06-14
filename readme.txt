@@ -1,7 +1,7 @@
-Imagepicker module for Drupal 5.1
+Imagepicker module for Drupal 6.x
 
 If you'll have any questions or suggestions please contact me at
-algisimu@gmail.com
+http://drupal.org/user/52366
 
 This module will help you to upload images and insert them into your nodes in a
 very easy way. To set up it follow next 5 steps and you should be done.

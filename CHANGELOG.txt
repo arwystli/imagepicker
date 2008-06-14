@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker for D6 in HEAD
+------------------------------------
+by hutch, beta version for Drupal 6 
+
 Image Picker 5.x-1.x-dev, 2008-06-06
 ------------------------------------
 by hutch, #266621 fixed bug in support for comments

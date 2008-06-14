@@ -1,4 +1,5 @@
+; $Id$
 name = Imagepicker
 description = Upload, browse and add images to your nodes.
 package = Other
-
+core = 6.x

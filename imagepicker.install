@@ -2,6 +2,9 @@
 // $Id$
 // $Name$
 
+/**
+* Implementation of hook_install().
+*/
 function imagepicker_install() {
   // Create a directory structure so that usernames would be divided by letters.
   $drupalDir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()).DIRECTORY_SEPARATOR;
@@ -17,56 +20,64 @@ function imagepicker_install() {
         drupal_set_message(t('directory creation for the Imagepicker module was unsuccessful.'), 'error');
       }
     }
-
-    $created1 = db_query("INSERT INTO {sequences} (name, id) VALUES ('imagepicker_img_id', 0);");
-
-    switch ($GLOBALS['db_type']) {
-      case 'mysql':
-      case 'mysqli':
-        $created2 = db_query("
-          CREATE TABLE {imagepicker} (
-          `img_id` int(11) unsigned NOT NULL,
-          `uid` int(10) unsigned NOT NULL,
-          `img_name` varchar(255) NOT NULL,
-          `img_title` varchar(255) default NULL,
-          `img_description` varchar(255) default NULL,
-          `img_date` timestamp NOT NULL,
-          PRIMARY KEY (`img_id`),
-          KEY `uid` (`uid`)
-          )
-        ");
-        break;
-
-/*
-      case 'pgsql':
-        db_query("
-          CREATE TABLE {imagepicker} (
-          img_id integer UNIQUE,
-          uid integer NOT NULL,
-          img_name varchar(255) NOT NULL,
-          img_title varchar(255) NULL,
-          img_description varchar(255) NULL,
-          img_date timestamp DEFAULT current_timestamp,
-          CONSTRAINT imagepicker_uid INDEX(uid)
-        );
-      ");
-      break;
-*/
-    }
-    if (!$created1 || !$created2) {
-      drupal_set_message(t('Table installation for the Imagepicker module was unsuccessful.'), 'error');
-    }
-    else {
-      drupal_set_message(t('Table installation for the Imagepicker module was successful. Go to Site Configuration to set preferences.'), '');
-    }
   }
-  else {
-    drupal_set_message(t('directory creation for the Imagepicker module was unsuccessful.'), 'error');
-  }
+
+  // Create tables.
+  drupal_install_schema('imagepicker');
 }
 
+/**
+* Implementation of hook_schema().
+*/
+function imagepicker_schema() {
+  $schema['imagepicker'] = array(
+   'fields' => array(
+     'img_id' => array(
+       'description' => t('The primary identifier for an image.'),
+       'type' => 'serial',
+       'unsigned' => TRUE,
+       'not null' => TRUE,
+     'uid' => array(
+       'description' => t('The user identifier for an image.'),
+       'type' => 'int',
+       'unsigned' => TRUE,
+       'not null' => TRUE,
+       'default' => 0),
+     'img_name' => array(
+       'type' => 'varchar',
+       'length' => 255,
+       'not null' => TRUE,
+       'default' => ''),
+     'img_title' => array(
+       'type' => 'varchar',
+       'length' => 255,
+       'not null' => TRUE,
+       'default' => ''),
+     'img_description' => array(
+       'type' => 'varchar',
+       'length' => 255,
+       'not null' => TRUE,
+       'default' => ''),
+     'img_date' => array(
+       'type' => 'datetime',
+       'not null' => TRUE),
+    ),
+    'indexes' => array(
+      'uid' => array('uid'),
+    ),
+    'primary key' => array('img_id'),
+  );
+
+  return $schema;
+
+}
+
+/**
+* Implementation of hook_uninstall().
+*/
 function imagepicker_uninstall() {
-  db_query('DROP TABLE {imagepicker};');
-  db_query("DELETE FROM {sequences} WHERE name = 'imagepicker_img_id';");
+  // Remove tables.
+  drupal_uninstall_schema('imagepicker');
+
   db_query("DELETE FROM {variable} WHERE name LIKE 'imagepicker_%';");
 }
