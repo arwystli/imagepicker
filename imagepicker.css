@@ -1,3 +1,6 @@
+/* $Id$ */
+/* $Name$ */
+
 body {
 	background-color: white!important;
 }
@@ -49,4 +52,10 @@ tbody {
 }
 #imgp_edit_form .form-item {
 	margin-top: 0;
+}
+#imgp_img_holder_title {
+	font-weight: bold;
+}
+#imgp_img_holder_description {
+	font-style: italic;
 }
