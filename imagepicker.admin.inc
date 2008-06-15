@@ -62,6 +62,38 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_default_pagelink', 1),
     '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
   );
+  // alignment settings
+  $form['imagepicker_align'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Image alignment settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['imagepicker_align']['imagepicker_default_align_show'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show Alignment options'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_default_align_show', 1),
+    '#description' => t('Unsetting this option will remove the alignment options from the insert page.'),
+  );
+  $form['imagepicker_align']['imagepicker_default_fleft'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Float left code'),
+    '#size' => 25,
+    '#maxlength' => 50,
+    '#required' => TRUE,
+    '#default_value' => variable_get('imagepicker_default_fleft', 'style="float: left"'),
+    '#description' => t('Configure the default code used for float left styling.'),
+  );
+  $form['imagepicker_align']['imagepicker_default_fright'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Float right code'),
+    '#size' => 25,
+    '#maxlength' => 50,
+    '#required' => TRUE,
+    '#default_value' => variable_get('imagepicker_default_fright', 'style="float: right"'),
+    '#description' => t('Configure the default code used for float right styling.'),
+  );
   // advanced settings
   $form['imagepicker_advanced'] = array(
     '#type' => 'fieldset',
@@ -131,6 +163,12 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   }
   if (strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
+  }
+  if (! strlen($form_state['values']['imagepicker_default_fleft'])) {
+    form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));
+  }
+  if (! strlen($form_state['values']['imagepicker_default_fright'])) {
+    form_set_error('imagepicker_default_fright', t('You must fill in the Right alignment field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_iframe_height'])) {
     form_set_error('imagepicker_advanced_iframe_height', t('The Iframe height must be a number'));

@@ -1,6 +1,10 @@
 // $Id$
 
-Image Picker for D6 in HEAD
+Image Picker for D6 in HEAD, 2006-06-15
+------------------------------------
+by hutch, fixed bug in install, added alignment options
+
+Image Picker for D6 in HEAD, 2006-06-14
 ------------------------------------
 by hutch, beta version for Drupal 6 
 

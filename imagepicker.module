@@ -193,16 +193,18 @@ function imagepicker_image_select() {
 function imagepicker_image_form() {
   $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
   $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page'));
-  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
-  $form['align'] = array(
-    '#type' => 'radios',
-    '#title' => t('Align'),
-    '#default_value' => 'none',
-    '#options' => $alignoptions,
-    '#description' => '',
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
-  );
+  if (variable_get('imagepicker_default_align_show', 1)) {
+    $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
+    $form['align'] = array(
+      '#type' => 'radios',
+      '#title' => t('Align'),
+      '#default_value' => 'none',
+      '#options' => $alignoptions,
+      '#description' => '',
+      '#prefix' => '<div class="imgp_img_options">',
+      '#suffix' => '</div>'
+    );
+  }
   $form['show'] = array(
     '#type' => 'radios',
     '#id' => 'show',
@@ -408,7 +410,7 @@ function imagepicker_strip_messages($msg) {
 
 function imagepicker_js($img) {
 
-  return "
+  $ret = "
   function imagepickerInsert(button) {
     // Get the form element
     var imgpForm = document.getElementById('imagepicker-image-form');
@@ -439,6 +441,9 @@ function imagepicker_js($img) {
           var imgpLink = imgpForm.link[i].value
         }
       }
+";
+  if (variable_get('imagepicker_default_align_show', 1)) {
+    $ret .= "
       // Get align value
       for (i = 0; i < imgpForm.align.length; i++) {
         if(imgpForm.align[i].checked) {
@@ -461,7 +466,14 @@ function imagepicker_js($img) {
           imgpImageStyle = '';
           break;
       }
-
+";
+  }
+  else {
+    $ret .= "
+      imgpImageStyle = '';
+";
+  }
+  $ret .= "
       switch (imgpShow) {
         case 'full': imgpImagePath = imgpFileLink; break;
         case 'title': imgpImagePath = ''; break;
@@ -542,6 +554,7 @@ function imagepicker_js($img) {
       myField.value += myValue;
     }
   }
-  ";
+";
+  return $ret;
 }
 
