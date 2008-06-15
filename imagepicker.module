@@ -454,11 +454,11 @@ function imagepicker_js($img) {
       // Create a style for image holder
       switch (imgpAlign) {
         case 'fleft':
-          imgpImageStyle = ' style=\"float: left;\"';
+          imgpImageStyle = '". variable_get('imagepicker_default_fleft', 'style="float: left"') ."';
           break;
 
         case 'fright':
-          imgpImageStyle = ' style=\"float: right;\"';
+          imgpImageStyle = '". variable_get('imagepicker_default_fright', 'style="float: right"') ."';
           break;
 
         case 'none':
