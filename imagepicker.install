@@ -25,7 +25,7 @@ function imagepicker_install() {
       case 'mysqli':
         $created2 = db_query("
           CREATE TABLE {imagepicker} (
-          `img_id` int(11) unsigned NOT NULL,
+          `img_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
           `uid` int(10) unsigned NOT NULL,
           `img_name` varchar(255) NOT NULL,
           `img_title` varchar(255) default NULL,

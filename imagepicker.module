@@ -258,7 +258,7 @@ function imagepicker_upload_form_submit($form_id, $form_values) {
           $nextimgid = db_next_id('{imagepicker}_img_id');
           $title = htmlspecialchars($form_values['title']);
           $description = htmlspecialchars($form_values['description']);
-          if (db_query("INSERT INTO {imagepicker} (img_id, uid, img_name, img_title, img_description) VALUES ('%d', '%d', '%s', '%s', '%s')", array($nextimgid, $user->uid, $file, $title, $description))) {
+          if (db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description) VALUES ('%d', '%s', '%s', '%s')", array($user->uid, $file, $title, $description))) {
             drupal_set_message(t('Image was successfully uploaded.'));
             drupal_goto('imagepicker/browse/'. $nextimgid);
           }

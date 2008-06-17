@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-06-17
+------------------------------------
+by hutch, added auto-increment to img_id field
+
 Image Picker 5.x-1.x-dev, 2008-06-15
 ------------------------------------
 by hutch, added more settings options
