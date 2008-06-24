@@ -438,7 +438,7 @@ function imagepicker_browse() {
       $imgpath = imagepicker_get_image_path($img, 'browser');
       if ($imgpath) {
         $formlink = url('imagepicker/browse/'. $img['img_id']);
-        $tooltip = $img['img_title'] .' '. $img['img_description'];
+        $tooltip =  $img['img_name'].': '. $img['img_title'] .' '. $img['img_description'];
         $content .= '<div class="imgp_holder"><a href="'. $formlink .'">';
         $content .= '<img src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $tooltip .'" />';
         $content .= '</a></div>';
@@ -474,7 +474,7 @@ function imagepicker_image_select() {
       $content .= '<div id="imgp_img_holder_description">'. $img['img_description'] .'</div>';
     }
     $content .= '<div id="imgp_img_holder">';
-    $content .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_title'] .'" />';
+    $content .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_name'] .'" />';
     $content .= '</div>';
     $content .= drupal_get_form('imagepicker_image_form');
   }
@@ -489,6 +489,9 @@ function imagepicker_image_select() {
 function imagepicker_image_form() {
   $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
   $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page'));
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
+    $linkoptions['lightbox'] = t('Lightbox');
+  }
   if (variable_get('imagepicker_default_align_show', 1)) {
     $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
     $form['align'] = array(
@@ -710,7 +713,7 @@ function imagepicker_image_page() {
     $content = '';
   }
 
-  echo theme('page', $content);
+  return $content;
 }
 
 function theme_imagepicker(&$content) {
@@ -822,10 +825,16 @@ function imagepicker_js($img) {
       switch (imgpLink) {
         case 'none': imgpLinkElement = '%imgpImageElement%'; break;
         case 'page': imgpLinkElement = '<a href=\"'+imgpPageLink+'\" title=\"'+imgpImageTitle+'\" >%imgpImageElement%<\/a>'; break;
-        case 'file':
+        case 'file': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
+";
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
+  $ret .= "
+        case 'lightbox': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" rel=\"" .variable_get('imagepicker_lightbox2_insert', 'lightbox') . "\" >%imgpImageElement%<\/a>'; break;
+";
+  }
+  $ret .= "
         default: imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
       }
-
       // Create a HTML string which should be inserted in the node body
       imgpInsertion = imgpLinkElement.replace('%imgpImageElement%', imgpImageElement);
 
@@ -980,6 +989,31 @@ function imagepicker_settings() {
     '#default_value' => variable_get('imagepicker_default_fright', 'style="float: right"'),
     '#description' => t('Configure the default code used for float right styling.'),
   );
+  if (module_exists('lightbox2')) {
+    // lightbox2 integration
+    $form['imagepicker_lightbox2'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Lightbox integration'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Lightbox2 in Imagepicker'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_lightbox2_enable', 1),
+      '#description' => t('Unsetting this option will disable Lightbox2 in Imagepicker.'),
+    );
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Default Lightbox insert'),
+      '#size' => 15,
+      '#maxlength' => 30,
+      '#required' => TRUE,
+      '#default_value' => variable_get('imagepicker_lightbox2_insert', 'lightbox'),
+      '#description' => t('Configure the default code inserted into the "rel" attribute.'),
+    );
+  }
   // advanced settings
   $form['imagepicker_advanced'] = array(
     '#type' => 'fieldset',

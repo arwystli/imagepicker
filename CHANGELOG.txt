@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-06-24
+------------------------------------
+by hutch, added support for lightbox2
+
 Image Picker 5.x-1.x-dev, 2008-06-17
 ------------------------------------
 by hutch, added auto-increment to img_id field
