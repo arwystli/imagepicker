@@ -57,10 +57,11 @@ function imagepicker_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'imagepicker.edit.inc',
   );
-  $items['imagepicker/image'] = array(
+  $items['imagepicker/image/%imagepicker_img_id'] = array(
     'title' => 'Imagepicker',
     'page callback' => 'imagepicker_image_page',
-    'access arguments' => array('use imagepicker'),
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
   $items['admin/settings/imagepicker'] = array(
@@ -192,7 +193,10 @@ function imagepicker_image_select() {
 
 function imagepicker_image_form() {
   $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
-  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page'));
+  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
+    $linkoptions['lightbox'] = t('Lightbox');
+  }
   if (variable_get('imagepicker_default_align_show', 1)) {
     $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
     $form['align'] = array(
@@ -290,9 +294,8 @@ function imagepicker_image_delete() {
 /**
  * Menu callback; presents the image page for imagepicker
  */
-function imagepicker_image_page() {
+function imagepicker_image_page($img_id) {
   global $base_url;
-  $img_id = arg(2);
 
   $result = db_query_range("SELECT i.*, u.name FROM {imagepicker} AS i JOIN {users} AS u USING (uid) WHERE img_id = '%d'", $img_id, 0, 1);
   $img = db_fetch_array($result);
@@ -318,7 +321,7 @@ function imagepicker_image_page() {
     $content = '';
   }
 
-  echo theme('page', $content);
+  return $content;
 }
 
 /**
@@ -493,7 +496,14 @@ function imagepicker_js($img) {
       switch (imgpLink) {
         case 'none': imgpLinkElement = '%imgpImageElement%'; break;
         case 'page': imgpLinkElement = '<a href=\"'+imgpPageLink+'\" title=\"'+imgpImageTitle+'\" >%imgpImageElement%<\/a>'; break;
-        case 'file':
+        case 'file': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
+";
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
+  $ret .= "
+        case 'lightbox': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" rel=\"" .variable_get('imagepicker_lightbox2_insert', 'lightbox') . "\" >%imgpImageElement%<\/a>'; break;
+";
+  }
+  $ret .= "
         default: imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
       }
 
@@ -556,5 +566,9 @@ function imagepicker_js($img) {
   }
 ";
   return $ret;
+}
+
+function imagepicker_img_id_load($arg) {
+  return (is_numeric($arg) ? $arg : FALSE);
 }
 

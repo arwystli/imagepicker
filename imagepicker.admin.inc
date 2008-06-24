@@ -94,6 +94,31 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_default_fright', 'style="float: right"'),
     '#description' => t('Configure the default code used for float right styling.'),
   );
+  if (module_exists('lightbox2')) {
+    // lightbox2 integration
+    $form['imagepicker_lightbox2'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Lightbox integration'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Lightbox2 in Imagepicker'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_lightbox2_enable', 1),
+      '#description' => t('Unsetting this option will disable Lightbox2 in Imagepicker.'),
+    );
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Default Lightbox insert'),
+      '#size' => 15,
+      '#maxlength' => 30,
+      '#required' => TRUE,
+      '#default_value' => variable_get('imagepicker_lightbox2_insert', 'lightbox'),
+      '#description' => t('Configure the default code inserted into the "rel" attribute.'),
+    );
+  }
   // advanced settings
   $form['imagepicker_advanced'] = array(
     '#type' => 'fieldset',
@@ -179,4 +204,6 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   if (! strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
+
+
 }

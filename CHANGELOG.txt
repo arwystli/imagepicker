@@ -1,12 +1,16 @@
 // $Id$
 
+Image Picker for D6 in HEAD, 2006-06-24
+------------------------------------
+by hutch, added support for lightbox2
+
 Image Picker for D6 in HEAD, 2006-06-15
 ------------------------------------
 by hutch, fixed bug in install, added alignment options
 
 Image Picker for D6 in HEAD, 2006-06-14
 ------------------------------------
-by hutch, beta version for Drupal 6 
+by hutch, beta version for Drupal 6
 
 Image Picker 5.x-1.x-dev, 2008-06-06
 ------------------------------------
