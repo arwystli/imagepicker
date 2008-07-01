@@ -5,12 +5,22 @@
 /**
  * Menu callback; presents the upload form for imagepicker
  */
+// iframe
 function imagepicker_upload() {
+  variable_del('imagepicker_advanced_browser_pagestart');
+  $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
   $content = drupal_get_form('imagepicker_upload_form');
   theme('imagepicker', $content);
 }
+// account
+function imagepicker_user_upload() {
+  variable_del('imagepicker_advanced_browser_pagestart');
+  $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
+  $content .= drupal_get_form('imagepicker_upload_form', TRUE);
+  return $content;
+}
 
-function imagepicker_upload_form(&$form_state) {
+function imagepicker_upload_form(&$form_state, $account=FALSE) {
   $form['#attributes']['enctype'] = 'multipart/form-data';
   $form['file_upload'] = array(
     '#type' => 'file',
@@ -18,7 +28,7 @@ function imagepicker_upload_form(&$form_state) {
     '#description' => t('Browse your computer for image file'),
     '#required' => TRUE,
     '#value' => 1
-    );
+  );
   $form['thumb'] = array(
     '#type' => 'textfield',
     '#title' => t('Thumbnail size'),
@@ -26,30 +36,34 @@ function imagepicker_upload_form(&$form_state) {
     '#default_value' => variable_get('imagepicker_default_thumbnail_size', 100),
     '#description' => t('Size in pixels of thumbnail\'s bigger side'),
     '#required' => TRUE
-    );
+  );
   $form['scale'] = array(
     '#type' => 'textfield',
     '#title' => t('Scale image'),
     '#size' => 10,
     '#default_value' => variable_get('imagepicker_default_scale', ''),
     '#description' => t('Scale image to this size in pixels if not left empty')
-    );
+  );
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#description' => t('Add title for your image')
-    );
+    '#description' => t('Add a title for your image')
+  );
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
     '#rows' => 2,
     '#cols' => 80,
-    '#description' => t('Add description for your image')
-    );
+    '#description' => t('Add a description for your image')
+  );
+  $form['account'] = array(
+    '#type' => 'hidden',
+    '#value' => $account,
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Upload'),
-    );
+  );
   return $form;
 }
 
@@ -138,7 +152,13 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           if($result) {
             $nextimgid = db_last_insert_id('imagepicker', 'img_id');
             drupal_set_message(t('Image was successfully uploaded.'));
-            drupal_goto('imagepicker/browse/'. $nextimgid);
+            if ($form_state['values']['account']) {
+              $outpath = 'user/'. $user->uid .'/imagepicker/browse';
+            }
+            else {
+              $outpath = 'imagepicker/browse/'. $nextimgid;
+            }
+            drupal_goto($outpath);
           }
           else {
             file_delete($thumbsdir . $file);
@@ -159,13 +179,19 @@ function imagepicker_upload_form_submit($form, &$form_state) {
         }
       }
       file_delete($destination . $file);
-      drupal_goto('imagepicker');
     }
     else {
       drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
-      drupal_goto('imagepicker');
     }
   }
+  if ($form_state['values']['account']) {
+    $outpath = 'user/'. $user->uid .'/imagepicker';
+  }
+  else {
+    $outpath = 'imagepicker';
+  }
+
+  drupal_goto($outpath);
 }
 
 

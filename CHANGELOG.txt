@@ -1,5 +1,11 @@
 // $Id$
 
+Image Picker for D6 in HEAD, 2006-07-01
+------------------------------------
+by hutch, added imagepicker to My Account
+added paging to browse images
+various menu fixes
+
 Image Picker for D6 in HEAD, 2006-06-24
 ------------------------------------
 by hutch, added support for lightbox2

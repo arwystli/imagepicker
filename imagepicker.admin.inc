@@ -62,6 +62,13 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_default_pagelink', 1),
     '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
   );
+  $form['imagepicker_defaults']['imagepicker_account_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Imagepicker in My Account'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_account_enabled', 1),
+    '#description' => t('Setting this option enables Imagepicker in My Account.'),
+  );
   // alignment settings
   $form['imagepicker_align'] = array(
     '#type' => 'fieldset',
@@ -159,6 +166,14 @@ function imagepicker_admin_settings() {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_browser_columns', 0),
   );
+  $form['imagepicker_advanced']['imagepicker_advanced_browser_page'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Images per page'),
+    '#description' => t('Configure the number of images shown per page in the image browser. This must be a number, 0 for no paging'),
+    '#size' => 10,
+    '#required' => TRUE,
+    '#default_value' => variable_get('imagepicker_advanced_browser_page', 20),
+  );
   $form['imagepicker_advanced']['imagepicker_advanced_collapsed'] = array(
     '#type' => 'checkbox',
     '#title' => t('Fieldset state'),
@@ -204,6 +219,4 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   if (! strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
-
-
 }
