@@ -1,16 +1,9 @@
 // $Id$
 
-Image Picker 5.x-1.x-dev, 2008-06-24
+Image Picker 5.x-1.x-dev, 2008-07-01
 ------------------------------------
-by hutch, added support for lightbox2
-
-Image Picker 5.x-1.x-dev, 2008-06-17
-------------------------------------
-by hutch, added auto-increment to img_id field
-
-Image Picker 5.x-1.x-dev, 2008-06-15
-------------------------------------
-by hutch, added more settings options
+by hutch, added imagepicker to My Account
+added paging to browse images
 
 Image Picker 5.x-1.x-dev, 2008-06-06
 ------------------------------------

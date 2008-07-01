@@ -59,3 +59,19 @@ tbody {
 #imgp_img_holder_description {
 	font-style: italic;
 }
+#imgp_img_view {
+	margin: 15px 15px 15px 15px;
+}
+#imgp_img_view_title {
+	font-weight: bold;
+}
+#imgp_img_view_img {
+
+}
+#imgp_img_view_desc {
+	font-style: italic;
+}
+.imgp_help {
+	padding: 2px 0px 4px 4px;
+	margin-left: 20px;
+}

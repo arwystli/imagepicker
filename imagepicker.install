@@ -70,3 +70,10 @@ function imagepicker_uninstall() {
   db_query("DELETE FROM {sequences} WHERE name = 'imagepicker_img_id';");
   db_query("DELETE FROM {variable} WHERE name LIKE 'imagepicker_%';");
 }
+
+function imagepicker_update_1() {
+  $ret = array();
+  $sql = "ALTER TABLE {imagepicker} CHANGE img_id img_id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT";
+  $ret[] = update_sql($sql);
+  return $ret;
+}
