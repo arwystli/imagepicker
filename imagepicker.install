@@ -14,7 +14,18 @@ function imagepicker_install() {
     foreach ($dirList as $v) {
       $newDir = $dir.DIRECTORY_SEPARATOR.$v;
       if (! file_check_directory($newDir, true)) {
-        drupal_set_message(t('directory creation for the Imagepicker module was unsuccessful.'), 'error');
+        drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
+      }
+    }
+    $errors = drupal_get_messages('error');
+    if (! count($errors)) {
+      // clear
+      drupal_get_messages();
+      drupal_set_message(t('Directory creation for the Imagepicker module was successful.'), '');
+    }
+    else {
+      foreach($errors['error'] as $error) {
+        drupal_set_message($error, 'error');
       }
     }
 
@@ -24,7 +35,7 @@ function imagepicker_install() {
       case 'mysql':
       case 'mysqli':
         $created2 = db_query("
-          CREATE TABLE {imagepicker} (
+          CREATE TABLE IF NOT EXISTS {imagepicker} (
           `img_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
           `uid` int(10) unsigned NOT NULL,
           `img_name` varchar(255) NOT NULL,
@@ -61,7 +72,7 @@ function imagepicker_install() {
     }
   }
   else {
-    drupal_set_message(t('directory creation for the Imagepicker module was unsuccessful.'), 'error');
+    drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
   }
 }
 
