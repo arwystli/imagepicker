@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker  for D6 in HEAD, 2008-07-11
+------------------------------------
+by hutch, #281241 fixed excessive messages on install.
+
 Image Picker for D6 in HEAD, 2006-07-01
 ------------------------------------
 by hutch, added imagepicker to My Account
