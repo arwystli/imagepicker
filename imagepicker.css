@@ -75,3 +75,23 @@ tbody {
 	padding: 2px 0px 4px 4px;
 	margin-left: 20px;
 }
+
+.imgp_groups_list {
+	margin: 10px 0 10px 0;
+}
+.imgp_groups_info {
+	margin: 10px 0 20px 0;
+}
+
+#imgp_groups_form .form-select, #imgp_groups_form .form-submit {
+	height: 1.5em;
+}
+#imgp_groups_form .form-select {
+	float: left;
+	margin: 14px 0px 0px 0px;
+	padding: 0px 2px 2px 2px;
+}
+#imgp_groups_form .form-submit {
+	margin: -2px 0px 8px 5px;
+	padding: 2px 2px 2px 2px;
+}

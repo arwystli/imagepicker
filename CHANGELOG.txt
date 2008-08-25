@@ -1,5 +1,12 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-08-25
+------------------------------------
+by hutch, improved menuing
+added admin mode to image browser
+added drupal paging to image browser
+added groups
+
 Image Picker 5.x-1.x-dev, 2008-07-11
 ------------------------------------
 by hutch, #281241 fixed excessive messages on install.
