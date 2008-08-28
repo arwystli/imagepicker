@@ -1291,6 +1291,7 @@ function _imagepicker_browse($src="iframe") {
   }
   $content .= '<div class="clear-block">';
   $ct = 0;
+  $imgct = 0;
   while ($img = db_fetch_array($result)) {
     // img_id img_name 	img_title 	img_description
     $imgpath = imagepicker_get_image_path($img, 'browser');
@@ -1306,11 +1307,12 @@ function _imagepicker_browse($src="iframe") {
         $ct = 0;
       }
     }
+    $imgct++;
   }
   $content .= '</div>';
   $content .= theme('pager', NULL, $how_many);
 
-  if (! count($img) || ! is_array($img)) {
+  if (! $imgct) {
     $content = '<div class="messages">'. t('You do not have any uploaded images') .'</div>';
   }
   return $content;
@@ -1726,12 +1728,28 @@ function imagepicker_group_images_form_submit($form_id, $form_values) {
   $img_id = $form_values['img_id'];
   imagepicker_delete_group_image($img_id);
   $grouplist = $form_values['grouplist'];
+  $inserted = FALSE;
   foreach ($grouplist AS $gid) {
     if ($gid > 0) {
       $record = array('gid' => $gid, 'img_id' => $img_id);
       imagepicker_insert_group_image($record);
+      $inserted = TRUE;
     }
   }
+  if (! $inserted) {
+    // need to check if this user has a state set for a group and
+    // if this gid has images in imagepicker_group_images
+    $gid = imagepicker_get_user_group_state();
+    if ($gid) {
+      $ids = imagepicker_get_images_by_group($gid);
+      if (! $ids) {
+        global $user;
+        db_query("UPDATE {imagepicker_user_groups} SET state=0 WHERE uid=%d AND state=1", array($user->uid));
+
+      }
+    }
+  }
+
 }
 
 // get all the groups for the current user;
