@@ -1285,7 +1285,7 @@ function _imagepicker_browse($src="iframe") {
     $content .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.') .'</div>';
   }
 
-  if (imagepicker_get_groups()) {
+  if (imagepicker_get_groups() && imagepicker_has_grouplist()) {
     // add groups select here
     $content .= drupal_get_form('imagepicker_browse_groups_form');
   }
@@ -1334,7 +1334,7 @@ function _imagepicker_browse_admin($src="iframe") {
   }
   // if there are groups
   $gid = 0;
-  if (imagepicker_get_groups()) {
+  if (imagepicker_get_groups() && imagepicker_has_grouplist()) {
     // add groups select here
     $content .= drupal_get_form('imagepicker_browse_groups_form');
     $gids = imagepicker_get_user_group_state();
@@ -1818,6 +1818,19 @@ function imagepicker_get_grouplist() {
   }
   return $grouplist;
 }
+function imagepicker_has_grouplist() {
+  global $user;
+  $result = db_query("
+  SELECT DISTINCT g.gid, g.group_name
+  FROM {imagepicker_user_groups} g, {imagepicker_group_images} i
+  WHERE g.uid=%d AND g.gid = i.gid", array($user->uid));
+  $ct = 0;
+  while ($row = db_fetch_array($result)) {
+        $ct++;
+  }
+  return $ct;
+}
+
 function imagepicker_get_enabled_group() {
   global $user;
   $result = db_query("
