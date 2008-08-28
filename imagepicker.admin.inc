@@ -3,6 +3,11 @@
 // $Name$
 
 /**
+ * @file
+ * admin settings functions
+ */
+
+/**
  * Menu callback; presents the settings form for imagepicker
  */
 function imagepicker_admin_settings() {
@@ -189,34 +194,34 @@ function imagepicker_admin_settings() {
  * Validate form
  */
 function imagepicker_admin_settings_validate($form_id, $form_state) {
-  if (! strlen($form_state['values']['imagepicker_default_thumbnail_size'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_default_thumbnail_size'])) {
     form_set_error('imagepicker_default_thumbnail_size', t('You must fill in the Thumbnail field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_default_thumbnail_size'])) {
     form_set_error('imagepicker_default_thumbnail_size', t('The Thumbnail field must be a number'));
   }
-  if (! strlen($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
     form_set_error('imagepicker_default_browser_thumbnail_size', t('You must fill in the Browser Thumbnail field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
     form_set_error('imagepicker_default_browser_thumbnail_size', t('The Browser Thumbnail field must be a number'));
   }
-  if (strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
+  if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
   }
-  if (! strlen($form_state['values']['imagepicker_default_fleft'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_default_fleft'])) {
     form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));
   }
-  if (! strlen($form_state['values']['imagepicker_default_fright'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_default_fright'])) {
     form_set_error('imagepicker_default_fright', t('You must fill in the Right alignment field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_iframe_height'])) {
     form_set_error('imagepicker_advanced_iframe_height', t('The Iframe height must be a number'));
   }
-  if (! strlen($form_state['values']['imagepicker_advanced_iframe_width'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_width'])) {
     form_set_error('imagepicker_advanced_iframe_width', t('You must fill in the Iframe width'));
   }
-  if (! strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
+  if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
 }

@@ -3,6 +3,11 @@
 // $Name$
 
 /**
+ * @file
+ * upload functions
+ */
+
+/**
  * Menu callback; presents the upload form for imagepicker
  */
 // iframe
@@ -149,11 +154,11 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           $description = htmlspecialchars($form_state['values']['description']);
           $date = date('Y-m-d H:i:s');
           $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($user->uid, $file, $title, $description, $date));
-          if($result) {
+          if ($result) {
             $nextimgid = db_last_insert_id('imagepicker', 'img_id');
             drupal_set_message(t('Image was successfully uploaded.'));
             if ($form_state['values']['account']) {
-              $outpath = 'user/'. $user->uid .'/imagepicker/browse';
+              $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
             }
             else {
               $outpath = 'imagepicker/browse/'. $nextimgid;
@@ -234,7 +239,7 @@ function imagepicker_get_uploaded_file_name($destination, $name) {
   $fileext = imagepicker_get_uploaded_file_extension($name);
 
   if (FALSE !== strpos($_FILES['files']['name'][$name], '.')) {
-    $filename = substr($_FILES['files']['name'][$name], 0, strrpos($_FILES['files']['name'][$name], '.'));
+    $filename = drupal_substr($_FILES['files']['name'][$name], 0, strrpos($_FILES['files']['name'][$name], '.'));
   }
   else {
     $filename = $_FILES['files']['name'][$name];

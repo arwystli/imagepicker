@@ -3,6 +3,12 @@
 <?php
 // $Id$
 // $Name$
+
+/**
+ * @file
+ * template for imagepicker iframe
+ */
+
 ?>
 <head>
   <title><?php echo $head_title ?></title>

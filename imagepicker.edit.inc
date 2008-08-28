@@ -3,6 +3,11 @@
 // $Name$
 
 /**
+ * @file
+ * Contains the functions pertaining to editing image information
+ */
+
+/**
  * Menu callback; fetches the image edit form for imagepicker
  */
 // iframe
@@ -65,7 +70,7 @@ function imagepicker_edit_form(&$form_state, $img, $account=FALSE) {
 function imagepicker_edit_form_cancel($form, &$form_state) {
   global $user;
   if ($form_state['values']['account']) {
-    $outpath = 'user/'. $user->uid .'/imagepicker/browse';
+    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
   }
   else {
     $outpath = 'imagepicker/browse/'. $img_id;
@@ -79,7 +84,7 @@ function imagepicker_edit_form_process($form, &$form_state) {
   global $user;
   $img_id = $form_state['values']['img_id'];
   if ($form_state['values']['account']) {
-    $outpath = 'user/'. $user->uid .'/imagepicker/browse';
+    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
   }
   else {
     $outpath = 'imagepicker/browse/'. $img_id;
@@ -118,7 +123,7 @@ function imagepicker_edit_form_process($form, &$form_state) {
 function _imagepicker_edit_img($img_id, $account=FALSE) {
   $content = '';
   $img =  _imagepicker_get_img($img_id);
-  if($img) {
+  if ($img) {
     $imgsrc = imagepicker_get_image_path($img, 'browser');
     $content .= "<div class='imgp_help'>". t('Edit image details') ."</div>";
     $content .= '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
