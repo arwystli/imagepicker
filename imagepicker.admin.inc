@@ -13,6 +13,52 @@
 function imagepicker_admin_settings() {
 
   // default settings
+  $form['imagepicker_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Set imagepicker settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['imagepicker_settings']['imagepicker_default_browser_thumbnail_size'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Browser Thumbnail Size'),
+    '#size' => 10,
+    '#required' => TRUE,
+    '#default_value' => variable_get('imagepicker_default_browser_thumbnail_size', 100),
+    '#description' => t('Configure the default browser thumbnail size'),
+  );
+  $node_types = node_get_types('names');
+  $form['imagepicker_settings']['imagepicker_node_types_enabled'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Node Types'),
+    '#description' => t('Set the node types you want to enable Imagepicker for.'),
+    '#default_value' => variable_get('imagepicker_node_types_enabled', array_keys($node_types)),
+    '#options' => $node_types,
+  );
+  if (module_exists('comment')) {
+    $form['imagepicker_settings']['imagepicker_comment_enabled'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Comments'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_comment_enabled', 0),
+      '#description' => t('Setting this option enables Imagepicker in comments.'),
+    );
+  }
+  $form['imagepicker_settings']['imagepicker_default_pagelink'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show return link in page'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_default_pagelink', 1),
+    '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
+  );
+  $form['imagepicker_settings']['imagepicker_account_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Imagepicker in My Account'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_account_enabled', 1),
+    '#description' => t('Setting this option enables Imagepicker in My Account.'),
+  );
+  // default options
   $form['imagepicker_defaults'] = array(
     '#type' => 'fieldset',
     '#title' => t('Set imagepicker defaults'),
@@ -35,44 +81,44 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_default_scale', ''),
     '#description' => t('Configure the default scale. leave empty for no default scale'),
   );
-  $form['imagepicker_defaults']['imagepicker_default_browser_thumbnail_size'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Default Browser Thumbnail Size'),
-    '#size' => 10,
-    '#required' => TRUE,
-    '#default_value' => variable_get('imagepicker_default_browser_thumbnail_size', 100),
-    '#description' => t('Configure the default browser thumbnail size'),
+  // insert settings
+  $form['imagepicker_insert_defaults'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Set imagepicker insert defaults'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#description' => ''
   );
-  $node_types = node_get_types('names');
-  $form['imagepicker_defaults']['imagepicker_node_types_enabled'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Node Types'),
-    '#description' => t('Set the node types you want to enable Imagepicker for.'),
-    '#default_value' => variable_get('imagepicker_node_types_enabled', array_keys($node_types)),
-    '#options' => $node_types,
-  );
-  if (module_exists('comment')) {
-    $form['imagepicker_defaults']['imagepicker_comment_enabled'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Comments'),
-      '#return_value' => 1,
-      '#default_value' => variable_get('imagepicker_comment_enabled', 0),
-      '#description' => t('Setting this option enables Imagepicker in comments.'),
-    );
+  $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
+  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
+    $linkoptions['lightbox'] = t('Lightbox');
   }
-  $form['imagepicker_defaults']['imagepicker_default_pagelink'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show return link in page'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_default_pagelink', 1),
-    '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
+  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = array(
+    '#type' => 'radios',
+    '#title' => t('Align'),
+    '#default_value' => 'none',
+    '#options' => $alignoptions,
+    '#description' => '',
+    '#default_value' => variable_get('imagepicker_insert_defaults_align', 'none'),
   );
-  $form['imagepicker_defaults']['imagepicker_account_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Imagepicker in My Account'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_account_enabled', 1),
-    '#description' => t('Setting this option enables Imagepicker in My Account.'),
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = array(
+    '#type' => 'radios',
+    '#id' => 'show',
+    '#title' => t('Show'),
+    '#default_value' => 'full',
+    '#options' => $showoptions,
+    '#description' => '',
+    '#default_value' => variable_get('imagepicker_insert_defaults_show', 'full'),
+  );
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = array(
+    '#type' => 'radios',
+    '#title' => t('Link'),
+    '#default_value' => 'none',
+    '#options' => $linkoptions,
+    '#description' => '',
+    '#default_value' => variable_get('imagepicker_insert_defaults_link', 'none'),
   );
   // alignment settings
   $form['imagepicker_align'] = array(
@@ -223,5 +269,14 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   }
   if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
+  }
+  if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_align'])) {
+    form_set_error('imagepicker_insert_defaults_align', t('You must fill in the default align field'));
+  }
+  if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_show'])) {
+    form_set_error('imagepicker_insert_defaults_show', t('You must fill in the default show field'));
+  }
+  if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
+    form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
 }
