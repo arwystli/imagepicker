@@ -141,7 +141,7 @@ function imagepicker_form_alter($form_id, &$form) {
         '#theme' => 'imagepicker_iframe',
         1 => array()
       );
-      $form['body_filter']['#prefix'] = '<a name="body_hash"></a>' . $form['body_field']['#prefix'];
+      $form['body_filter']['#prefix'] = '<a name="body_hash"></a>' . $form['body_filter']['#prefix'];
     }
   }
 }
