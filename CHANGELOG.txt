@@ -1,5 +1,11 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-09-03
+------------------------------------
+by hutch, #302210 patch supplied by Joshua Hesketh
+improved admin settings and improved the javascript
+insertion method. ported from D6
+
 Image Picker 5.x-1.x-dev, 2008-08-25
 ------------------------------------
 by hutch, improved menuing
