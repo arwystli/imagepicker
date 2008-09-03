@@ -39,9 +39,7 @@ function imagepicker_perm() {
 function imagepicker_menu($may_cache) {
   global $user;
   $items = array();
-
   if ($may_cache) {
-    #$access = user_access('use imagepicker');
     $items[] = array(
       'path' => 'imagepicker',
       'title' => t('Image picker'),
@@ -64,16 +62,6 @@ function imagepicker_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
       'weight' => 2
     );
-/*
-    $items[] = array(
-      'path' => 'imagepicker/groups',
-      'title' => t('Groups'),
-      'callback' => 'imagepicker_groups',
-      'access' => user_access('use imagepicker'),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 3
-    );
- */
     $items[] = array(
       'path' => 'imagepicker/edit',
       'title' => t('Edit image'),
@@ -98,9 +86,7 @@ function imagepicker_menu($may_cache) {
       'callback arguments' => 'imagepicker_settings',
       'type' => MENU_NORMAL_ITEM,
     );
-
   }
-
   // in my account
   if (variable_get('imagepicker_account_enabled', 1)) {
     $items[] = array(
@@ -141,7 +127,7 @@ function imagepicker_form_alter($form_id, &$form) {
         '#theme' => 'imagepicker_iframe',
         1 => array()
       );
-      $form['body_filter']['#prefix'] = '<a name="body_hash"></a>' . $form['body_filter']['#prefix'];
+      $form['body_filter']['#prefix'] = '<a name="body_hash"></a>'. $form['body_filter']['#prefix'];
     }
   }
 }
@@ -385,7 +371,6 @@ function imagepicker_get_uploaded_file_extension($name) {
     case 'image/png': $fileext = '.png'; break;
     default: $fileext = '';
   }
-
   return $fileext;
 }
 
@@ -619,7 +604,7 @@ function imagepicker_edit_form(&$img, $account=FALSE) {
     '#description' => t('Edit title of your image'),
     '#default_value' => htmlspecialchars_decode($img['img_title']),
     '#prefix' => '<div id="imgp_edit_form">'
-    );
+  );
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
@@ -628,7 +613,7 @@ function imagepicker_edit_form(&$img, $account=FALSE) {
     '#description' => t('Edit description of your image'),
     '#default_value' => htmlspecialchars_decode($img['img_description']),
     '#suffix' => '</div>'
-    );
+  );
   if ($account) {
     $form['account'] = array(
       '#type' => 'hidden',
@@ -639,12 +624,12 @@ function imagepicker_edit_form(&$img, $account=FALSE) {
     '#type' => 'submit',
     '#value' => t('Submit'),
     '#prefix' => '<div id="imgp_controls">'
-    );
+  );
   $form['cancel'] = array(
     '#type' => 'submit',
     '#value' => t('Cancel'),
     '#suffix' => '</div>'
-    );
+  );
   return $form;
 }
 
@@ -1220,6 +1205,7 @@ function imagepicker_user_browse() {
   $content .= _imagepicker_browse("account");
   return $content;
 }
+
 function imagepicker_user_browse_admin() {
   global $user;
   $content = '<p>'. l( t('Browse mode'), 'user/'. $user->uid .'/imagepicker/browse') .'</p>';
@@ -1276,6 +1262,9 @@ function imagepicker_user_image_form() {
   return $form;
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_user_image_form_submit($form_id, $form_values) {
   global $user;
   if ($form_values['op'] == t('Delete image')) {
@@ -1550,6 +1539,9 @@ function imagepicker_groups_form($record=0, $account=FALSE) {
   return $form;
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_groups_form_submit($form_id, $form_values) {
   global $user;
   $record['group_name'] = $form_values['group_name'];
@@ -1614,7 +1606,6 @@ function imagepicker_get_user_groups_by_user($uid, $obj=TRUE) {
 }
 
 // imagepicker_group_images
-// gid img_id
 function imagepicker_insert_group_image($record) {
   if (! db_query(
     "INSERT INTO {imagepicker_group_images} (gid, img_id) VALUES (%d, %d)",
@@ -1747,11 +1738,11 @@ function imagepicker_group_delete_form_submit($form_id, $form_values) {
   imagepicker_delete_user_group($form_values['gid']);
 }
 
-// insert a form into the edit image page to allow the image to be associated with a group
+/**
+ * insert a form into the edit image page to allow the image to be associated with a group
+ */
 function imagepicker_group_images_form($img_id) {
 
-  // list of all the groups for this user
-  // also need to know which ones are enabled for this image
   $grouplist = imagepicker_get_groups();
   $enabledlist = imagepicker_get_image_groups($img_id);
   $form['group_images'] = array(
@@ -1779,6 +1770,9 @@ function imagepicker_group_images_form($img_id) {
   return $form;
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_group_images_form_submit($form_id, $form_values) {
   // have to delete all the entries for this image and rebuild with the new ones;
   $img_id = $form_values['img_id'];
@@ -1793,22 +1787,20 @@ function imagepicker_group_images_form_submit($form_id, $form_values) {
     }
   }
   if (! $inserted) {
-    // need to check if this user has a state set for a group and
-    // if this gid has images in imagepicker_group_images
     $gid = imagepicker_get_user_group_state();
     if ($gid) {
       $ids = imagepicker_get_images_by_group($gid);
       if (! $ids) {
         global $user;
         db_query("UPDATE {imagepicker_user_groups} SET state=0 WHERE uid=%d AND state=1", array($user->uid));
-
       }
     }
   }
-
 }
 
-// get all the groups for the current user;
+/**
+ * get all the groups for the current user
+ */
 function imagepicker_get_groups($account=FALSE) {
   if ($account) {
     $user = $account;
@@ -1838,7 +1830,7 @@ function imagepicker_get_images_by_group($gid) {
   }
   return $data;
 }
-// get state
+
 function imagepicker_get_user_group_state($state=1) {
   global $user;
   $result = db_query("SELECT gid FROM {imagepicker_user_groups} WHERE state=%d AND uid=%d", array($state, $user->uid));
@@ -1874,6 +1866,7 @@ function imagepicker_get_grouplist() {
   }
   return $grouplist;
 }
+
 function imagepicker_has_grouplist() {
   global $user;
   $result = db_query("
@@ -1923,6 +1916,9 @@ function imagepicker_browse_groups_form() {
   return $form;
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_browse_groups_form_submit($form_id, $form_values) {
   // need to get the users gids
   $gids = imagepicker_get_groups();

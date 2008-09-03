@@ -4,16 +4,16 @@
 
 function imagepicker_install() {
   // Create a directory structure so that usernames would be divided by letters.
-  $drupalDir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()).DIRECTORY_SEPARATOR;
-  $dir = $drupalDir.file_directory_path().DIRECTORY_SEPARATOR.'imagepicker';
+  $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
+  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR .'imagepicker';
 
-  if (file_check_directory($dir, true)) {
-    $dirList = range('a', 'z');
-    array_push($dirList, 'others');
+  if (file_check_directory($dir, TRUE)) {
+    $dirlist = range('a', 'z');
+    array_push($dirlist, 'others');
 
-    foreach ($dirList as $v) {
-      $newDir = $dir.DIRECTORY_SEPARATOR.$v;
-      if (! file_check_directory($newDir, true)) {
+    foreach ($dirlist AS $v) {
+      $newdir = $dir . DIRECTORY_SEPARATOR . $v;
+      if (! file_check_directory($newdir, TRUE)) {
         drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
       }
     }
@@ -24,7 +24,7 @@ function imagepicker_install() {
       drupal_set_message(t('Directory creation for the Imagepicker module was successful.'), '');
     }
     else {
-      foreach($errors['error'] as $error) {
+      foreach ($errors['error'] as $error) {
         drupal_set_message($error, 'error');
       }
     }
