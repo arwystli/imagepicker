@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker  for D6 in HEAD, 2008-09-04
+------------------------------------
+by hutch, added Use full url feature
+
 Image Picker  for D6 in HEAD, 2008-09-02
 ------------------------------------
 by hutch, #302210 patch supplied by Joshua Hesketh

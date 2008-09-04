@@ -232,6 +232,13 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_advanced_collapsed', 0),
     '#description' => t('Setting this option will collapse the fieldset the iframe is in by default.'),
   );
+  $form['imagepicker_advanced']['imagepicker_use_full_url'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use full url'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_full_url', 1),
+    '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an absolute path.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
+  );
 
   return system_settings_form($form);
 }
