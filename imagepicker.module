@@ -909,7 +909,7 @@ function _imagepicker_get_img($img_id, $checkuser=TRUE) {
   if ($img) {
     if (($img['uid'] != $user->uid) && $checkuser) {
       drupal_set_message(t('This image does not belong to you.'), 'error');
-      watchdog('imagepicker', t('User uid !uid1 attempted to edit image belonging to user uid !uid2', array('!uid1' => $user->uid, '!uid2' => $img['uid'])), WATCHDOG_WARNING);
+       watchdog('imagepicker', "User uid !a attempted to edit image belonging to user uid !b", array('!a' => $user->uid, '!b' => $img['uid']), WATCHDOG_WARNING);
       return FALSE;
     }
     return $img;
