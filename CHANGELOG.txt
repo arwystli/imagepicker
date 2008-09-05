@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-09-05
+------------------------------------
+by hutch, added Use full url feature
+
 Image Picker 5.x-1.x-dev, 2008-09-03
 ------------------------------------
 by hutch, #302210 patch supplied by Joshua Hesketh
