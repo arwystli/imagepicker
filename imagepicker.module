@@ -1123,6 +1123,27 @@ function imagepicker_settings() {
     '#default_value' => variable_get('imagepicker_use_full_url', 1),
     '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an absolute path.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
   );
+  $form['imagepicker_advanced']['imagepicker_show_browse_order_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the order select box in the browser'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_show_browse_order_form', 1),
+    '#description' => t(''),
+  );
+  $orderlist = array(
+    'img_id DESC' => t('Newest first'),
+    'img_id ASC' => t('Newest last'),
+    'img_date DESC' => t('Edited first'),
+    'img_date ASC' => t('Edited last'),
+    'img_name' => t('By name'),
+  );
+  $form['imagepicker_advanced']['imagepicker_default_browser_order'] = array(
+    '#type' => 'select',
+    '#default_value' => variable_get('imagepicker_default_browser_order', 'img_id DESC'),
+    '#options' => $orderlist,
+    '#title' => t('Default order'),
+    '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
+  );
 
   return system_settings_form($form);
 }
@@ -1169,6 +1190,9 @@ function imagepicker_settings_validate($form_id, $form_values) {
   }
   if (! drupal_strlen($form_values['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
+  }
+  if ($form_values['imagepicker_show_browse_order_form'] != 1) {
+    variable_del('imagepicker_browser_order');
   }
 }
 
@@ -1315,39 +1339,45 @@ function _imagepicker_browse($src="iframe") {
   else {
     $imgurl = 'user/'. $user->uid .'/imagepicker/browse/';
   }
-  // if there are groups
-  $gid = 0;
-  if (imagepicker_get_groups()) {
-    $gids = imagepicker_get_user_group_state();
-    $gid = $gids[0];
-  }
-  $how_many = variable_get('imagepicker_advanced_browser_page', 25);
-  // filter by selected group
-  if ($gid) {
-    $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
-      FROM {imagepicker} i, {imagepicker_group_images} g
-      WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d
-      ORDER BY i.img_id";
-    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid, $gid));
-  }
-  else {
-    $sql = "SELECT * FROM {imagepicker} WHERE uid=%d ORDER BY img_id";
-    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid) );
-  }
 
-  $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
+  if (variable_get('imagepicker_show_browse_order_form', 1)) {
+    $content .= drupal_get_form('imagepicker_browse_order_form');
+  }
+  if (imagepicker_get_groups() && imagepicker_has_grouplist()) {
+    // add groups select here
+    $content .= drupal_get_form('imagepicker_browse_groups_form');
+  }
   if ($src == "account") {
     $content .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
   }
   else {
     $content .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.') .'</div>';
   }
-
-  if (imagepicker_get_groups() && imagepicker_has_grouplist()) {
-    // add groups select here
-    $content .= drupal_get_form('imagepicker_browse_groups_form');
-  }
   $content .= '<div class="clear-block">';
+
+  // if there are groups
+  $gid = 0;
+  if (imagepicker_get_groups()) {
+    $gids = imagepicker_get_user_group_state();
+    $gid = $gids[0];
+  }
+  $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
+  $how_many = variable_get('imagepicker_advanced_browser_page', 25);
+  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $order = variable_get('imagepicker_browser_order', $default_order);
+  // filter by selected group
+  if ($gid) {
+    $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
+      FROM {imagepicker} i, {imagepicker_group_images} g
+      WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d
+      ORDER BY i.$order";
+    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid, $gid));
+  }
+  else {
+    $sql = "SELECT * FROM {imagepicker} WHERE uid=%d ORDER BY $order";
+    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid));
+  }
+
   $ct = 0;
   $imgct = 0;
   while ($img = db_fetch_array($result)) {
@@ -1946,3 +1976,36 @@ function imagepicker_browse_groups_form_submit($form_id, $form_values) {
 
 }
 
+// browse order
+function imagepicker_browse_order_form() {
+  $orderlist = array(
+    'img_id DESC' => t('Newest first'),
+    'img_id ASC' => t('Newest last'),
+    'img_date DESC' => t('Edited first'),
+    'img_date ASC' => t('Edited last'),
+    'img_name' => t('By name'),
+  );
+  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $form['imagepicker_browser_order'] = array(
+    '#type' => 'select',
+    '#default_value' => variable_get('imagepicker_browser_order', $default_order),
+    '#options' => $orderlist,
+    '#title' => t('Order'),
+    '#description' => t(''),
+    '#prefix' => '<div id="imgp_order_form">',
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit form
+ */
+function imagepicker_browse_order_form_submit($form_id, $form_values) {
+  variable_set('imagepicker_browser_order', $form_values['imagepicker_browser_order']);
+}

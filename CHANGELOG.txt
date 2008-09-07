@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-09-07
+------------------------------------
+by hutch, added order select box to browser
+
 Image Picker 5.x-1.x-dev, 2008-09-05
 ------------------------------------
 by hutch, added Use full url feature
