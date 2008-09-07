@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-09-07 10:30+0100\n"
+"POT-Creation-Date: 2008-09-07 18:15+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -28,15 +28,15 @@ msgstr ""
 msgid "Image picker"
 msgstr ""
 
-#: imagepicker.module:52;192;238;1325
+#: imagepicker.module:52;192;238;1324
 msgid "Upload"
 msgstr ""
 
-#: imagepicker.module:59;1326
+#: imagepicker.module:59;1325
 msgid "Browse"
 msgstr ""
 
-#: imagepicker.module:67;539;557;1294;1311
+#: imagepicker.module:67;539;557;1293;1310
 msgid "Edit image"
 msgstr ""
 
@@ -148,7 +148,7 @@ msgstr ""
 msgid "Choose the settings you want, place the cursor in the Body box above and Insert image."
 msgstr ""
 
-#: imagepicker.module:487;588;673;691;1285;1507
+#: imagepicker.module:487;588;673;691;1284;1507
 msgid "Image not found."
 msgstr ""
 
@@ -200,7 +200,7 @@ msgstr ""
 msgid "Insert image"
 msgstr ""
 
-#: imagepicker.module:543;554;1298;1308
+#: imagepicker.module:543;554;1297;1307
 msgid "Delete image"
 msgstr ""
 
@@ -428,27 +428,27 @@ msgstr ""
 msgid "Show the order select box in the browser"
 msgstr ""
 
-#: imagepicker.module:1131;1554;1794;1803;1950;1994
+#: imagepicker.module:1131;1554;1794;1803
 msgid ""
 msgstr ""
 
-#: imagepicker.module:1134;1982
+#: imagepicker.module:1134;1981
 msgid "Newest first"
 msgstr ""
 
-#: imagepicker.module:1135;1983
+#: imagepicker.module:1135;1982
 msgid "Newest last"
 msgstr ""
 
-#: imagepicker.module:1136;1984
+#: imagepicker.module:1136;1983
 msgid "Edited first"
 msgstr ""
 
-#: imagepicker.module:1137;1985
+#: imagepicker.module:1137;1984
 msgid "Edited last"
 msgstr ""
 
-#: imagepicker.module:1138;1986
+#: imagepicker.module:1138;1985
 msgid "By name"
 msgstr ""
 
@@ -516,39 +516,39 @@ msgstr ""
 msgid "Upload images. You can give them a title and description"
 msgstr ""
 
-#: imagepicker.module:1242
+#: imagepicker.module:1241
 msgid "Admin mode"
 msgstr ""
 
-#: imagepicker.module:1249
+#: imagepicker.module:1248
 msgid "Browse mode"
 msgstr ""
 
-#: imagepicker.module:1271
+#: imagepicker.module:1270
 msgid "Width"
 msgstr ""
 
-#: imagepicker.module:1272
+#: imagepicker.module:1271
 msgid "Height"
 msgstr ""
 
-#: imagepicker.module:1273
+#: imagepicker.module:1272
 msgid "Type"
 msgstr ""
 
-#: imagepicker.module:1274
+#: imagepicker.module:1273
 msgid "Size"
 msgstr ""
 
-#: imagepicker.module:1327;1793
+#: imagepicker.module:1326;1793
 msgid "Groups"
 msgstr ""
 
-#: imagepicker.module:1367
+#: imagepicker.module:1351
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to view."
 msgstr ""
 
-#: imagepicker.module:1370
+#: imagepicker.module:1354
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to use."
 msgstr ""
 
@@ -685,14 +685,14 @@ msgid "Save group settings"
 msgstr ""
 
 #: imagepicker.module:1949
-msgid "Select group to view"
+msgid "Group"
 msgstr ""
 
-#: imagepicker.module:1955;1999
+#: imagepicker.module:1954;1997
 msgid "Go"
 msgstr ""
 
-#: imagepicker.module:1993
+#: imagepicker.module:1992
 msgid "Order"
 msgstr ""
 
