@@ -95,28 +95,9 @@ tbody {
 	margin: 10px 0 20px 0;
 }
 
-#imgp_groups_form .form-select, #imgp_groups_form .form-submit {
-	height: 1.5em;
+#imgp_order_form {
+	margin: 8px 0px 8px 0px;
 }
-#imgp_groups_form .form-select {
-	float: left;
-	margin: 2px 0px 0px 0px;
-	padding: 0px 2px 2px 2px;
-}
-#imgp_groups_form .form-submit {
-	margin: -10px 0px 8px 5px;
-	padding: 2px 2px 2px 2px;
-}
-
-#imgp_order_form .form-select, #imgp_order_form .form-submit {
-	height: 1.5em;
-}
-#imgp_order_form .form-select {
-	float: left;
-	margin: 2px 0px 0px 0px;
-	padding: 0px 2px 2px 2px;
-}
-#imgp_order_form .form-submit {
-	margin: -10px 0px 8px 5px;
-	padding: 2px 2px 4px 2px;
+#imgp_groups_form {
+	margin: 8px 0px 8px 0px;
 }

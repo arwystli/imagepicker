@@ -775,6 +775,7 @@ function _imagepicker_browse($src="iframe") {
   else {
     $imgurl = 'user/'. $user->uid .'/imagepicker/images/browse/';
   }
+
   if (variable_get('imagepicker_show_browse_order_form', 1)) {
     $content .= drupal_get_form('imagepicker_browse_order_form');
   }
@@ -1042,9 +1043,8 @@ function imagepicker_browse_groups_form(&$form_state) {
     '#type' => 'select',
     '#default_value' => $enabledlist,
     '#options' => $grouplist,
-    '#title' => t('Select group to view'),
-    '#description' => t(''),
-    '#prefix' => '<div id="imgp_groups_form">',
+    '#title' => t('Group'),
+    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -1178,8 +1178,7 @@ function imagepicker_browse_order_form() {
     '#default_value' => variable_get('imagepicker_browser_order', $default_order),
     '#options' => $orderlist,
     '#title' => t('Order'),
-    '#description' => t(''),
-    '#prefix' => '<div id="imgp_order_form">',
+    '#prefix' => '<div id="imgp_order_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
