@@ -775,6 +775,9 @@ function _imagepicker_browse($src="iframe") {
   else {
     $imgurl = 'user/'. $user->uid .'/imagepicker/images/browse/';
   }
+  if (variable_get('imagepicker_show_browse_order_form', 1)) {
+    $content .= drupal_get_form('imagepicker_browse_order_form');
+  }
 
   $gid = 0;
   if (imagepicker_has_groups() && imagepicker_has_grouplist()) {
@@ -794,16 +797,18 @@ function _imagepicker_browse($src="iframe") {
 
   $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
   $how_many = variable_get('imagepicker_advanced_browser_page', 25);
+  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $order = variable_get('imagepicker_browser_order', $default_order);
   // filter by selected group
   if ($gid) {
     $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
       FROM {imagepicker} i, {imagepicker_group_images} g
       WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d
-      ORDER BY i.img_id";
+      ORDER BY i.$order";
     $result = pager_query($sql, $how_many, 0, NULL, array($user->uid, $gid));
   }
   else {
-    $sql = "SELECT * FROM {imagepicker} WHERE uid=%d ORDER BY img_id";
+    $sql = "SELECT * FROM {imagepicker} WHERE uid=%d ORDER BY $order";
     $result = pager_query($sql, $how_many, 0, NULL, array($user->uid) );
   }
 
@@ -1158,3 +1163,36 @@ function imagepicker_insert_group_image($record) {
   }
 }
 
+// browse order
+function imagepicker_browse_order_form() {
+  $orderlist = array(
+    'img_id DESC' => t('Newest first'),
+    'img_id ASC' => t('Newest last'),
+    'img_date DESC' => t('Edited first'),
+    'img_date ASC' => t('Edited last'),
+    'img_name' => t('By name'),
+  );
+  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $form['imagepicker_browser_order'] = array(
+    '#type' => 'select',
+    '#default_value' => variable_get('imagepicker_browser_order', $default_order),
+    '#options' => $orderlist,
+    '#title' => t('Order'),
+    '#description' => t(''),
+    '#prefix' => '<div id="imgp_order_form">',
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit form
+ */
+function imagepicker_browse_order_form_submit($form, &$form_state) {
+  variable_set('imagepicker_browser_order', $form_state['values']['imagepicker_browser_order']);
+}

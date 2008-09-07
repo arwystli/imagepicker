@@ -239,6 +239,27 @@ function imagepicker_admin_settings() {
     '#default_value' => variable_get('imagepicker_use_full_url', 1),
     '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an absolute path.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
   );
+  $form['imagepicker_advanced']['imagepicker_show_browse_order_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the order select box in the browser'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_show_browse_order_form', 1),
+    '#description' => t(''),
+  );
+  $orderlist = array(
+    'img_id DESC' => t('Newest first'),
+    'img_id ASC' => t('Newest last'),
+    'img_date DESC' => t('Edited first'),
+    'img_date ASC' => t('Edited last'),
+    'img_name' => t('By name'),
+  );
+  $form['imagepicker_advanced']['imagepicker_default_browser_order'] = array(
+    '#type' => 'select',
+    '#default_value' => variable_get('imagepicker_default_browser_order', 'img_id DESC'),
+    '#options' => $orderlist,
+    '#title' => t('Default order'),
+    '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
+  );
 
   return system_settings_form($form);
 }
@@ -285,5 +306,8 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
+  }
+  if ($form_values['imagepicker_show_browse_order_form'] != 1) {
+    variable_del('imagepicker_browser_order');
   }
 }

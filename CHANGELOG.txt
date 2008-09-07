@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker for D6 in HEAD, 2008-09-07
+------------------------------------
+by hutch, added order select box to browser
+
 Image Picker  for D6 in HEAD, 2008-09-04
 ------------------------------------
 by hutch, added Use full url feature
