@@ -15,7 +15,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2008-09-07 11:59+0100\n"
+"POT-Creation-Date: 2008-09-07 18:18+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -100,7 +100,7 @@ msgstr ""
 msgid "Thumbnail"
 msgstr ""
 
-#: imagepicker.admin.inc:92 imagepicker.edit.inc:28 imagepicker.upload.inc:54 imagepicker.module:241;900
+#: imagepicker.admin.inc:92 imagepicker.edit.inc:28 imagepicker.upload.inc:54 imagepicker.module:241;901
 msgid "Title"
 msgstr ""
 
@@ -256,7 +256,7 @@ msgstr ""
 msgid "Show the order select box in the browser"
 msgstr ""
 
-#: imagepicker.admin.inc:247 imagepicker.group.inc:43 imagepicker.module:1046;1181
+#: imagepicker.admin.inc:247 imagepicker.group.inc:43
 msgid ""
 msgstr ""
 
@@ -344,7 +344,7 @@ msgstr ""
 msgid "Edit title of your image"
 msgstr ""
 
-#: imagepicker.edit.inc:35 imagepicker.group.inc:181 imagepicker.upload.inc:59 imagepicker.module:901
+#: imagepicker.edit.inc:35 imagepicker.group.inc:181 imagepicker.upload.inc:59 imagepicker.module:902
 msgid "Description"
 msgstr ""
 
@@ -372,7 +372,7 @@ msgstr ""
 msgid "Error while updating image."
 msgstr ""
 
-#: imagepicker.edit.inc:109 imagepicker.module:320;922
+#: imagepicker.edit.inc:109 imagepicker.module:320;923
 msgid "This image does not belong to you."
 msgstr ""
 
@@ -388,7 +388,7 @@ msgstr ""
 msgid "Image not found in edit."
 msgstr ""
 
-#: imagepicker.edit.inc:110 imagepicker.module:321;923;0
+#: imagepicker.edit.inc:110 imagepicker.module:321;924;0
 msgid "imagepicker"
 msgstr ""
 
@@ -452,11 +452,11 @@ msgstr ""
 msgid "selected"
 msgstr ""
 
-#: imagepicker.group.inc:172 imagepicker.module:891
+#: imagepicker.group.inc:172 imagepicker.module:892
 msgid "Edit"
 msgstr ""
 
-#: imagepicker.group.inc:173 imagepicker.module:892
+#: imagepicker.group.inc:173 imagepicker.module:893
 msgid "Delete"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr ""
 msgid "State"
 msgstr ""
 
-#: imagepicker.group.inc:184 imagepicker.module:903
+#: imagepicker.group.inc:184 imagepicker.module:904
 msgid "Actions"
 msgstr ""
 
@@ -668,31 +668,31 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-#: imagepicker.module:791
+#: imagepicker.module:792
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to view."
 msgstr ""
 
-#: imagepicker.module:794
+#: imagepicker.module:795
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to use."
 msgstr ""
 
-#: imagepicker.module:838;910
+#: imagepicker.module:839;911
 msgid "You do not have any uploaded images"
 msgstr ""
 
-#: imagepicker.module:899
+#: imagepicker.module:900
 msgid "Name"
 msgstr ""
 
-#: imagepicker.module:902
+#: imagepicker.module:903
 msgid "Date"
 msgstr ""
 
-#: imagepicker.module:1045
-msgid "Select group to view"
+#: imagepicker.module:1046
+msgid "Group"
 msgstr ""
 
-#: imagepicker.module:1051;1186
+#: imagepicker.module:1051;1185
 msgid "Go"
 msgstr ""
 
@@ -716,7 +716,7 @@ msgstr ""
 msgid "User uid %d attempted to delete image belonging to user uid %d"
 msgstr ""
 
-#: imagepicker.module:923
+#: imagepicker.module:924
 msgid "User uid !a attempted to edit image belonging to user uid !b"
 msgstr ""
 
