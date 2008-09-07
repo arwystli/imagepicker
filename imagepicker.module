@@ -1361,7 +1361,6 @@ function _imagepicker_browse($src="iframe") {
     $gids = imagepicker_get_user_group_state();
     $gid = $gids[0];
   }
-  $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
   $how_many = variable_get('imagepicker_advanced_browser_page', 25);
   $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
   $order = variable_get('imagepicker_browser_order', $default_order);
@@ -1378,6 +1377,7 @@ function _imagepicker_browse($src="iframe") {
     $result = pager_query($sql, $how_many, 0, NULL, array($user->uid));
   }
 
+  $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
   $ct = 0;
   $imgct = 0;
   while ($img = db_fetch_array($result)) {
@@ -1946,9 +1946,8 @@ function imagepicker_browse_groups_form() {
     '#type' => 'select',
     '#default_value' => $enabledlist,
     '#options' => $grouplist,
-    '#title' => t('Select group to view'),
-    '#description' => t(''),
-    '#prefix' => '<div id="imgp_groups_form">',
+    '#title' => t('Group'),
+    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -1991,8 +1990,7 @@ function imagepicker_browse_order_form() {
     '#default_value' => variable_get('imagepicker_browser_order', $default_order),
     '#options' => $orderlist,
     '#title' => t('Order'),
-    '#description' => t(''),
-    '#prefix' => '<div id="imgp_order_form">',
+    '#prefix' => '<div id="imgp_order_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
