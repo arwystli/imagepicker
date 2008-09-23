@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker for D6 in HEAD, 2008-09-23
+------------------------------------
+by hutch, fixed path in menu to edit in iframe
+
 Image Picker for D6 in HEAD, 2008-09-07
 ------------------------------------
 by hutch, added order select box to browser

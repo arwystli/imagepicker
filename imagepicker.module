@@ -50,7 +50,7 @@ function imagepicker_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2
   );
-  $items['imagepicker/browse/%imagepicker_img_id'] = array(
+  $items['imagepicker/browse/%imagepicker_id'] = array(
     'title' => 'Browse',
     'page callback' => 'imagepicker_browse',
     'page arguments' => array(2),
@@ -58,8 +58,7 @@ function imagepicker_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2
   );
-
-  $items['imagepicker/edit/%imagepicker_img_id'] = array(
+  $items['imagepicker/edit/%imagepicker_id'] = array(
     'title' => 'Edit image',
     'page callback' => 'imagepicker_image_edit',
     'page arguments' => array(2),
@@ -67,7 +66,7 @@ function imagepicker_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'imagepicker.edit.inc',
   );
-  $items['imagepicker/image/%imagepicker_img_id'] = array(
+  $items['imagepicker/image/%imagepicker_id'] = array(
     'title' => 'Imagepicker',
     'page callback' => 'imagepicker_image_page',
     'page arguments' => array(2),
@@ -318,7 +317,7 @@ function imagepicker_image_delete($img_id, $account=FALSE) {
   if ($img) {
     if ($img['uid'] != $user->uid) {
       drupal_set_message(t('This image does not belong to you.'), 'error');
-      watchdog('imagepicker', 'User uid %d attempted to delete image belonging to user uid %d', array($user->uid, $img['uid']), WATCHDOG_WARNING);
+      watchdog('imagepicker', 'User uid !a attempted to delete image belonging to user uid !b', array( '!a' => $user->uid, '!b' => $img['uid']), WATCHDOG_WARNING);
     }
     else {
       $destination = imagepicker_get_path(FALSE, TRUE);
