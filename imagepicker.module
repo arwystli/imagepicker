@@ -718,7 +718,15 @@ function theme_imagepicker(&$content) {
   $scripts = drupal_get_js();
   $tabs = theme('menu_local_tasks');
   $messages = imagepicker_strip_messages(theme('status_messages'));
-  include('imagepicker.tpl.php');
+  $template = 'imagepicker.tpl.php';
+  $defaulttemplate = variable_get('theme_default', '');
+  if ($defaulttemplate) {
+    $templatepath = drupal_get_path('theme', $defaulttemplate);
+    if (file_exists($templatepath . '/' . $template)) {
+      $template = $templatepath .'/'. $template;
+    }
+  }
+  include($template);
   drupal_page_footer();
   exit;
 }

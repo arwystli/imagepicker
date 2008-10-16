@@ -1,5 +1,10 @@
 // $Id$
 
+Image Picker 5.x-1.x-dev, 2008-10-16
+------------------------------------
+by hutch, added the ability to use imagepicker.tpl.php
+if found in the default theme directory
+
 Image Picker 5.x-1.x-dev, 2008-09-07
 ------------------------------------
 by hutch, added order select box to browser
