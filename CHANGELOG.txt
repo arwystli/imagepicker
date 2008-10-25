@@ -1,5 +1,9 @@
 // $Id$
 
+Image Picker for D6 in HEAD, 2008-10-25
+------------------------------------
+by hutch, #321162 cleaned up css
+
 Image Picker for D6 in HEAD, 2008-10-16
 ------------------------------------
 by hutch, added the ability to use imagepicker.tpl.php

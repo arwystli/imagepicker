@@ -1,23 +1,5 @@
 /* $Id$ */
 /* $Name$ */
-/*
-body {
-  color: #1D2326;
-/*  background:#DBDAC6;*/
-  background:#ffffff;
-}
-*/
-a { color: #9C1D25; }
-
-
-body {
-background-color: white!important;
-/*		background-color: #DBDAC6!important; */
-}
-
-tbody {
-  border-top: 0;
-}
 
 #imgp {
 	clear: both;
