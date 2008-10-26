@@ -1,12 +1,10 @@
 // $Id$
+// $Name$
 
 Image Picker 5.x-1.x-dev, 2008-10-25
 ------------------------------------
 by hutch, #321162 cleaned up css
-
-Image Picker 5.x-1.x-dev, 2008-10-16
-------------------------------------
-by hutch, added the ability to use imagepicker.tpl.php
+added the ability to use imagepicker.tpl.php
 if found in the default theme directory
 
 Image Picker 5.x-1.x-dev, 2008-09-07
