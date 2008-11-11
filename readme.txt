@@ -20,6 +20,10 @@ NOTE: Once you install Imagepicker module, it is not recomended to change
 Drupal's files directory path. But if you do so, please make sure, that you will
 copy whole imagepicker directory to the new location as well.
 
+Go to
+Site Configuration -> Image Picker -> Save Configuration
+if you cannot find imagepicker in a create node such as page.
+
 	2. Enabling imagepicker
 Only users who have the right to use Full HTML filter will be able to use
 imagepicker. This is done because Imagepicker uses some HTML, which will be
@@ -79,3 +83,4 @@ click on the Insert image button.
 After inserting an image into tinyMCE editor (doesn't matter which browser you
 are using) your cursor will be before '</a></div>' HTML tags. This might cause
 some problems, so be aware of it.
+The newer wysiwyg module works better in my opinion.
