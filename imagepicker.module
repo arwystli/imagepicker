@@ -669,6 +669,9 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
     elseif ($func == 'browse') {
       $content .= imagepicker_user_groups();
     }
+    elseif ($func == 'delete') {
+      $content .= drupal_get_form('imagepicker_group_delete_form', $id);
+    }
   }
   else {
     include_once('imagepicker.upload.inc');
