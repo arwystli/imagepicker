@@ -10,7 +10,13 @@
 /**
  * Menu callback; presents the settings form for imagepicker
  */
-function imagepicker_admin_settings() {
+function imagepicker_settings_page($op = NULL) {
+  $content = drupal_get_form('imagepicker_settings_form');
+  return $content;
+}
+
+
+function imagepicker_settings_form($form_state) {
 
   // default settings
   $form['imagepicker_settings'] = array(
@@ -260,14 +266,52 @@ function imagepicker_admin_settings() {
     '#title' => t('Default order'),
     '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
   );
+  $form['imagepicker_advanced']['imagepicker_public_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Public option'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_public_enabled', 1),
+    '#description' => t('Allow users to make image groups publicly available.'),
+  );
+  $form['imagepicker_advanced']['imagepicker_groups_in_upload_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Groups in upload form '),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
+    '#description' => t('Allow users to select a group in the upload form.'),
+  );
+  $form['imagepicker_advanced']['imagepicker_upload_progress_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Progress bar in upload'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_upload_progress_enabled', 1),
+    '#description' => t(''),
+  );
+  $form['imagepicker_advanced']['imagepicker_upload_progress_delay'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Progress bar Delay'),
+    '#size' => 3,
+    '#default_value' => variable_get('imagepicker_upload_progress_delay', 3),
+    '#field_suffix' => t('seconds'),
+    '#description' => t('Show the progress bar if processing is longer than this value.'),
+  );
+
+  $form['imagepicker_advanced']['imagepicker_upload_progress_message'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Progress bar message'),
+    '#size' => 60,
+    '#default_value' => variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
+    '#description' => t('Message to display while uploading.'),
+  );
 
   return system_settings_form($form);
 }
 
 /**
- * Validate form
+ * Validate settings form
  */
-function imagepicker_admin_settings_validate($form_id, $form_state) {
+function imagepicker_settings_form_validate($form_id, $form_state) {
+  global $user;
   if (! drupal_strlen($form_state['values']['imagepicker_default_thumbnail_size'])) {
     form_set_error('imagepicker_default_thumbnail_size', t('You must fill in the Thumbnail field'));
   }
@@ -307,7 +351,1014 @@ function imagepicker_admin_settings_validate($form_id, $form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
-  if ($form_values['imagepicker_show_browse_order_form'] != 1) {
-    variable_del('imagepicker_browser_order');
+  if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
+    user_save($user, array('imagepicker_browser_order' => NULL));
   }
 }
+
+/**
+ * Administration functions
+ */
+function imagepicker_admin_users_list($dir) {
+
+  $how_many = variable_get('imagepicker_rows_per_page', 25);
+  $header = array(
+    array('data' => t('Name'), 'field' => 'u.name'),
+    t('Images'),
+    t('Groups'),
+  );
+  $rowcount = 0;
+  $result = db_query("
+    SELECT DISTINCT u.uid, u.name
+    FROM {imagepicker} i, {users} u
+    WHERE i.uid=u.uid AND status=1".  tablesort_sql($header));
+  while ($row = db_fetch_array($result)) {
+    $user = user_load( array('uid' => $row['uid']));
+    $allcount = _imagepicker_user_has_img($user);
+    $groupcount = _imagepicker_user_has_groups('all', $user);
+
+    $row_data = array(
+      check_plain($row['name']),
+      ($allcount ? $allcount .' '. l(t('images'), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
+      ($groupcount ? $groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' ) : t('No groups')),
+    );
+    $rows[] = $row_data;
+    $rowcount++;
+  }
+  if (count($rows)) {
+    $content .= '<div>'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
+  }
+  else {
+    $content = '<div class="messages">'. t('No users found.') .'</div>';
+  }
+  return $content;
+}
+
+function imagepicker_admin_groups_list() {
+  $how_many = variable_get('imagepicker_rows_per_page', 25);
+    $header = array(
+      array('data' => t('Group Name'), 'field' => 'g.group_name'),
+      array('data' => t('User Name'), 'field' => 'u.name'),
+      array('data' => t('Status'), 'field' => 'g.public'),
+      array('data' => t('Images'), 'field' => 'ct'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  $sql = "SELECT g.gid, g.uid, g.group_name, g.group_description, g.state, g.public, COUNT(i.img_id) AS ct, u.name
+    FROM {imagepicker_user_groups} g LEFT JOIN {imagepicker_group_images} i USING(gid), {users} u
+    WHERE g.uid=u.uid
+    GROUP BY g.gid". tablesort_sql($header);
+  $result = db_query($sql);
+  $rowcount = 0;
+  while ($row = db_fetch_array($result)) {
+    $row_data = array(
+      $row['group_name'],
+      l($row['name'], 'admin/settings/imagepicker/groups/user/'. $row['uid']),
+      ($row['public'] ? t('Public') : t('Private')),
+      ($row['ct'] ? l(format_plural($row['ct'], '1 image', '@count images'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
+      l(t('Edit'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/edit/'. $row['gid']) ,
+      l(t('Delete'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/delete/'. $row['gid']) ,
+    );
+    $rows[] = $row_data;
+    $rowcount++;
+  }
+  if (count($rows)) {
+    $content .= '<div>'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
+  }
+  else {
+    $content = '<div class="messages">'. t('No groups found.') .'</div>';
+  }
+  return $content;
+}
+
+function imagepicker_admin_view($img_id, $account = FALSE) {
+  if ($account) {
+    $user = $account;
+    $userdir = array('name' => $user->name , 'uid' => $user->uid);
+  }
+  else {
+    global $user;
+    $userdir = FALSE;
+  }
+
+  $img = _imagepicker_get_img($img_id, FALSE, $user);
+  if ($img) {
+    $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
+    $info = image_get_info(imagepicker_get_path(FALSE, $userdir) . $img['img_name']);
+    $content = _imagepicker_view_content($img, $imgpath, $info) .
+    drupal_get_form('imagepicker_admin_image_form', $img_id, $user) .
+    '<br />'.
+    (_imagepicker_has_groups($user) ? drupal_get_form('imagepicker_group_images_form', $img['img_id'], $user) : '');
+  }
+  else {
+    drupal_set_message(t('Image not found.'), 'error');
+    $content = '';
+  }
+  return $content;
+}
+
+function imagepicker_admin_image_form($form_state, $img_id, $account = FALSE) {
+  if ($account) {
+    $form['account'] = array(
+      '#type' => 'hidden',
+      '#value' => $account->uid,
+    );
+  }
+  $form['img_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $img_id,
+  );
+  $form['edit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Edit image'),
+  );
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete image'),
+  );
+  return $form;
+}
+
+function imagepicker_admin_image_form_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Delete image')) {
+    $user = user_load(array('uid' => $form_state['values']['account']));
+    imagepicker_image_delete($form_state['values']['img_id'], $user, 'admin');
+  }
+  elseif ($form_state['values']['op'] == t('Edit image')) {
+    drupal_goto('admin/settings/imagepicker/images/user/'. $form_state['values']['account'] .'/edit/'. $form_state['values']['img_id'] .'');
+  }
+}
+
+
+
+function imagepicker_user_search_form($form_state, $dir) {
+
+  $form['imagepicker_currentuser'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Users'),
+    '#description' => '',
+    '#autocomplete_path' => 'admin/settings/imagepicker/'. $dir .'/autocomplete',
+    '#default_value' => '',
+    '#maxlength' => 30,
+    '#size' => 25,
+    '#prefix' => '<div class="container-inline">',
+  );
+  $form['dir'] = array(
+    '#type' => 'hidden',
+    '#value' => $dir,
+  );
+  $form['imagepicker_stats_submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Go',
+    '#suffix' => '</div>',
+  );
+  return $form;
+}
+
+function imagepicker_user_search_form_submit($form, &$form_state) {
+  if ($form_state['values']['imagepicker_currentuser']) {
+
+    $result = db_query("SELECT u.uid FROM {users} u, {imagepicker} i WHERE u.name = '%s' AND u.uid=i.uid", $form_state['values']['imagepicker_currentuser']);
+    $row = db_fetch_array($result);
+    if ($row['uid'] ) {
+      variable_set('imagepicker_currentuser', $row['uid']);
+      drupal_goto('admin/settings/imagepicker/'. $form_state['values']['dir'] .'/user/'. $row['uid']);
+    }
+    else {
+      variable_del('imagepicker_currentuser');
+    }
+  }
+  else {
+    variable_del('imagepicker_currentuser');
+  }
+}
+
+function imagepicker_fstype() {
+  $dir = imagepicker_get_files_directory();
+  $alphadir = 'a';
+  if ( is_dir($dir . DIRECTORY_SEPARATOR . $alphadir)) {
+    variable_set('imagepicker_fstype', 'alpha');
+  }
+  else {
+    variable_set('imagepicker_fstype', 'numeric');
+  }
+}
+
+/**
+ * files and conversion
+ */
+function imagepicker_convert_form($form_state) {
+
+  $dir = imagepicker_get_files_directory();
+  imagepicker_fstype();
+  $fstype = variable_get('imagepicker_fstype', '');
+
+  if ( empty($form_state['storage']['imagepicker_files_submit'])) {
+    $step = 1;
+    variable_del('imagepicker_files_validate_failed');
+    variable_del('imagepicker_convert_to_numeric_failed');
+    variable_del('imagepicker_convert_to_alpha_failed');
+  }
+  else {
+    $validate_failed = variable_get('imagepicker_files_validate_failed', FALSE);
+    $numeric_failed = variable_get('imagepicker_convert_to_numeric_failed', FALSE);
+    $alpha_failed = variable_get('imagepicker_convert_to_alpha_failed', FALSE);
+    if ($validate_failed || $numeric_failed || $alpha_failed) {
+      $step = 1;
+
+    }
+    else {
+      $step = $form_state['values']['step']+1;
+      if ($step > 2) {
+        $step = 1;
+      }
+    }
+  }
+
+  $form['imagepicker_files'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker files validation'),
+    '#description' => t('The current filesystem type is %fstype and the current path is %dir', array('%fstype' => $fstype, '%dir' => $dir )),
+    '#collapsible' => TRUE,
+    '#collapsed' => ($fstype == 'numeric' ? TRUE : FALSE),
+    '#weight' => ($fstype == 'numeric' ? 10 : -10),
+  );
+  $form['imagepicker_files']['step'] = array(
+    '#type' => 'hidden',
+    '#value' => $step,
+  );
+
+  switch ($step) {
+    case 1:
+      $form['imagepicker_files']['imagepicker_files_validate_label'] = array(
+        '#prefix' => '<p>',
+        '#value' => t('Validate'),
+        '#suffix' => '</p>',
+      );
+      $form['imagepicker_files']['imagepicker_files_validate_label1'] = array(
+        '#prefix' => '<div class="description">',
+        '#value' => t('check the files directory for anomalies'),
+        '#suffix' => '</div>',
+      );
+      $form['imagepicker_files']['imagepicker_files_validate'] = array(
+        '#type' => 'hidden',
+        '#value' => 1,
+      );
+      break;
+
+    case 2:
+      $form['imagepicker_files']['imagepicker_files_validate_label'] = array(
+        '#prefix' => '<p>',
+        '#value' => t('Validation done'),
+        '#suffix' => '</p>',
+      );
+      $form['imagepicker_files']['imagepicker_files_validate'] = array(
+        '#type' => 'hidden',
+        '#value' => 1,
+      );
+      if ($fstype == 'alpha') {
+        $form['imagepicker_files']['imagepicker_files_convert_to_numeric_label'] = array(
+          '#prefix' => '<p>',
+          '#value' => t('Next: Convert to numeric. Recommended'),
+          '#suffix' => '</p>',
+        );
+        $form['imagepicker_files']['imagepicker_files_convert_to_numeric'] = array(
+          '#type' => 'hidden',
+          '#value' => 1,
+        );
+      }
+      else {
+        $form['imagepicker_files']['imagepicker_files_convert_to_alpha'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Convert to alpha'),
+          '#description' => t('NOT recommended'),
+          '#return_value' => 1,
+          '#default_value' => 0,
+        );
+      }
+      break;
+  }
+
+  $form['imagepicker_files']['imagepicker_submit_label'] = array(
+    '#prefix' => '<p>',
+    '#value' => '&nbsp;',
+    '#suffix' => '</p>',
+  );
+  $form['imagepicker_files']['imagepicker_files_submit'] = array(
+    '#type' => 'submit',
+    '#value' => ($step==1 ? t('Validate') : t('Convert')),
+  );
+  return $form;
+}
+
+function imagepicker_convert_form_submit($form, &$form_state) {
+  $dir = imagepicker_get_files_directory();
+  $form_state['storage']['imagepicker_files_submit'] = TRUE;
+  if ($form_state['values']['step'] == 1 && $form_state['values']['imagepicker_files_validate'] == 1) {
+    // run validator
+    $result = imagepicker_files_validate($dir);
+    if (! $result) {
+      // failed
+      variable_set('imagepicker_files_validate_failed', TRUE);
+    }
+  }
+  elseif ($form_state['values']['step'] == 2 && $form_state['values']['imagepicker_files_convert_to_numeric'] == 1) {
+    // convert to numeric
+    $result = imagepicker_convert_to_numeric($dir);
+    if (! $result) {
+      // failed
+      variable_set('imagepicker_convert_to_numeric_failed', TRUE);
+      $form_state['values']['step'] = 1;
+    }
+  }
+  elseif ($form_state['values']['step'] == 2 && $form_state['values']['imagepicker_files_convert_to_alpha'] == 1) {
+    // convert to alpha
+    $result = imagepicker_convert_to_alpha($dir);
+    if (! $result) {
+      // failed
+      variable_set('imagepicker_convert_to_alpha_failed', TRUE);
+      $form_state['values']['step'] = 1;
+    }
+  }
+}
+
+function imagepicker_convert_to_numeric($dir) {
+
+  $result = TRUE;
+  $errlist = array();
+
+  // work over the oldstyle dirs
+  $dirlist = range('a', 'z');
+  array_push($dirlist, 'others');
+  foreach ($dirlist AS $alphadir) {
+    $newdir = $dir . DIRECTORY_SEPARATOR . $alphadir;
+    if (is_dir($newdir)) {
+      // old style dir exists, now look to see if it has any users
+      $newdirlist = file_scan_directory($newdir, ".*", array('.', '..', 'CVS'), 0, FALSE);
+      if (count($newdirlist)) {
+        foreach ($newdirlist AS $k => $v) {
+          if ($newdirlist[$k]->basename) {
+            $username = $newdirlist[$k]->basename;
+            // get the user uid
+            $uid = FALSE;
+            $result = db_query("SELECT uid FROM {users} WHERE name='%s' AND status=1", array($username));
+            $row = db_fetch_array($result);
+            if ($row['uid']) {
+              $uid = $row['uid'];
+            }
+            if ($uid) {
+              $newpath = $dir . DIRECTORY_SEPARATOR . $uid;
+              $thumbstarget = $newpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR;
+              $browsertarget = $newpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR;
+
+              // create dirs
+              if (! file_check_directory($newpath, TRUE)) {
+                $errlist[$newpath] = "Could not create dir";
+              }
+              if (! file_check_directory($thumbstarget, TRUE)) {
+                $errlist[$thumbstarget] = "Could not create thumbs dir";
+              }
+              if (! file_check_directory($browsertarget, TRUE)) {
+                $errlist[$browsertarget] = "Could not create browser dir";
+              }
+
+              if (! count($errlist) ) {
+                // clear
+                drupal_get_messages();
+                $oldpath = $newdirlist[$k]->filename;
+                // do here: move oldpath/* to newpath and delete oldpath
+                // needs to be done per-file and dir
+                $oldfilelist = file_scan_directory($oldpath, ".*", array('.', '..', 'CVS'), 0, FALSE);
+                if (count($oldfilelist)) {
+                  foreach ($oldfilelist as $k1 => $v1) {
+                    if (! is_dir($oldfilelist[$k1]->filename) && file_exists($oldfilelist[$k1]->filename)) {
+                      $file = $oldfilelist[$k1]->filename;
+                      $thumbsfile = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $oldfilelist[$k1]->basename;
+                      $browserfile =  $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $oldfilelist[$k1]->basename;
+                      # file_move(&$source, $dest = 0, $replace = FILE_EXISTS_RENAME)  FILE_EXISTS_ERROR
+                      if (! file_move($file,  $newpath, FILE_EXISTS_ERROR)) {
+                        $errlist[$file] = "Could not move to $newpath";
+                      }
+                      if (! file_move($thumbsfile, $thumbstarget, FILE_EXISTS_ERROR)) {
+                        $errlist[$thumbsfile] = "Could not move to $thumbstarget";
+                      }
+                      if (! file_move($browserfile, $browsertarget, FILE_EXISTS_ERROR)) {
+                        $errlist[$browserfile] = "Could not move to $browsertarget";
+                      }
+                    }
+                  }
+                }
+
+                if (! count($errlist)) {
+                  $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR;
+                  $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR;
+                  $delpath[] = $oldpath;
+                  $delpath[] = $newdir;
+                }
+              }
+            }
+            else {
+              $errlist[$k] = "NO uid for user $username";
+            }
+          }
+        }
+      }
+      else {
+        // newdir exists but is empty so delete it
+        $delpath[] = $newdir;
+      }
+    }
+  }
+
+  if (! count($errlist)) {
+    // tidy up
+    if (count($delpath)) {
+      foreach ($delpath AS $p) {
+        if (is_dir($p)) {
+          if (! rmdir($p)) {
+            $errlist[$p] = 'deletion failed';
+          }
+        }
+        else {
+          $errlist[$p] = 'not a dir';
+        }
+      }
+    }
+  }
+
+  if (count($errlist)) {
+    foreach ($errlist as $key => $val) {
+      drupal_set_message("ERRORS: $key: $val ", 'error');
+    }
+    $result = FALSE;
+  }
+  return $result;
+}
+
+function imagepicker_convert_to_alpha($dir) {
+
+  $result = TRUE;
+  $errlist = array();
+  $uiddirlist = file_scan_directory($dir, ".*", array('.', '..', 'CVS'), 0, FALSE);
+
+  if (! imagepicker_make_alphadirs($dir) ) {
+    drupal_set_message( t('Directories could not be created'), 'error');
+    return FALSE;
+  }
+
+  if (count($uiddirlist)) {
+    foreach ($uiddirlist AS $uiddir => $uid) {
+      if ($uiddirlist[$uiddir]->basename) {
+        $useruid = $uiddirlist[$uiddir]->basename;
+
+        // get the user name
+        $result = db_query("SELECT uid, name FROM {users} WHERE uid=%d AND status=1", array($useruid));
+        $row = db_fetch_array($result);
+        if ($row['name']) {
+          $username = $row['name'];
+        }
+        if ($username) {
+          $firstletter = drupal_strtolower(drupal_substr($username, 0, 1));
+          $firstletter = preg_match('/^[a-z]$/', $firstletter) ? $firstletter : 'others';
+          $newpath = $dir . DIRECTORY_SEPARATOR . $firstletter . DIRECTORY_SEPARATOR . $username;
+          $thumbstarget = $newpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR;
+          $browsertarget = $newpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR;
+          // create dirs
+          if (! file_check_directory($newpath, TRUE)) {
+            $errlist[$newpath] = "Could not create dir";
+          }
+          if (! file_check_directory($thumbstarget, TRUE)) {
+            $errlist[$thumbstarget] = "Could not create thumbs dir";
+          }
+          if (! file_check_directory($browsertarget, TRUE)) {
+            $errlist[$browsertarget] = "Could not create browser dir";
+          }
+          if (! count($errlist) ) {
+            // clear
+            drupal_get_messages();
+            $oldpath = $uiddir;
+            $newfilelist = file_scan_directory($oldpath, ".*", array('.', '..', 'CVS'), 0, FALSE);
+            if ( count($newfilelist) ) {
+              foreach ($newfilelist as $k => $v) {
+                if (! is_dir($k) ) {
+                  $file = $newfilelist[$k]->filename;
+                  $thumbsfile = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $newfilelist[$k]->basename;
+                  $browserfile =  $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $newfilelist[$k]->basename;
+                  if (! file_move($file,  $newpath, FILE_EXISTS_ERROR)) {
+                    $errlist[$file] = "Could not move to $newpath";
+                  }
+                  if (! file_move($thumbsfile, $thumbstarget, FILE_EXISTS_ERROR)) {
+                    $errlist[$thumbsfile] = "Could not move to $thumbstarget";
+                  }
+                  if (! file_move($browserfile, $browsertarget, FILE_EXISTS_ERROR)) {
+                    $errlist[$browserfile] = "Could not move to $browsertarget";
+                  }
+                }
+              }
+            }
+            if (! count($errlist) ) {
+              $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR;
+              $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR;
+              $delpath[] = $oldpath;
+            }
+          }
+        }
+        else {
+          $errlist[$k] = "NO uid for user $u";
+        }
+      }
+    }
+  }
+
+  if (! count($errlist) ) {
+    // tidy up
+    if ( count($delpath) ) {
+      foreach ($delpath AS $p) {
+        if (is_dir($p)) {
+          if (! rmdir($p)) {
+            $errlist[$p] = 'deletion failed';
+          }
+        }
+        else {
+          $errlist[$p] = 'not a dir';
+        }
+      }
+    }
+  }
+
+  if (count($errlist)) {
+    foreach ( $errlist as $key => $val ) {
+      drupal_set_message("ERRORS: $key: $val ", 'error');
+    }
+    $result = FALSE;
+  }
+  return $result;
+
+}
+
+function imagepicker_make_alphadirs($dir) {
+
+  if (file_check_directory($dir, TRUE)) {
+    $dirlist = range('a', 'z');
+    array_push($dirlist, 'others');
+
+    foreach ($dirlist AS $v) {
+      $newdir = $dir . DIRECTORY_SEPARATOR . $v;
+      if (! file_check_directory($newdir, TRUE)) {
+        drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
+      }
+    }
+    $errors = drupal_get_messages('error');
+    if (! count($errors)) {
+      // clear
+      drupal_get_messages();
+      drupal_set_message(t('Directory creation for the Imagepicker module was successful.'));
+      return $dir;
+    }
+    else {
+      foreach ($errors['error'] as $error) {
+        drupal_set_message($error, 'error');
+      }
+    }
+  }
+  else {
+    drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
+  }
+  return FALSE;
+}
+
+function imagepicker_files_validate($dir) {
+  $fstype = variable_get('imagepicker_fstype', '');
+  $result = TRUE;
+  $errlist = array();
+  $uidlist = array();
+  if ($fstype == 'numeric' ) {
+    $baddirlist = array();
+    $numericdirlist = file_scan_directory($dir, ".*", array('.', '..', 'CVS'), 0, FALSE);
+    foreach ( $numericdirlist AS $k => $v ) {
+      if ( is_numeric($numericdirlist[$k]->basename) ) {
+        $numericdir = $numericdirlist[$k]->basename;
+        $result = db_query("SELECT uid FROM {users} WHERE uid=%d AND status=1", array($numericdir));
+        $row = db_fetch_array($result);
+        if ($row['uid']) {
+          // build list of valid paths to images, use uid as key
+          $uidlist[$row['uid']] = $numericdirlist[$k]->filename;
+        }
+        else {
+          array_push($baduseridlist, $numericdir);
+        }
+      }
+    }
+    if ( count($baduseridlist) ) {
+      $errlist['user ids do not exist'] = implode(',', $baduseridlist);
+    }
+  }
+  elseif ($fstype == 'alpha' ) {
+    // check that a-z and other exist, log errors
+    $dirlist = range('a', 'z');
+    array_push($dirlist, 'others');
+    $baddirlist = array();
+    $gooddirlist = array();
+    foreach ($dirlist AS $alphadir) {
+      if (! is_dir($dir . DIRECTORY_SEPARATOR . $alphadir)) {
+        array_push($baddirlist, $alphadir);
+      }
+      else {
+        array_push($gooddirlist, $alphadir);
+      }
+    }
+    if (count($baddirlist)) {
+      $errlist['missing dirs'] = implode(',', $baddirlist);
+    }
+    // get the first level dirs actually present and check for unknowns
+    $baddirlist = array();
+    $alphadirlist = file_scan_directory($dir, ".*", array('.', '..', 'CVS'), 0, FALSE);
+    foreach ($alphadirlist AS $k => $v) {
+      $alphadir = $alphadirlist[$k]->basename;
+      if (! in_array($alphadir , $dirlist)) {
+        array_push($baddirlist, $alphadir);
+      }
+    }
+    if (count($baddirlist)) {
+      $errlist['Anomalous directories'] = implode(',', $baddirlist);
+    }
+    // search for usernames and validate them
+    $userdirlist = array();
+    $userdirlistpath = array();
+    foreach ($gooddirlist AS $alphadir) {
+      $gooddir = $dir . DIRECTORY_SEPARATOR . $alphadir;
+      $userdirlisttmp = file_scan_directory($gooddir, ".*", array('.', '..', 'CVS'), 0, FALSE);
+      if (count($userdirlisttmp)) {
+        foreach ($userdirlisttmp AS $k => $v) {
+          array_push($userdirlist, $userdirlisttmp[$k]->basename);
+          array_push($userdirlistpath, $userdirlisttmp[$k]->filename);
+        }
+      }
+    }
+    // we have usernames, now look them up
+    $badusernamelist = array();
+    foreach ( $userdirlist AS $k => $username ) {
+      $result = db_query("SELECT uid FROM {users} WHERE name='%s' AND status=1", array($username));
+      $row = db_fetch_array($result);
+      if ($row['uid']) {
+        // build list of valid paths to images, use uid as key
+        $uidlist[$row['uid']] = $userdirlistpath[$k];
+      }
+      else {
+        array_push($badusernamelist, $username);
+      }
+    }
+    if ( count($badusernamelist) ) {
+      $errlist['bad usernames'] = implode(',', $badusernamelist);
+    }
+  }
+
+  // check valid uids against the imagepicker table, get the file list for each
+  $badfiledirs = array();
+  $badfilelist = array();
+  $badthumbsfilelist = array();
+  $badbrowserfilelist = array();
+  $badfilelist2 = array();
+  $badwritefiles = array();
+
+  $files = array();
+  $thumbsfiles = array();
+  $browserfiles = array();
+  foreach ($uidlist AS $uid => $filepath) {
+    $imgnames = array();
+    $result = db_query("SELECT img_name FROM {imagepicker} WHERE uid=%d", array($uid));
+    while ($row = db_fetch_array($result)) {
+      array_push($imgnames, $row['img_name']);
+    }
+    $filestmp = file_scan_directory($filepath, ".*", array('.', '..', 'CVS', IMAGEPICKER_THUMBS_DIR, IMAGEPICKER_BROWSER_DIR), 0, FALSE);
+    if (count($filestmp)) {
+      // compare files with db
+      foreach ($filestmp AS $k => $v ) {
+        $file = $filestmp[$k]->basename;
+        array_push($files, $file);
+        if (! is_writable($filestmp[$k]->filename) ) {
+          array_push($badwritefiles, $filestmp[$k]->filename);
+        }
+        $thumbsfile = $filepath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $file;
+        array_push($thumbsfiles, $thumbsfile);
+        $browserfile = $filepath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $file;
+        array_push($browserfiles, $browserfile);
+        // test for presence in db
+        if (! in_array($file , $imgnames) ) {
+          array_push($badfilelist, $file);
+        }
+        if (! file_exists($thumbsfile)) {
+          array_push($badthumbsfilelist, $thumbsfile);
+        }
+        elseif (! is_writable($thumbsfile)) {
+          array_push($badwritefiles, $thumbsfile);
+        }
+        if (! file_exists($browserfile)) {
+          array_push($badbrowserfilelist, $browserfile);
+        }
+        elseif (! is_writable($browserfile)) {
+          array_push($badwritefiles, $browserfile);
+        }
+      }
+    }
+    else {
+      array_push($badfiledirs, $uid);
+    }
+    // compare db to files
+    if (count($imgnames) ) {
+      foreach ($imgnames AS $imgname ) {
+        if (! in_array($imgname, $files) ) {
+          array_push($badfilelist2, $filepath . DIRECTORY_SEPARATOR . $imgname);
+          $thumbsfile = $filepath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $imgname;
+          if (! file_exists($thumbsfile)) {
+            array_push($badthumbsfilelist, $thumbsfile);
+          }
+          $browserfile = $filepath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $imgname;
+          if (! file_exists($browserfile)) {
+            array_push($badbrowserfilelist, $browserfile);
+          }
+        }
+      }
+    }
+  }
+
+  if (count($badfilelist)) {
+    $errlist[t('file not found in database')] = implode(',', $badfilelist);
+  }
+  if (count($badfilelist2)) {
+    $errlist[t('database image name not found in files')] = implode(',', $badfilelist2);
+  }
+  if (count($badthumbsfilelist)) {
+    $errlist[t('thumbs file does not exist')] = implode(',', $badthumbsfilelist);
+  }
+  if (count($badbrowserfilelist)) {
+    $errlist[t('browser file does not exist')] = implode(',', $badbrowserfilelist);
+  }
+  if (count($badfiledirs)) {
+    $errlist[t('uid has no files')] = implode(',', $badfiledirs);
+  }
+  if ( count($badwritefiles)) {
+    $errlist[t('file not writable')] = implode(',', $badwritefiles);
+  }
+
+  if (count($errlist) ) {
+    foreach ($errlist AS $k => $v) {
+      drupal_set_message("$k: $v", 'error');
+    }
+    drupal_set_message(t('Validation of directory structure failed, please correct the above errors before continuing.'), 'error');
+    $result = FALSE;
+  }
+  else {
+    drupal_set_message(t('Directory structure validated, %uidlist users found', array('%uidlist' => count($uidlist))));
+  }
+  return $result;
+}
+
+function imagepicker_admin_groups() {
+  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  include_once('imagepicker.group.inc');
+  if (! arg(4) ) {
+    variable_del('imagepicker_currentuser');
+    variable_set('imagepicker_currentgroup', 0);
+    $action = 'users';
+  }
+  $uid = variable_get('imagepicker_currentuser', '');
+  if ( arg(4) == 'user' && is_numeric(arg(5))) {
+    $uid = arg(5);
+  }
+  elseif (arg(4) == 'stats' || arg(4) == 'users') {
+    $action = arg(4);
+  }
+  if ( (arg(6) == 'browse' || arg(6) == 'edit' || arg(6) == 'delete') && is_numeric(arg(7)) ) {
+    $gidaction = arg(6);
+    $gid = arg(7);
+    if (arg(6) == 'browse') {
+      variable_set('imagepicker_currentgroup', $gid);
+      drupal_goto('admin/settings/imagepicker/images/user/'. $uid .'/browse');
+    }
+  }
+  $name = "";
+  if ($uid) {
+    $user = user_load(array('uid' => $uid));
+    $result = db_query("SELECT u.name FROM {users} u, {imagepicker} i WHERE u.uid = %d AND u.uid=i.uid", $uid);
+    $row = db_fetch_array($result);
+    $name = $row['name'];
+    $menu = array(
+      l(t('Users'), 'admin/settings/imagepicker/groups'),
+      l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid),
+      l(t('Images'), 'admin/settings/imagepicker/images/user/'. $uid .'/browse'),
+      l(t('Statistics'), 'admin/settings/imagepicker/groups/user/'. $uid .'/stats'),
+    );
+  }
+  elseif ($action) {
+    $menu = array(
+      l(t('Groups'), 'admin/settings/imagepicker/groups/users'),
+      l(t('Statistics'), 'admin/settings/imagepicker/groups/stats'),
+    );
+  }
+
+  $content .= drupal_get_form('imagepicker_group_search_form');
+  $content .= '<p>'. t('Managing groups for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
+  if ( is_array($menu)) {
+    $content .= theme_item_list($menu, NULL, 'ul', $attributes = array('class' => 'tabs secondary'));
+  }
+
+  if ($uid) {
+    // show groups for $uid
+    if ($gid) {
+      if ($gidaction == 'edit') {
+        $record = imagepicker_get_user_group($gid);
+        $content .= drupal_get_form('imagepicker_groups_form', $record);
+      }
+      elseif ($gidaction == 'delete') {
+        $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
+      }
+    }
+    elseif (arg(6) == 'stats') {
+      $content .= "<fieldset><legend>" . t('Statistics for %name', array('%name' => $name)) ."</legend>";
+      $content .= imagepicker_group_stats($user);
+      $content .= '</fieldset>';
+    }
+    else {
+      $content .= "<fieldset><legend>" . t('Groups for %name', array('%name' => $name)) ."</legend>";
+      $content .= imagepicker_groups_list('admin', $user);
+      $content .= '</fieldset>';
+      $content .= drupal_get_form('imagepicker_groups_form', 0, $user);
+    }
+  }
+  else {
+    if ($action == 'stats') {
+      $content .= '<fieldset><legend>'. t('Statistics') .'</legend>';
+      $content .= imagepicker_group_stats();
+      $content .= '</fieldset>';
+    }
+    else {
+      $content .= '<fieldset><legend>'. t('Groups') .'</legend>';
+      $content .= imagepicker_admin_groups_list('groups');
+      $content .= '</fieldset>';
+    }
+  }
+  return $content;
+}
+
+function imagepicker_admin_images() {
+  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+
+  if (! arg(4) ) {
+    variable_del('imagepicker_currentuser');
+    variable_set('imagepicker_currentgroup', 0);
+    #$action = 'browse_public';
+    $action = 'users';
+  }
+  $uid = variable_get('imagepicker_currentuser', '');
+  if ( arg(4) == 'user' && is_numeric(arg(5))) {
+    $uid = arg(5);
+  }
+  elseif (arg(4) == 'browse_public' || arg(4) == 'stats' || arg(4) == 'users' || arg(4) == 'list_public') {
+    $action = arg(4);
+  }
+  if (arg(6) == 'browse_public' || arg(6) == 'browse' || arg(6) == 'edit' || arg(6) == 'delete' || arg(6) == 'browseadmin' || arg(6) == 'upload' || arg(6) == 'stats' ) {
+    $imgaction = arg(6);
+  }
+  if ( is_numeric(arg(7))) {
+    $img_id = arg(7);
+  }
+  if (arg(6) == 'upload' ) {
+    include_once('imagepicker.upload.inc');
+    if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+      $content .= imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
+    }
+  }
+
+  $name = "";
+  if ($uid) {
+    $user = user_load(array('uid' => $uid));
+    $name = $user->name;
+    $menu = array(
+      l(t('Users'), 'admin/settings/imagepicker/images'),
+      l(t('Browse All'), 'admin/settings/imagepicker/images/browse_public'),
+      l(t('List All'), 'admin/settings/imagepicker/images/list_public'),
+      l(t('Browse'), 'admin/settings/imagepicker/images/user/'. $uid .'/browse'),
+      l(t('List'), 'admin/settings/imagepicker/images/user/'. $uid .'/browseadmin'),
+      l(t('Upload'), 'admin/settings/imagepicker/images/user/'. $uid .'/upload'),
+      l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid ),
+      l(t('Statistics'), 'admin/settings/imagepicker/images/user/'. $uid .'/stats'),
+    );
+  }
+  elseif ($action) {
+    $menu = array(
+      l(t('Users'), 'admin/settings/imagepicker/images/users'),
+      l(t('Browse All'), 'admin/settings/imagepicker/images/browse_public'),
+      l(t('List All'), 'admin/settings/imagepicker/images/list_public'),
+      l(t('Statistics'), 'admin/settings/imagepicker/images/stats'),
+    );
+  }
+  $content .= drupal_get_form('imagepicker_user_search_form', 'images');
+  $content .= '<p>'. t('Managing images for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
+  if ( is_array($menu)) {
+    $content .= theme_item_list($menu, NULL, 'ul', $attributes = array('class' => 'tabs secondary'));
+  }
+
+  if ($uid) {
+    if ($img_id) {
+      if ($imgaction == 'edit' ) {
+        include_once('imagepicker.edit.inc');
+        $img =  _imagepicker_get_img($img_id, FALSE, $user);
+        $imgsrc = imagepicker_get_image_path($img, 'browser', array('uid' => $user->uid , 'name' => $user->name) );
+        $content .= "<div class='imgp_help'>". t('Edit image details') ."</div>";
+        $content .= '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
+        $content .= drupal_get_form('imagepicker_edit_form', $img, 'admin', $user);
+      }
+      elseif ($imgaction == 'delete') {
+        imagepicker_image_delete($img_id, $user, 'admin');
+      }
+      else {
+        $content .= imagepicker_admin_view($img_id, $user);
+      }
+    }
+    elseif ($imgaction == 'upload') {
+      $content .= '<fieldset><legend>'. t('Upload file for %name', array('%name' => $name)) .'</legend>';
+      $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
+      $content .= '</fieldset>';
+    }
+    elseif ($imgaction == 'stats') {
+      $content .= '<fieldset><legend>'. t('Statistics for %name', array('%name' => $name)) .'</legend>';
+      $content .= imagepicker_group_stats($user);
+      $content .= '</fieldset>';
+    }
+    elseif ($imgaction == 'browseadmin') {
+      $content .= '<fieldset><legend>'. t('List images for %name', array('%name' => $name)) .'</legend>';
+      $content .= _imagepicker_browse_admin('admin', $user);
+      $content .= '</fieldset>';
+    }
+    else {
+      $content .= '<fieldset><legend>'. t('Browse images for %name', array('%name' => $name)) .'</legend>';
+      $content .= _imagepicker_browse('admin', $user);
+      $content .= '</fieldset>';
+    }
+  }
+  else {
+    if ($action == 'stats') {
+      $content .= '<fieldset><legend>'. t('Statistics') .'</legend>';
+      $content .= imagepicker_group_stats();
+      $content .= '</fieldset>';
+    }
+    elseif ($action == 'browse_public') {
+      $content .= '<fieldset><legend>'. t('Images') .'</legend>';
+      $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 1));
+      $content .= '</fieldset>';
+    }
+    elseif ($action == 'list_public') {
+      $content .= '<fieldset><legend>'. t('List All') .'</legend>';
+      $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 1));
+      $content .= '</fieldset>';
+    }
+    else {
+      $content .= '<fieldset><legend>'. t('Users') .'</legend>';
+      $content .= imagepicker_admin_users_list('images');
+      $content .= '</fieldset>';
+    }
+  }
+  return $content;
+}
+
+function imagepicker_group_search_form($form_state, $dir = 'groups') {
+
+  $form['imagepicker_currentgroup'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Groups'),
+    '#description' => '',
+    '#autocomplete_path' => 'admin/settings/imagepicker/groups/autocomplete',
+    '#default_value' => '',
+    '#maxlength' => 30,
+    '#size' => 25,
+    '#prefix' => '<div class="container-inline">',
+  );
+  $form['dir'] = array(
+    '#type' => 'hidden',
+    '#value' => $dir,
+  );
+  $form['imagepicker_group_search_submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Go',
+    '#suffix' => '</div>',
+  );
+  return $form;
+}
+
+function imagepicker_group_search_form_submit($form, &$form_state) {
+  if ($form_state['values']['imagepicker_currentgroup']) {
+    $result = db_query("SELECT gid, uid FROM {imagepicker_user_groups} WHERE group_name = '%s' ", $form_state['values']['imagepicker_currentgroup']);
+    $row = db_fetch_array($result);
+    if ($row['gid'] ) {
+      variable_set('imagepicker_currentgroup', $row['gid']);
+      drupal_goto('admin/settings/imagepicker/'. $form_state['values']['dir'] .'/user/'. $row['uid'] .'/edit/'. $row['gid']);
+    }
+    else {
+      variable_set('imagepicker_currentgroup', 0);
+    }
+  }
+  else {
+    variable_set('imagepicker_currentgroup', 0);
+  }
+}
+

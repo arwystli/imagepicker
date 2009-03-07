@@ -12,17 +12,17 @@
  */
 // iframe
 function imagepicker_image_edit($img_id) {
-  $content = _imagepicker_edit_img($img_id, FALSE);
+  $content = _imagepicker_edit_img($img_id, 'iframe');
   theme('imagepicker', $content);
 }
 
 // account
 function imagepicker_user_image_edit($img_id) {
-  $content = _imagepicker_edit_img($img_id, TRUE);
+  $content = _imagepicker_edit_img($img_id, 'account');
   return $content;
 }
 
-function imagepicker_edit_form(&$form_state, $img, $account=FALSE) {
+function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE) {
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
@@ -42,13 +42,17 @@ function imagepicker_edit_form(&$form_state, $img, $account=FALSE) {
   if ($account) {
     $form['account'] = array(
       '#type' => 'hidden',
-      '#value' => 1,
+      '#value' => $account->uid,
     );
   }
   $form['img_id'] = array(
       '#type' => 'hidden',
       '#value' => $img['img_id'],
     );
+  $form['src'] = array(
+      '#type' => 'hidden',
+      '#value' => $src,
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
@@ -68,9 +72,19 @@ function imagepicker_edit_form(&$form_state, $img, $account=FALSE) {
  * Submit form functions
  */
 function imagepicker_edit_form_cancel($form, &$form_state) {
-  global $user;
-  if ($form_state['values']['account']) {
-    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
+  if ($form_state['values']['account'] && $form_state['values']['src'] == 'admin') {
+    $user = user_load(array('uid' => $form_state['values']['account'] ));
+  }
+  else {
+    global $user;
+  }
+
+  if ($form_state['values']['src'] == 'admin') {
+    $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse/'. $img_id;
+
+  }
+  elseif ($form_state['values']['src'] == 'account') {
+    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse/'. $img_id;
   }
   else {
     $outpath = 'imagepicker/browse/'. $img_id;
@@ -81,14 +95,25 @@ function imagepicker_edit_form_cancel($form, &$form_state) {
 
 
 function imagepicker_edit_form_process($form, &$form_state) {
-  global $user;
   $img_id = $form_state['values']['img_id'];
-  if ($form_state['values']['account']) {
-    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
+  $src = $form_state['values']['src'];
+  if ($form_state['values']['account'] && $src == 'admin') {
+    $user = user_load(array('uid' => $form_state['values']['account'] ));
+  }
+  else {
+    global $user;
+  }
+
+  if ($src == 'admin') {
+    $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse/'. $img_id;
+  }
+  elseif ($src == 'account') {
+    $outpath = 'user/'. $user->uid .'/imagepicker/images/browse/'. $img_id;
   }
   else {
     $outpath = 'imagepicker/browse/'. $img_id;
   }
+
   $result = db_query_range("SELECT uid, img_name FROM {imagepicker} WHERE img_id = '%d'", $img_id, 0, 1);
   $img = db_fetch_array($result);
   if ($img) {
@@ -120,17 +145,21 @@ function imagepicker_edit_form_process($form, &$form_state) {
 /**
  * private functions
  */
-function _imagepicker_edit_img($img_id, $account=FALSE) {
+function _imagepicker_edit_img($img_id, $src='iframe', $account=FALSE) {
+  $userdir = FALSE;
+  if (is_object($account)) {
+    $userdir = array('uid' => $account->uid , 'name' => $account->name) ;
+  }
   $content = '';
-  $img =  _imagepicker_get_img($img_id);
+  $img =  _imagepicker_get_img($img_id, ($src=='admin'? FALSE: TRUE), $account);
   if ($img) {
-    $imgsrc = imagepicker_get_image_path($img, 'browser');
+    $imgsrc = imagepicker_get_image_path($img, 'browser', $userdir);
     $content .= "<div class='imgp_help'>". t('Edit image details') ."</div>";
     $content .= '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
-    $content .= drupal_get_form('imagepicker_edit_form', $img, $account);
+    $content .= drupal_get_form('imagepicker_edit_form', $img, $src, $account);
   }
   else {
-    drupal_set_message(t('Image not found in edit.'), 'error');
+    drupal_set_message(t('Image not found.'), 'error');
     $content = '';
   }
 

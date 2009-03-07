@@ -87,3 +87,9 @@ some problems, so be aware of it.
 Imagepicker can now be accessed in My Account, this is the best place to build
 up a collection of images. Here you can create Groups and add images to one or
 more groups. There is also an Admin mode where your images are listed.
+
+	Imagepicker Administrator
+In the 2 series there is the ability for an administrator to 
+view/add/edit/delete anything. Still BETA!
+The directories under files/imagepicker are now stored under uid. Older systems
+should still run. See the configuration tab 'Validate Files'

@@ -13,26 +13,33 @@
 // iframe
 function imagepicker_upload() {
   variable_del('imagepicker_advanced_browser_pagestart');
+  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+    $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
+  }
   $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
   $content = drupal_get_form('imagepicker_upload_form');
   theme('imagepicker', $content);
 }
 // account
 function imagepicker_user_upload() {
+  global $user;
   variable_del('imagepicker_advanced_browser_pagestart');
+  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+    $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
+  }
   $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
-  $content .= drupal_get_form('imagepicker_upload_form', TRUE);
+  $content .= drupal_get_form('imagepicker_upload_form', $user);
   return $content;
 }
 
-function imagepicker_upload_form(&$form_state, $account=FALSE) {
+function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
   $form['#attributes']['enctype'] = 'multipart/form-data';
   $form['file_upload'] = array(
     '#type' => 'file',
     '#title' => t('Image file'),
     '#description' => t('Browse your computer for image file'),
     '#required' => TRUE,
-    '#value' => 1
+    '#value' => 1,
   );
   $form['thumb'] = array(
     '#type' => 'textfield',
@@ -40,35 +47,60 @@ function imagepicker_upload_form(&$form_state, $account=FALSE) {
     '#size' => 10,
     '#default_value' => variable_get('imagepicker_default_thumbnail_size', 100),
     '#description' => t('Size in pixels of thumbnail\'s bigger side'),
-    '#required' => TRUE
+    '#required' => TRUE,
   );
   $form['scale'] = array(
     '#type' => 'textfield',
     '#title' => t('Scale image'),
     '#size' => 10,
     '#default_value' => variable_get('imagepicker_default_scale', ''),
-    '#description' => t('Scale image to this size in pixels if not left empty')
+    '#description' => t('Scale image to this size in pixels if not left empty'),
   );
   $form['title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title'),
-    '#description' => t('Add a title for your image')
+    '#description' => t('Add a title for your image'),
   );
   $form['description'] = array(
     '#type' => 'textarea',
     '#title' => t('Description'),
     '#rows' => 2,
     '#cols' => 80,
-    '#description' => t('Add a description for your image')
+    '#description' => t('Add a description for your image'),
   );
-  $form['account'] = array(
-    '#type' => 'hidden',
-    '#value' => $account,
-  );
+
+  // groups
+  if ( variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+    $grouplist = imagepicker_get_groups( ($admin ? $account : FALSE));
+    if ($grouplist) {
+      $form['grouplist'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $grouplist,
+        '#title' => t('Your Groups'),
+        '#description' => t('Select a group to add your image to.'),
+      );
+    }
+  }
+
+  if ($account) {
+    $form['account'] = array(
+      '#type' => 'hidden',
+      '#value' => $account->uid,
+    );
+  }
+  if ($admin) {
+    $form['admin'] = array(
+      '#type' => 'hidden',
+      '#value' => 1,
+    );
+  }
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Upload'),
   );
+  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+    $form['#suffix'] = imagepicker_upload_progress_busy();
+  }
   return $form;
 }
 
@@ -114,10 +146,15 @@ function imagepicker_upload_form_validate($form, &$form_state) {
  */
 function imagepicker_upload_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Upload')) {
-    global $user;
-    $destination = imagepicker_get_path(FALSE, TRUE);
-    $thumbsdir = $destination .'thumbs';
-    $browserdir = $destination .'browser';
+    if ( $form_state['values']['account'] && $form_state['values']['admin'] ) {
+      $user = user_load(array('uid' => $form_state['values']['account']));
+    }
+    else {
+      global $user;
+    }
+    $destination = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
+    $thumbsdir = $destination . IMAGEPICKER_THUMBS_DIR;
+    $browserdir = $destination . IMAGEPICKER_BROWSER_DIR;
 
     if (file_check_directory($destination, TRUE) && file_check_directory($thumbsdir, TRUE) && file_check_directory($browserdir, TRUE)) {
       // Add DIRECTORY_SEPARATORS here because drupals' functions remove trailing slashes
@@ -156,8 +193,20 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($user->uid, $file, $title, $description, $date));
           if ($result) {
             $nextimgid = db_last_insert_id('imagepicker', 'img_id');
+            if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+              $result = db_query("SELECT img_id FROM {imagepicker} WHERE uid = '%d' AND img_name = '%s'", array($user->uid, $file));
+              $row = db_fetch_array($result);
+              $record['img_id']  = $row['img_id'];
+              foreach ($form_state['values']['grouplist'] AS $gid) {
+                $record['gid'] = $gid;
+                imagepicker_insert_group_image($record);
+              }
+            }
             drupal_set_message(t('Image was successfully uploaded.'));
-            if ($form_state['values']['account']) {
+            if ($form_state['values']['admin']) {
+              $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse';
+            }
+            elseif ($form_state['values']['account']) {
               $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
             }
             else {
@@ -189,13 +238,15 @@ function imagepicker_upload_form_submit($form, &$form_state) {
       drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
     }
   }
-  if ($form_state['values']['account']) {
+  if ($form_state['values']['admin']) {
+    $outpath = 'admin/settings/imagepicker/images';
+  }
+  elseif ($form_state['values']['account']) {
     $outpath = 'user/'. $user->uid .'/imagepicker';
   }
   else {
     $outpath = 'imagepicker';
   }
-
   drupal_goto($outpath);
 }
 
@@ -274,3 +325,18 @@ function imagepicker_scale_image($source, $destination, $maxsize) {
   return image_toolkit_invoke('resize', array($source, $destination, $width, $height));
 }
 
+function imagepicker_upload_progress_get_script($delay) {
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_js(array('imagepicker_upload_progress' => array('delay' => $delay[0])), 'setting');
+}
+
+function imagepicker_upload_progress_busy() {
+  $message = variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.'));
+
+  return <<<CONTENT
+  <div id="sending" class="progress" style="display: none;">
+    <div class="status">$message</div>
+    <div class="bar"></div>
+  </div>
+CONTENT;
+}

@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-03-07
+------------------------------------
+by hutch, branch to imagepicker 2
+
 Image Picker  for D6 in HEAD, 2008-11-11
 ------------------------------------
 by hutch, added some help to readme.txt
