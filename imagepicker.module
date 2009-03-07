@@ -654,6 +654,9 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       include_once('imagepicker.edit.inc');
       $content .= imagepicker_user_image_edit($id);
     }
+    elseif ($func == 'delete' && is_numeric($id) && $id > 0) {
+      $content .= imagepicker_image_delete($id, TRUE);
+    }
     elseif ($func == 'browse') {
       $content .= imagepicker_user_browse();
     }
