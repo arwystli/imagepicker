@@ -101,6 +101,11 @@ function imagepicker_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
+      'avail_roles' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'all'),
     ),
     'indexes' => array(
       'uid' => array('uid'),
@@ -175,6 +180,11 @@ function imagepicker_update_1() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
+      'avail_roles' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'all'),
     ),
     'indexes' => array(
       'uid' => array('uid'),
@@ -211,4 +221,10 @@ function imagepicker_update_6002() {
   $ret[] = update_sql($sql);
   return $ret;
 
+}
+function imagepicker_update_6201() {
+  $ret = array();
+  $sql = "ALTER TABLE {imagepicker_user_groups} ADD `avail_roles` varchar(255) NOT NULL default 'all'";
+  $ret[] = update_sql($sql);
+  return $ret;
 }

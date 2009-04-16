@@ -273,6 +273,13 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_public_enabled', 1),
     '#description' => t('Allow users to make image groups publicly available.'),
   );
+  $form['imagepicker_advanced']['imagepicker_publicroles_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Public Role Control option'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_publicroles_enabled', 1),
+    '#description' => t('Allow users to make publicly available image groups restricted by role.'),
+  );
   $form['imagepicker_advanced']['imagepicker_groups_in_upload_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Groups in upload form '),

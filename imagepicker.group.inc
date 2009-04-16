@@ -74,7 +74,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
     '#description' => t('Maximum 50 characters'),
     '#required' => FALSE
   );
-  if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+  if (user_access('use public imagepicker') && user_access('create public groups') && variable_get('imagepicker_public_enabled', 1)) {
     $form['groupsave']['group_public'] = array(
       '#type' => 'checkbox',
       '#title' => t('Public'),
@@ -82,6 +82,33 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
       '#default_value' => ($record->public ? $record->public : ''),
       '#description' => t('Make this group publicly available'),
     );
+    // Create role restrictions
+    if (variable_get('imagepicker_publicroles_enabled', 1)) {
+      $form['groupsave']['group_public_roles'] = array(
+        '#type' => 'fieldset',
+        '#title' => ( $record->gid ?  t('Edit group roles') : t('Add public group roles')),
+        '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all groups.)'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+      );
+      // Output a list of available roles as checkboxes
+      $form['groupsave']['group_public_roles']['roles']['#tree'] = TRUE;
+      if ($record->avail_roles) {
+        if ($record->avail_roles != 'all') $availroles = explode(':', $record->avail_roles);
+      }
+      foreach (user_roles(TRUE) as $rid => $role) {
+        if (imagepicker_role_has_permission($rid)) {
+          if (is_array($availroles) && in_array($role, array_values($availroles))) $checked = TRUE;
+          else $checked = FALSE;
+          $form['groupsave']['group_public_roles']['roles'][$rid] = array(
+            '#type' => 'checkbox',
+            '#title' => t($role),
+            '#return_value' => $role,
+            '#default_value' => ($checked ? 1 : ''),
+          );
+        }
+      }
+    }
   }
 
   if ($account) {
@@ -108,6 +135,26 @@ function imagepicker_groups_form_submit($form, &$form_state) {
   $record['group_name'] = $form_state['values']['group_name'];
   $record['group_description'] = $form_state['values']['group_description'];
   $record['public'] = $form_state['values']['group_public'];
+
+  // Check role restrictions submitted
+  if ( $form_state['values']['roles']) {
+    $found = 0;
+    foreach ($form_state['values']['roles'] as $rid => $role) {
+      if (!$role) {
+        unset($form_state['values']['roles'][$rid]);
+      }
+      else {
+        $found++;
+      }
+    }
+    if ($found) {
+      $record['avail_roles'] = implode(':', $form_state['values']['roles']);
+    }
+    else {
+      $record['avail_roles'] = 'all';
+    }
+  }
+
   if ( $form_state['values']['account'] ) {
     $record['uid'] = $form_state['values']['account'];
   }
@@ -128,8 +175,8 @@ function imagepicker_groups_form_submit($form, &$form_state) {
  */
 function imagepicker_insert_user_group($record) {
   if (db_query(
-    "INSERT INTO {imagepicker_user_groups} (uid, group_name, group_description, public) VALUES (%d, '%s', '%s', %d)",
-    array($record['uid'], $record['group_name'], $record['group_description'], $record['public']))) {
+    "INSERT INTO {imagepicker_user_groups} (uid, group_name, group_description, public, avail_roles) VALUES (%d, '%s', '%s', %d, '%s')",
+    array($record['uid'], $record['group_name'], $record['group_description'], $record['public'], $record['avail_roles']))) {
     drupal_set_message(t('Group was successfully inserted'));
   }
   else {
@@ -139,8 +186,8 @@ function imagepicker_insert_user_group($record) {
 
 function imagepicker_update_user_group($record) {
   if (db_query(
-    "UPDATE {imagepicker_user_groups} SET group_name='%s', group_description='%s', public=%d WHERE gid = %d",
-    array($record['group_name'], $record['group_description'], $record['public'], $record['gid']))) {
+    "UPDATE {imagepicker_user_groups} SET group_name='%s', group_description='%s', public=%d, avail_roles='%s' WHERE gid = %d",
+    array($record['group_name'], $record['group_description'], $record['public'], $record['avail_roles'], $record['gid']))) {
     drupal_set_message(t('Group was successfully updated'));
   }
   else {
@@ -207,4 +254,10 @@ function imagepicker_group_delete_form_submit($form, &$form_state) {
   imagepicker_delete_user_group($form_state['values']['gid']);
 }
 
+
+function imagepicker_role_has_permission($rid) {
+  $result = db_query("SELECT count(pid) AS ct FROM {permission} WHERE rid = %d AND perm LIKE '%%use public imagepicker%%'", array($rid));
+  $row = db_fetch_array($result);
+  return $row['ct'];
+}
 
