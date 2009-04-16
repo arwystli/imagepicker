@@ -2,32 +2,17 @@
 // $Id$
 // $Name$
 
+/**
+ * @file
+ * imagepicker install, update and uninstall functions
+ */
+
 function imagepicker_install() {
-  // Create a directory structure so that usernames would be divided by letters.
+
   $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
   $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR .'imagepicker';
 
   if (file_check_directory($dir, TRUE)) {
-    $dirlist = range('a', 'z');
-    array_push($dirlist, 'others');
-
-    foreach ($dirlist AS $v) {
-      $newdir = $dir . DIRECTORY_SEPARATOR . $v;
-      if (! file_check_directory($newdir, TRUE)) {
-        drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
-      }
-    }
-    $errors = drupal_get_messages('error');
-    if (! count($errors)) {
-      // clear
-      drupal_get_messages();
-      drupal_set_message(t('Directory creation for the Imagepicker module was successful.'), '');
-    }
-    else {
-      foreach ($errors['error'] as $error) {
-        drupal_set_message($error, 'error');
-      }
-    }
 
     $created1 = db_query("INSERT INTO {sequences} (name, id) VALUES ('imagepicker_img_id', 0);");
 
@@ -53,6 +38,8 @@ function imagepicker_install() {
             `group_name` varchar(255) NOT NULL default '',
             `group_description` varchar(255) default NULL,
             `state` tinyint(4) unsigned NOT NULL default '0',
+            `public` tinyint(1) unsigned NOT NULL default '0',
+            `avail_roles` varchar(255) NOT NULL default 'all',
             PRIMARY KEY  (`gid`),
             KEY `uid` (`uid`)
             )
@@ -135,3 +122,19 @@ function imagepicker_update_2() {
     drupal_set_message(t('Table installation for the Imagepicker module was successful.'), '');
   }
 }
+
+function imagepicker_update_5103() {
+  $ret = array();
+  $sql = "ALTER TABLE {imagepicker_user_groups} ADD `public` tinyint(1) unsigned NOT NULL default '0'";
+  $ret[] = update_sql($sql);
+  return $ret;
+}
+
+
+function imagepicker_update_5201() {
+  $ret = array();
+  $sql = "ALTER TABLE {imagepicker_user_groups} ADD `avail_roles` VARCHAR(255) NOT NULL DEFAULT 'all'";
+  $ret[] = update_sql($sql);
+  return $ret;
+}
+
