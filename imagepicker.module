@@ -1809,6 +1809,12 @@ function imagepicker_user_has_role($role, $user=NULL) {
   return FALSE;
 }
 
+function imagepicker_role_has_permission($rid) {
+  $result = db_query("SELECT count(pid) AS ct FROM {permission} WHERE rid = %d AND perm LIKE '%%use public imagepicker%%'", array($rid));
+  $row = db_fetch_array($result);
+  return $row['ct'];
+}
+
 /**
  * Account functions
  */
@@ -2038,7 +2044,7 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
 
   if ($range == 1) {
     // Build sql for role restriction matching
-    if (variable_get('imagepicker_publicroles_enabled', 1)) {
+    if (variable_get('imagepicker_publicroles_enabled', 1) &&  $src != 'admin') {
       $x=1;
       foreach ($user->roles as $role) {
         if ($x==1) $rolesql = "AND (u.avail_roles = 'all' OR u.avail_roles LIKE '%%". $role ."%%'";
@@ -2508,7 +2514,7 @@ function imagepicker_groups_form($record=0, $account=FALSE) {
         if ($record->avail_roles != 'all') $availroles = explode(':', $record->avail_roles);
       }
       foreach (user_roles(TRUE) as $rid => $role) {
-        if (mysql_num_rows(db_query("SELECT * FROM {permission} WHERE rid = %d AND perm LIKE '%%use public imagepicker%%'", array($rid)))>0) {
+        if (imagepicker_role_has_permission($rid)) {
           if (is_array($availroles) && in_array($role, array_values($availroles))) $checked = TRUE;
           else $checked = FALSE;
           $form['groupsave']['group_public_roles']['roles'][$rid] = array(
@@ -2551,12 +2557,23 @@ function imagepicker_groups_form_submit($form_id, $form_values) {
   $record['public'] = $form_values['group_public'];
   // Check role restrictions submitted
   if ($form_values['roles']) {
+    $found = 0;
     foreach ($form_values['roles'] as $rid => $role) {
-      if (!$role) unset($form_values['roles'][$rid]);
+      if (!$role) {
+        unset($form_values['roles'][$rid]);
+      }
+      else {
+        $found++;
+      }
     }
+    if ($found) {
     $record['avail_roles'] = implode(':', $form_values['roles']);
   }
-  else $record['avail_roles'] = 'all';
+    else {
+      $record['avail_roles'] = 'all';
+    }
+  }
+
   if ( $form_values['account'] ) {
     $record['uid'] = $form_values['account'];
   }
