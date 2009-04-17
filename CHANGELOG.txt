@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-04-17
+------------------------------------
+by hutch, added roles and fixed support
+for module fckeditor-6.x-1.3
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-03-07
 ------------------------------------
 by hutch, branch to imagepicker 2

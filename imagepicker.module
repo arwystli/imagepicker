@@ -730,13 +730,13 @@ function imagepicker_js($img, $public = FALSE) {
       var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
 
       if (isFCKeditor == 'yes') {
-        myFCKeditor = win.FCKeditorAPI.GetInstance(win.fckLaunchedJsId);
+        myFCKeditor = win.FCKeditorAPI.GetInstance('oFCK_1');
       }
 
       if (isTinyMCE) {
         win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
       }
-      else if (isFCKeditor == 'yes' && myFCKeditor && win.fckIsRunning[win.fckLaunchedJsId] && win.document.getElementById(win.fckLaunchedTextareaId[0]).style.display=='none' ){
+      else if (isFCKeditor == 'yes' && myFCKeditor){
         myFCKeditor.InsertHtml(imgpInsertion);
       }
       else {
