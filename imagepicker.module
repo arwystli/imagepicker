@@ -1810,7 +1810,7 @@ function imagepicker_user_has_role($role, $user=NULL) {
 }
 
 function imagepicker_role_has_permission($rid) {
-  $result = db_query("SELECT count(pid) AS ct FROM {permission} WHERE rid = %d AND perm LIKE '%%use public imagepicker%%'", array($rid));
+  $result = db_query("SELECT count(rid) AS ct FROM {permission} WHERE rid = %d AND perm LIKE '%%use public imagepicker%%'", array($rid));
   $row = db_fetch_array($result);
   return $row['ct'];
 }
