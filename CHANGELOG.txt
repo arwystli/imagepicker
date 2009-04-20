@@ -1,6 +1,15 @@
 // $Id$
 // $Name$
 
+Image Picker 5.x-2.x-dev, 2009-04-20
+------------------------------------
+by hutch Added quotas
+
+Image Picker 5.x-2.x-dev, 2009-04-16
+------------------------------------
+by hutch commited development version
+of 2.x series
+
 Image Picker 5.x-1.x-dev, 2008-10-25
 ------------------------------------
 by hutch, #321162 cleaned up css

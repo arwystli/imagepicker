@@ -227,12 +227,12 @@ function imagepicker_form_alter($form_id, &$form) {
  * Menu callback; presents the upload form for imagepicker
  */
 function imagepicker_upload() {
+  global $user;
   variable_del('imagepicker_advanced_browser_pagestart');
   if (variable_get('imagepicker_upload_progress_enabled', 1)) {
     $content = theme('imagepicker_upload_progress_get_script', variable_get('imagepicker_upload_progress_delay', 0));
   }
-  $content .= drupal_get_form('imagepicker_upload_form');
-
+  $content .= imagepicker_quota_ok('iframe');
   theme('imagepicker', $content);
 }
 
@@ -1274,6 +1274,27 @@ function imagepicker_settings_form() {
       '#description' => t('Configure the default code inserted into the "rel" attribute.'),
     );
   }
+  // quota
+  $form['imagepicker_quotas'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User quotas'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+    $form['imagepicker_quotas']['imagepicker_quota_enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Quotas in Imagepicker'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_quota_enable', 1),
+      '#description' => t('Unsetting this option will disable Quotas in Imagepicker.'),
+    );
+  $form['imagepicker_quotas']['imagepicker_quota_default'] = array(
+    '#type' => 'select',
+    '#default_value' => variable_get('imagepicker_quota_default', 0),
+    '#options' => imagepicker_get_quota_list(),
+    '#title' => t('Set default quota'),
+  );
+
   // advanced settings
   $form['imagepicker_advanced'] = array(
     '#type' => 'fieldset',
@@ -1463,6 +1484,7 @@ function imagepicker_admin_users_list($dir) {
     array('data' => t('Name'), 'field' => 'u.name'),
     t('Images'),
     t('Groups'),
+    (variable_get('imagepicker_quota_enable', 1) ? t('Quotas') : ''),
   );
   $rowcount = 0;
   $result = db_query("
@@ -1473,11 +1495,15 @@ function imagepicker_admin_users_list($dir) {
     $user = user_load( array('uid' => $row['uid']));
     $allcount = _imagepicker_user_has_img($user);
     $groupcount = _imagepicker_user_has_groups('all', $user);
+    $quota = isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 0);
+
     $row_data = array(
       check_plain($row['name']),
       ($allcount ? $allcount .' '. l(t('images'), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
       ($groupcount ? $groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' ) : t('No groups')),
+      (variable_get('imagepicker_quota_enable', 1) ? l(imagepicker_get_quota_list($quota+1), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/quota') : ''),
     );
+
     $rows[] = $row_data;
     $rowcount++;
   }
@@ -1620,13 +1646,13 @@ function imagepicker_admin_groups() {
       l(t('All groups'), 'admin/settings/imagepicker/groups'),
       l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid),
       l(t('Images'), 'admin/settings/imagepicker/images/user/'. $uid .'/browse'),
-      l(t('Statistics'), 'admin/settings/imagepicker/groups/user/'. $uid .'/stats'),
+      l(t('Stats'), 'admin/settings/imagepicker/groups/user/'. $uid .'/stats'),
     );
   }
   elseif ($action) {
     $menu = array(
       l(t('Groups'), 'admin/settings/imagepicker/groups/users'),
-      l(t('Statistics'), 'admin/settings/imagepicker/groups/stats'),
+      l(t('Stats'), 'admin/settings/imagepicker/groups/stats'),
     );
   }
 
@@ -1692,7 +1718,14 @@ function imagepicker_admin_images() {
     variable_set('imagepicker_currentgroup', 0);
     $uid = FALSE;
   }
-  if (arg(6) == 'browse_public' || arg(6) == 'browse' || arg(6) == 'edit' || arg(6) == 'delete' || arg(6) == 'browseadmin' || arg(6) == 'upload' || arg(6) == 'stats') {
+  if ( arg(6) == 'browse_public'
+    || arg(6) == 'browse'
+    || arg(6) == 'edit'
+    || arg(6) == 'delete'
+    || arg(6) == 'browseadmin'
+    || arg(6) == 'upload'
+    || arg(6) == 'stats'
+    || arg(6) == 'quota' ) {
     $imgaction = arg(6);
   }
   if (is_numeric(arg(7))) {
@@ -1715,7 +1748,8 @@ function imagepicker_admin_images() {
       l(t('List'), 'admin/settings/imagepicker/images/user/'. $uid .'/browseadmin'),
       l(t('Upload'), 'admin/settings/imagepicker/images/user/'. $uid .'/upload'),
       l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid ),
-      l(t('Statistics'), 'admin/settings/imagepicker/images/user/'. $uid .'/stats'),
+      l(t('Stats'), 'admin/settings/imagepicker/images/user/'. $uid .'/stats'),
+      (variable_get('imagepicker_quota_enable', 1) ? l(t('Quota'), 'admin/settings/imagepicker/images/user/'. $uid .'/quota') : ''),
     );
   }
   elseif ($action) {
@@ -1723,7 +1757,7 @@ function imagepicker_admin_images() {
       l(t('Users'), 'admin/settings/imagepicker/images/users'),
       l(t('Browse All'), 'admin/settings/imagepicker/images/browse_public'),
       l(t('List All'), 'admin/settings/imagepicker/images/list_public'),
-      l(t('Statistics'), 'admin/settings/imagepicker/images/stats'),
+      l(t('Stats'), 'admin/settings/imagepicker/images/stats'),
     );
   }
   $content .= drupal_get_form('imagepicker_user_search_form', 'images');
@@ -1750,7 +1784,10 @@ function imagepicker_admin_images() {
     }
     elseif ($imgaction == 'upload') {
       $content .= '<fieldset><legend>'. t('Upload file for %name', array('%name' => $name)) .'</legend>';
-      $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
+      if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+        $content .= theme('imagepicker_upload_progress_get_script', variable_get('imagepicker_upload_progress_delay', 0));
+      }
+      $content .= imagepicker_quota_ok('admin', $user);
       $content .= '</fieldset>';
     }
     elseif ($imgaction == 'stats') {
@@ -1763,6 +1800,27 @@ function imagepicker_admin_images() {
       $content .= _imagepicker_browse_admin('admin', $user);
       $content .= '</fieldset>';
     }
+    elseif ($imgaction == 'quota') {
+      $usedbytes = imagepicker_get_all_bytes($user)+1;
+      $usedbytesprint = _imagepicker_bkmg($usedbytes);
+      $quota = 0;
+      if ( variable_get('imagepicker_quota_enable', 1) ) {
+        $quota = ($user->imagepicker_quota ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 1));
+      }
+
+      $content .= '<fieldset><legend>'. t('Quota for %name', array('%name' => $name)) .'</legend>';
+      $imgtot = _imagepicker_user_has_img($user);
+      if ($quota) {
+        $pused = round($usedbytes / ($quota*1000000) * 100, 2);
+        $content .= '<p>'. t('User %name has used %pused percent or %usedbytesprint of quota and has %imgtot images.', array('%name' => $name, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+      else {
+        $content .= '<p>'. t('User %name has used %usedbytesprint and has %imgtot images.', array('%name' => $name, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot) ) .'</p>';
+      }
+      $content .= drupal_get_form('imagepicker_quota_form', $user);
+      $content .= '</fieldset>';
+    }
+
     else {
       $content .= '<fieldset><legend>'. t('Browse images for %name', array('%name' => $name)) .'</legend>';
       $content .= _imagepicker_browse('admin', $user);
@@ -1876,7 +1934,7 @@ function imagepicker_user_upload() {
     $content = theme('imagepicker_upload_progress_get_script', variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
-  $content .= drupal_get_form('imagepicker_upload_form', $user);
+  $content .= imagepicker_quota_ok('user', $user);
   return $content;
 }
 
@@ -3122,7 +3180,6 @@ function imagepicker_browse_order_form($account = FALSE, $admin = FALSE) {
     '#value' => t('Go'),
     '#suffix' => '</div>',
   );
-#    '#default_value' => variable_get('imagepicker_browser_order', $default_order),
 
   return $form;
 }
@@ -3946,7 +4003,7 @@ function theme_imagepicker_user_menu($mode = 'browse') {
     l(t('Upload'), $path),
     ($mode == 'browse' ? l(t('List'), "$path/images/browseadmin") : l(t('Browse'), "$path/images/browse")),
     l(t('Groups'), "$path/groups/browse"),
-    l(t('Statistics'), "$path/stats"),
+    l(t('Stats'), "$path/stats"),
   );
   if ( user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1) ) {
     $items[] = l(t('Browse Public'), "$path/images/browse_public");
@@ -4104,4 +4161,171 @@ function _imagepicker_bkmg($number) {
     return ($number .' '. $sym);
   }
   return (round(($number/$count)*$inc, 2) .' '. $sym);
+}
+
+/**
+ * quotas
+ *
+ */
+function imagepicker_quota_form($account=FALSE) {
+
+  $list = imagepicker_get_quota_list();
+  $default = variable_get('imagepicker_quota_default', 0);
+  $quota = $default;
+  $title = t('Set default quota');
+  if ($account) {
+    $title = t('Set user quota');
+    $quota = $account->imagepicker_quota;
+    if (! $quota) {
+      $quota = $default;
+    }
+  }
+
+  $form['imagepicker_quota'] = array(
+    '#type' => 'select',
+    '#default_value' => $quota,
+    '#options' => $list,
+    '#title' => $title,
+  );
+  $form['account'] = array(
+    '#type' => 'hidden',
+    '#value' => $account ? $account->uid : 0,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+  );
+
+  return $form;
+
+}
+
+#function imagepicker_quota_form_validate($form_id, $form_values) {
+#
+#}
+
+function imagepicker_quota_form_submit($form_id, $form_values) {
+
+    if ( $form_values['account'] > 0 ) {
+      $user = user_load(array('uid' => $form_values['account']));
+      user_save($user, array('imagepicker_quota' => $form_values['imagepicker_quota']));
+    }
+    else {
+      variable_set('imagepicker_quota_default', $form_values['imagepicker_quota']);
+    }
+
+}
+
+#function imagepicker_quota_list() {
+#
+#}
+#
+#function imagepicker_get_quota($account=FALSE) {
+#  if ($account) {
+#
+#  }
+#}
+
+function imagepicker_get_quota_list($key = 'x') {
+  $list = array(
+    0 => t('Unlimited'),
+    1 => t('1 Meg'),
+    5 => t('5 Meg'),
+    10 => t('10 Meg'),
+    25 => t('25 Meg'),
+    50 => t('50 Meg'),
+    100 => t('100 Meg'),
+    250 => t('250 Meg'),
+    500 => t('500 Meg'),
+    750 => t('750 Meg'),
+    1000 => t('1 Gig'),
+    2000 => t('2 Gig'),
+    5000 => t('5 Gig'),
+  );
+
+  if ($key == 'x') {
+    return $list;
+  }
+
+  $value = $list[$key-1];
+  return $value;
+}
+
+function imagepicker_quota_ok($src, $account = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  $usedbytes = imagepicker_get_all_bytes($user)+1;
+  $usedbytesprint = _imagepicker_bkmg($usedbytes);
+  $quota = 0;
+  $quota_enabled = variable_get('imagepicker_quota_enable', 1);
+  if ($quota_enabled) {
+    $quota = ( isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 1));
+    if ($quota > 0) {
+      $quota_ok = (( ($quota*1000000) >  $usedbytes) ? TRUE : FALSE );
+    }
+    else {
+      $quota_ok = TRUE;
+    }
+  }
+  else {
+    $quota_ok = TRUE;
+  }
+
+  $imgtot = _imagepicker_user_has_img($user);
+  if ($quota_enabled) {
+    if ($quota > 0) {
+      $pused = round($usedbytes / ($quota*1000000) * 100, 2);
+      $quotaprint = imagepicker_get_quota_list($quota+1);
+      if ($src == 'admin') {
+        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %pused percent, or %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+      else {
+        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %pused percent, or %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+    }
+    else {
+      $quotaprint = imagepicker_get_quota_list($quota+1);
+      if ($src == 'admin') {
+        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+      else {
+        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+    }
+  }
+  else {
+    if ($src == 'admin') {
+      $content .= '<p class="messages">'. t('%name has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+    }
+    else {
+      $content .= '<p class="messages">'. t('You have used %usedbytesprint in %imgtot images', array('%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+    }
+  }
+  if ($quota_ok) {
+    if ($account) {
+      if ($src == 'admin') {
+        $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
+      }
+      elseif ($src == 'user') {
+        $content .= drupal_get_form('imagepicker_upload_form', $user);
+      }
+    }
+    else {
+      $content .= drupal_get_form('imagepicker_upload_form');
+    }
+  }
+  else {
+    if ($account) {
+      $content .= '<p class="messages">'. t('%name has used all of quota, please delete some files to make some room.', array('%name' => $user->name)) .'</p>';
+    }
+    else {
+      $content .= '<p class="messages">'. t('You have used all of your quota, please delete some files to make some room.') .'</p>';
+    }
+  }
+
+  return $content;
 }
