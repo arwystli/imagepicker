@@ -17,7 +17,7 @@ function imagepicker_upload() {
     $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
-  $content = drupal_get_form('imagepicker_upload_form');
+  $content .= imagepicker_quota_ok('iframe');
   theme('imagepicker', $content);
 }
 // account
@@ -28,7 +28,7 @@ function imagepicker_user_upload() {
     $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= "<div class='imgp_help'>" . t('Upload images. You can give them a title and description') ."</div>";
-  $content .= drupal_get_form('imagepicker_upload_form', $user);
+  $content .= imagepicker_quota_ok('user', $user);
   return $content;
 }
 

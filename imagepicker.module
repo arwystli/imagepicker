@@ -939,7 +939,7 @@ function theme_imagepicker_user_menu($uid, $mode = 'browse') {
     l(t('Upload'), $path),
     ($mode == 'browse' ? l(t('List'), "$path/images/browseadmin") : l(t('Browse'), "$path/images/browse")),
     l(t('Groups'), "$path/groups/browse" ),
-    l(t('Statistics'), "$path/stats"),
+    l(t('Stats'), "$path/stats"),
   );
   if ( user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1) ) {
     $items[] = l(t('Browse Public'), "$path/images/browse_public");
@@ -1806,35 +1806,35 @@ function imagepicker_group_stats($account = FALSE) {
     }
   }
   else {
-    # imagepicker users
+    // imagepicker users
     $result = db_query("SELECT count(DISTINCT uid) AS ct FROM {imagepicker_user_groups}");
     $row = db_fetch_array($result);
     $usercount = $row['ct'];
-    # all groups
+    // all groups
     $result = db_query("SELECT count(gid) AS ct FROM {imagepicker_user_groups}");
     $row = db_fetch_array($result);
     $groupcount = $row['ct'];
-    # public groups
+    // public groups
     $result = db_query("SELECT count(gid) AS ct FROM {imagepicker_user_groups} WHERE public = 1");
     $row = db_fetch_array($result);
     $publicgroupcount = $row['ct'];
-    # private groups
+    // private groups
     $result = db_query("SELECT count(gid) AS ct FROM {imagepicker_user_groups} WHERE public = 0");
     $row = db_fetch_array($result);
     $nopublicgroupcount = $row['ct'];
-    # all images
+    // all images
     $result = db_query("SELECT count(img_id) AS ct FROM {imagepicker}");
     $row = db_fetch_array($result);
     $allcount = $row['ct'];
-    # grouped images
+    // grouped images
     $result = db_query("SELECT count(DISTINCT gi.img_id) AS ct FROM {imagepicker_group_images} gi, {imagepicker_user_groups} g WHERE g.gid = gi.gid ");
     $row = db_fetch_array($result);
     $totcount = $row['ct'];
-    # public images
+    // public images
     $result = db_query("SELECT COUNT(i.img_id) AS ct FROM {imagepicker} i, {imagepicker_user_groups} g, {imagepicker_group_images} gi WHERE i.img_id = gi.img_id AND g.gid = gi.gid AND g.public = 1");
     $row = db_fetch_array($result);
     $publiccount = $row['ct'];
-    # private images
+    // private images
     $result = db_query("SELECT COUNT(i.img_id) AS ct FROM {imagepicker} i, {imagepicker_user_groups} g, {imagepicker_group_images} gi WHERE i.img_id = gi.img_id AND g.gid = gi.gid AND g.public = 0");
     $row = db_fetch_array($result);
     $nopubliccount = $row['ct'];
@@ -2104,4 +2104,156 @@ function _imagepicker_bkmg($number) {
     return ($number .' '. $sym);
   }
   return (round(($number/$count)*$inc, 2) .' '. $sym);
+}
+
+/**
+ * quotas
+ *
+ */
+function imagepicker_quota_form(&$form_state, $account=FALSE) {
+
+  $list = imagepicker_get_quota_list();
+  $default = variable_get('imagepicker_quota_default', 0);
+  $quota = $default;
+  $title = t('Set default quota');
+  if ($account) {
+    $title = t('Set user quota');
+    $quota = $account->imagepicker_quota;
+    if (! $quota) {
+      $quota = $default;
+    }
+  }
+
+  $form['imagepicker_quota'] = array(
+    '#type' => 'select',
+    '#default_value' => $quota,
+    '#options' => $list,
+    '#title' => $title,
+  );
+  $form['account'] = array(
+    '#type' => 'hidden',
+    '#value' => ($account ? $account->uid : 0),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+  );
+
+  return $form;
+
+}
+
+function imagepicker_quota_form_submit($form, &$form_state) {
+
+    if ( $form_state['values']['account'] > 0 ) {
+      $user = user_load(array('uid' => $form_state['values']['account']));
+      user_save($user, array('imagepicker_quota' => $form_state['values']['imagepicker_quota']));
+    }
+    else {
+      variable_set('imagepicker_quota_default', $form_state['values']['imagepicker_quota']);
+    }
+}
+
+function imagepicker_get_quota_list($key = 'x') {
+  $list = array(
+    0 => t('Unlimited'),
+    1 => t('1 Meg'),
+    5 => t('5 Meg'),
+    10 => t('10 Meg'),
+    25 => t('25 Meg'),
+    50 => t('50 Meg'),
+    100 => t('100 Meg'),
+    250 => t('250 Meg'),
+    500 => t('500 Meg'),
+    750 => t('750 Meg'),
+    1000 => t('1 Gig'),
+    2000 => t('2 Gig'),
+    5000 => t('5 Gig'),
+  );
+
+  if ($key == 'x') {
+    return $list;
+  }
+
+  $value = $list[$key-1];
+  return $value;
+}
+
+function imagepicker_quota_ok($src, $account = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  $usedbytes = imagepicker_get_all_bytes($user)+1;
+  $usedbytesprint = _imagepicker_bkmg($usedbytes);
+  $quota = 0;
+  $quota_enabled = variable_get('imagepicker_quota_enable', 1);
+  if ($quota_enabled) {
+    $quota = ( isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 1));
+    if ($quota > 0) {
+      $quota_ok = (( ($quota*1000000) >  $usedbytes) ? TRUE : FALSE );
+    }
+    else {
+      $quota_ok = TRUE;
+    }
+  }
+  else {
+    $quota_ok = TRUE;
+  }
+
+  $imgtot = _imagepicker_user_has_img($user);
+  if ($quota_enabled) {
+    if ($quota > 0) {
+      $pused = round($usedbytes / ($quota*1000000) * 100, 2);
+      $quotaprint = imagepicker_get_quota_list($quota+1);
+      if ($src == 'admin') {
+        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %pused percent, or %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+      else {
+        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %pused percent, or %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+    }
+    else {
+      $quotaprint = imagepicker_get_quota_list($quota+1);
+      if ($src == 'admin') {
+        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+      else {
+        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      }
+    }
+  }
+  else {
+    if ($src == 'admin') {
+      $content .= '<p class="messages">'. t('%name has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+    }
+    else {
+      $content .= '<p class="messages">'. t('You have used %usedbytesprint in %imgtot images', array('%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+    }
+  }
+  if ($quota_ok) {
+    if ($account) {
+      if ($src == 'admin') {
+        $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
+      }
+      elseif ($src == 'user') {
+        $content .= drupal_get_form('imagepicker_upload_form', $user);
+      }
+    }
+    else {
+      $content .= drupal_get_form('imagepicker_upload_form');
+    }
+  }
+  else {
+    if ($account) {
+      $content .= '<p class="messages">'. t('%name has used all of quota, please delete some files to make some room.', array('%name' => $user->name)) .'</p>';
+    }
+    else {
+      $content .= '<p class="messages">'. t('You have used all of your quota, please delete some files to make some room.') .'</p>';
+    }
+  }
+
+  return $content;
 }
