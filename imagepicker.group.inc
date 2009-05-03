@@ -102,7 +102,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
           else $checked = FALSE;
           $form['groupsave']['group_public_roles']['roles'][$rid] = array(
             '#type' => 'checkbox',
-            '#title' => t($role),
+            '#title' => $role,
             '#return_value' => $role,
             '#default_value' => ($checked ? 1 : ''),
           );

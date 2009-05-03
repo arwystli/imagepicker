@@ -263,6 +263,12 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     $comment = TRUE;
     $weight = 1;
   }
+  // blocks
+  $block = FALSE;
+  if (preg_match('/block_form$/i', $form_id) && variable_get('imagepicker_blocks_enabled', 0)) {
+    $block = TRUE;
+    $weight = 1;
+  }
   if (user_access('use imagepicker')) {
     if (($node_type && preg_match('/node_form$/i', $form_id) ) || $comment ) {
       $form['body_filter']['file_upload'] = array(
@@ -277,6 +283,21 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
         '#value' => '<div><iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe></div>',
       );
       $form['body_field']['#prefix'] = '<a name="body_hash"></a>'. $form['body_field']['#prefix'];
+    }
+    elseif ($block) {
+      $form['block_settings']['file_upload'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Image picker'),
+        '#collapsible' => 1,
+        '#collapsed' => variable_get('imagepicker_advanced_collapsed', 0),
+        '#weight' => $weight,
+      );
+      $form['block_settings']['file_upload']['mpframe'] = array(
+        '#type' => 'markup',
+        '#value' => '<div><iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe></div>',
+      );
+      $form['block_settings']['#prefix'] = '<a name="body_hash"></a>'. $form['body_field']['#prefix'];
+
     }
   }
 }

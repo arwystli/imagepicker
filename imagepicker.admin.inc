@@ -50,6 +50,13 @@ function imagepicker_settings_form($form_state) {
       '#description' => t('Setting this option enables Imagepicker in comments.'),
     );
   }
+  $form['imagepicker_settings']['imagepicker_blocks_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Blocks'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_blocks_enabled', 0),
+    '#description' => t('Setting this option enables Imagepicker in blocks.'),
+  );
   $form['imagepicker_settings']['imagepicker_default_pagelink'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show return link in page'),
