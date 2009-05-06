@@ -296,7 +296,7 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'markup',
         '#value' => '<div><iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe></div>',
       );
-      $form['block_settings']['#prefix'] = '<a name="body_hash"></a>'. $form['body_field']['#prefix'];
+      $form['block_settings']['#prefix'] = '<a name="body_hash"></a>'. $form['block_settings']['#prefix'];
 
     }
   }
