@@ -255,7 +255,7 @@ function imagepicker_func_load($arg) {
 function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   $node = $form['#node'];
   $node_types = node_get_types('names');
-  $node_type = in_array($node->type, variable_get('imagepicker_node_types_enabled', $node_types), TRUE);
+  $node_type = in_array($node->type, variable_get('imagepicker_node_types_enabled', array_keys($node_types)), TRUE);
   // comment
   $comment = FALSE;
   $weight = 1;
@@ -662,6 +662,7 @@ function imagepicker_js($img, $public = FALSE) {
       var imgpLinkElement;
       var imgpImageStyle;
       var isFCKeditor = '". (module_exists('fckeditor') ? 'yes' : 'no' ) ."'
+      var isWysiwyg = '". (module_exists('wysiwyg') ? 'yes' : 'no' ) ."'
       var imgpInsertion;
       var i;
 
@@ -747,20 +748,38 @@ function imagepicker_js($img, $public = FALSE) {
       if (!win) {
         win = top;
       }
+
+      // track down a wysiwyg editor
+      var jobdone = false;
+      var inst = false;
+      if (win.oFCK_1) {
+        inst = win.oFCK_1.InstanceName;
+      }
+      else if (win.oFCKeditor) {
+        inst = win.oFCKeditor.InstanceName;
+      }
+      else if (isWysiwyg == 'yes') {
+        inst = 'edit-body';
+      }
+
+      if (inst) {
+        if (win.FCKeditorAPI) {
+          myFCKeditor = win.FCKeditorAPI.GetInstance(inst);
+          if (myFCKeditor) {
+            myFCKeditor.InsertHtml(imgpInsertion);
+            jobdone = true;
+          }
+        }
+      }
+
       //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
       var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
-
-      if (isFCKeditor == 'yes') {
-        myFCKeditor = win.FCKeditorAPI.GetInstance('oFCK_1');
-      }
-
       if (isTinyMCE) {
         win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
+        jobdone = true;
       }
-      else if (isFCKeditor == 'yes' && myFCKeditor){
-        myFCKeditor.InsertHtml(imgpInsertion);
-      }
-      else {
+
+      if (! jobdone) {
         var nodeBody = win.document.getElementById('edit-body');
         var commentBody = win.document.getElementById('edit-comment');
         if (nodeBody) {
