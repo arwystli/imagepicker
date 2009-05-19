@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in HEAD, 2009-05-19
+------------------------------------
+by hutch fixed a bug in imagepicker_form_alter
+
 Image Picker  for D6 in HEAD, 2008-11-11
 ------------------------------------
 by hutch, added some help to readme.txt

@@ -166,14 +166,15 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   }
   if (user_access('use imagepicker')) {
     if (($node_type && preg_match('/node_form$/i', $form_id) ) || $comment ) {
-      $form['body_filter']['file_upload'] = array(
+      $form['body_field']['body_filter']['file_upload'] = array(
         '#type' => 'fieldset',
         '#title' => t('Image picker'),
         '#collapsible' => 1,
         '#collapsed' => variable_get('imagepicker_advanced_collapsed', 0),
         '#weight' => $weight,
       );
-      $form['body_filter']['file_upload']['mpframe'] = array(
+      $form['body_field']['body_filter']['#weight'] = 2;
+      $form['body_field']['body_filter']['file_upload']['mpframe'] = array(
         '#type' => 'markup',
         '#value' => '<div><iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe></div>',
       );
