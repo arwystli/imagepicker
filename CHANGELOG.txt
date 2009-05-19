@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-05-19
+------------------------------------
+by hutch fixed a bug in imagepicker_form_alter
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-05-13
 ------------------------------------
 by hutch added support for the wysiwyg module
