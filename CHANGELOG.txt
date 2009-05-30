@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker 5.x-2.x-dev, 2009-05-30
+------------------------------------
+by hutch updated translations
+
 Image Picker 5.x-2.x-dev, 2009-05-03
 ------------------------------------
 by hutch Added support for blocks module

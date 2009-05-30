@@ -3,7 +3,7 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  imagepicker.module,v 1.2.2.18.2.4 2009/04/20 00:16:16 hutch
+#  imagepicker.module,v 1.2.2.18.2.5 2009/05/03 16:13:58 hutch
 #  imagepicker.info: n/a
 #  imagepicker.install,v 1.2.2.6.2.1 2009/04/16 14:18:11 hutch
 #
@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2009-05-03 17:10+0100\n"
+"POT-Creation-Date: 2009-05-30 17:50+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
