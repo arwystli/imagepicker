@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-06-16
+------------------------------------
+by hutch, #358644 fixed
+bug in stats display fixed
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-05-30
 ------------------------------------
 by hutch updated translations

@@ -2142,7 +2142,7 @@ function _imagepicker_bkmg($number) {
 
   }
   if ($number < $inc ) {
-    return ($number .' '. $sym);
+    return ($number-1 .' '. $sym);
   }
   return (round(($number/$count)*$inc, 2) .' '. $sym);
 }

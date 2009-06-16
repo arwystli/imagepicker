@@ -25,19 +25,17 @@ Drupal's files directory path. But if you do so, please make sure, that you will
 copy whole imagepicker directory to the new location as well.
 
 	2. Enabling imagepicker
-Only users who have the right to use Full HTML filter will be able to use
-imagepicker. This is done because Imagepicker uses some HTML, which will be
-stipped out if user will not use this filter. Users, who has the right to use
-Full HTML filter will be able to use Imagepicker instantly after installation.
-If you want to enable Imagepicker module for other users, you will have to
-reconfigure filters.
+Imagepicker uses some HTML, which will be stripped out in input formats that
+use the HTML filter. If you want to enable Imagepicker module for use with such
+input formats, you will have to reconfigure filters.
 
 	3. Configuring filters
 Go to Administer > Site configuration > Input formats. You should see a list of
-all available filter in your site. Choose Full HTML and click on the configure
-link. In the Roles fieldset select all roles you want to be able to use this
-filter and save configuration.
-Alternately you can add <img>, <div> and <span> to the default filter.
+all available input formats in your site. Click the configure link next to each
+input format to see if it has the HTML filter is enabled. If it has, click on the
+configure tab and add <img>, <div> and <span> to the HTML filter's
+"Allowed tags".
+
 To see these changes you will need to clear Drupal's menu cache, otherwise you
 will see Access denied page instead of Imagepicker.
 
