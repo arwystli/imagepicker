@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker 5.x-1.x-dev, 2009-06-16
+------------------------------------
+by hutch, #358644 fixed
+
 Image Picker 5.x-1.x-dev, 2008-10-25
 ------------------------------------
 by hutch, #321162 cleaned up css
