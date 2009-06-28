@@ -31,6 +31,10 @@
 	margin-right: 40px;
 	margin-left: 20px;
 }
+#imgp_desc_control {
+	clear: both;
+}
+
 #imgp_controls {
 	padding-top: 10px;
 	clear: both;
@@ -80,4 +84,11 @@
 }
 #imgp_groups_form {
 	margin: 8px 0px 8px 0px;
+}
+.imgp_title {
+	font-weight: bold;
+
+}
+.imgp_desc {
+	font-style: italic;
 }

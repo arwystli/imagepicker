@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker 5.x-2.x-dev, 2009-06-28
+------------------------------------
+by hutch, added display description option
+
 Image Picker 5.x-2.x-dev, 2009-06-16
 ------------------------------------
 by hutch, #358644 fixed
