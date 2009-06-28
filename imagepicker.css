@@ -31,15 +31,29 @@
 	margin-right: 40px;
 	margin-left: 20px;
 }
+
+#imgp_desc_control {
+	clear: both;
+}
+
 #imgp_controls {
 	padding-top: 10px;
 	clear: both;
 }
 
+/* imagepicker page */
+#imgp_page {
+}
 #imgp_page_img {
 	text-align: center;
 	margin: 15px;
 }
+#imgp_page_description {
+}
+
+#imgp_page_returnlink {
+}
+
 #imgp_edit_form {
 	float: left;
 }
@@ -82,4 +96,12 @@
 }
 #imgp_groups_form {
 	margin: 8px 0px 8px 0px;
+}
+
+.imgp_title {
+	font-weight: bold;
+
+}
+.imgp_desc {
+	font-style: italic;
 }

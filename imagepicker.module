@@ -417,6 +417,13 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
     '#prefix' => '<div class="imgp_img_options">',
     '#suffix' => '</div>'
   );
+  $form['desc'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show Description'),
+    '#description' => t('Insert title and description'),
+    '#prefix' => '<div id="imgp_desc_control">',
+    '#suffix' => '</div>'
+  );
   $form['insert'] = array(
     '#type' => 'button',
     '#value' => t('Insert image'),
@@ -656,6 +663,7 @@ function imagepicker_js($img, $public = FALSE) {
       var imgpAlign = 'none';
       var imgpImagePath;
       var imgpImageTitle = '". ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image')) ."';
+      var imgpImageDesc = '". $img['img_description'] ."';
       var imgpFileLink = '". imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE) ) ."';
       var imgpThumbLink = '". imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)) ."';
       var imgpPageLink = '". url('imagepicker/image/'. $img['img_id']) ."';
@@ -740,6 +748,10 @@ function imagepicker_js($img, $public = FALSE) {
   }
   $ret .= "
         default: imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
+      }
+      // add title and description if requested
+      if (imgpForm.desc.checked) {
+        imgpLinkElement = '<div class=\"imgp_title\">' + imgpImageTitle + '</div>' + imgpLinkElement + '<div class=\"imgp_desc\">' + imgpImageDesc + '</div>';
       }
       // Create a HTML string which should be inserted in the node body
       imgpInsertion = imgpLinkElement.replace('%imgpImageElement%', imgpImageElement);
