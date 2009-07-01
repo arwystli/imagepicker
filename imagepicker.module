@@ -2459,7 +2459,7 @@ function imagepicker_quota_ok($src, $account = FALSE) {
  *
  */
 function imagepicker_thickbox_js() {
-  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 0)) {
+  if (module_exists('thickbox') && variable_get('imagepicker_advanced_thickbox', 0)) {
     drupal_add_js(array('imagepicker_thickbox' => array(
       'width' => variable_get('imagepicker_advanced_iframe_width', "100%"),
       'height' => variable_get('imagepicker_advanced_iframe_height', "500")
