@@ -1,6 +1,14 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-07-01
+------------------------------------
+by hutch, added thickbox integration
+added contribs folder
+fixed #504914 quota bug
+fixed #504872 multiple lines in description
+revemped menus and improved theming
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-06-28
 ------------------------------------
 by hutch, added display description option

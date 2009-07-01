@@ -1,0 +1,10 @@
+--- thickbox.module.org	2009-06-01 10:43:06.000000000 +0100
++++ thickbox.module	2009-07-01 08:34:03.000000000 +0100
+@@ -114,6 +114,7 @@
+     drupal_add_js($path .'/thickbox_auto.js');
+   }
+ 
++  module_invoke_all('thickbox_js');
+   drupal_add_js($path .'/thickbox.js');
+ }
+ 

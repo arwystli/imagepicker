@@ -15,7 +15,6 @@ function imagepicker_settings_page($op = NULL) {
   return $content;
 }
 
-
 function imagepicker_settings_form($form_state) {
 
   // default settings
@@ -107,6 +106,9 @@ function imagepicker_settings_form($form_state) {
   if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
     $linkoptions['lightbox'] = t('Lightbox');
   }
+  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1) ) {
+    $linkoptions['thickbox'] = t('Thickbox');
+  }
   $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = array(
     '#type' => 'radios',
@@ -190,6 +192,22 @@ function imagepicker_settings_form($form_state) {
       '#description' => t('Configure the default code inserted into the "rel" attribute.'),
     );
   }
+  if (module_exists('thickbox')) {
+    // thickbox integration
+    $form['imagepicker_thickbox'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Thickbox integration'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+    $form['imagepicker_thickbox']['imagepicker_thickbox_enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Thickbox in Imagepicker'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_thickbox_enable', 1),
+      '#description' => t('Unsetting this option will disable Thickbox in Imagepicker.'),
+    );
+  }
   // quota
   $form['imagepicker_quotas'] = array(
     '#type' => 'fieldset',
@@ -218,6 +236,15 @@ function imagepicker_settings_form($form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
+  if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
+    $form['imagepicker_advanced']['imagepicker_advanced_thickbox'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Thickbox Iframe'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_advanced_thickbox', 0),
+      '#description' => t('Use thickbox iframe instead of the builtin one. See the contribs folder in Imagepicker'),
+    );
+  }
   $form['imagepicker_advanced']['imagepicker_advanced_iframe_width'] = array(
     '#type' => 'textfield',
     '#title' => t('Iframe width'),
@@ -1177,26 +1204,9 @@ function imagepicker_admin_groups() {
     $result = db_query("SELECT u.name FROM {users} u, {imagepicker} i WHERE u.uid = %d AND u.uid=i.uid", $uid);
     $row = db_fetch_array($result);
     $name = $row['name'];
-    $menu = array(
-      l(t('Users'), 'admin/settings/imagepicker/groups'),
-      l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid),
-      l(t('Images'), 'admin/settings/imagepicker/images/user/'. $uid .'/browse'),
-      l(t('Stats'), 'admin/settings/imagepicker/groups/user/'. $uid .'/stats'),
-    );
   }
-  elseif ($action) {
-    $menu = array(
-      l(t('Groups'), 'admin/settings/imagepicker/groups/users'),
-      l(t('Stats'), 'admin/settings/imagepicker/groups/stats'),
-    );
-  }
-
   $content .= drupal_get_form('imagepicker_group_search_form');
   $content .= '<p>'. t('Managing groups for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
-  if ( is_array($menu)) {
-    $content .= theme_item_list($menu, NULL, 'ul', $attributes = array('class' => 'tabs secondary'));
-  }
-
   if ($uid) {
     // show groups for $uid
     if ($gid) {
@@ -1250,6 +1260,9 @@ function imagepicker_admin_images() {
   }
   elseif (arg(4) == 'browse_public' || arg(4) == 'stats' || arg(4) == 'users' || arg(4) == 'list_public') {
     $action = arg(4);
+    variable_del('imagepicker_currentuser');
+    variable_set('imagepicker_currentgroup', 0);
+    $uid = variable_get('imagepicker_currentuser', '');
   }
   if ( arg(6) == 'browse_public'
     || arg(6) == 'browse'
@@ -1275,31 +1288,9 @@ function imagepicker_admin_images() {
   if ($uid) {
     $user = user_load(array('uid' => $uid));
     $name = $user->name;
-    $menu = array(
-      l(t('Users'), 'admin/settings/imagepicker/images'),
-      l(t('Browse All'), 'admin/settings/imagepicker/images/browse_public'),
-      l(t('List All'), 'admin/settings/imagepicker/images/list_public'),
-      l(t('Browse'), 'admin/settings/imagepicker/images/user/'. $uid .'/browse'),
-      l(t('List'), 'admin/settings/imagepicker/images/user/'. $uid .'/browseadmin'),
-      l(t('Upload'), 'admin/settings/imagepicker/images/user/'. $uid .'/upload'),
-      l(t('Groups'), 'admin/settings/imagepicker/groups/user/'. $uid ),
-      l(t('Stats'), 'admin/settings/imagepicker/images/user/'. $uid .'/stats'),
-      (variable_get('imagepicker_quota_enable', 1) ? l(t('Quota'), 'admin/settings/imagepicker/images/user/'. $uid .'/quota') : ''),
-    );
-  }
-  elseif ($action) {
-    $menu = array(
-      l(t('Users'), 'admin/settings/imagepicker/images/users'),
-      l(t('Browse All'), 'admin/settings/imagepicker/images/browse_public'),
-      l(t('List All'), 'admin/settings/imagepicker/images/list_public'),
-      l(t('Stats'), 'admin/settings/imagepicker/images/stats'),
-    );
   }
   $content .= drupal_get_form('imagepicker_user_search_form', 'images');
   $content .= '<p>'. t('Managing images for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
-  if ( is_array($menu)) {
-    $content .= theme_item_list($menu, NULL, 'ul', $attributes = array('class' => 'tabs secondary'));
-  }
 
   if ($uid) {
     if ($img_id) {
@@ -1320,7 +1311,6 @@ function imagepicker_admin_images() {
     }
     elseif ($imgaction == 'upload') {
       $content .= '<fieldset><legend>'. t('Upload file for %name', array('%name' => $name)) .'</legend>';
-#      $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
       $content .= imagepicker_quota_ok('admin', $user);
       $content .= '</fieldset>';
     }
@@ -1366,13 +1356,13 @@ function imagepicker_admin_images() {
       $content .= '</fieldset>';
     }
     elseif ($action == 'browse_public') {
-      $content .= '<fieldset><legend>'. t('Images') .'</legend>';
-      $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 1));
+      $content .= '<fieldset><legend>'. t('Browse All Images') .'</legend>';
+      $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 0));
       $content .= '</fieldset>';
     }
     elseif ($action == 'list_public') {
-      $content .= '<fieldset><legend>'. t('List All') .'</legend>';
-      $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 1));
+      $content .= '<fieldset><legend>'. t('List All Images') .'</legend>';
+      $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 0));
       $content .= '</fieldset>';
     }
     else {
