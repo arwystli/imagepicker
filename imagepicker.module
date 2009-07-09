@@ -1140,28 +1140,75 @@ function _imagepicker_browse($src="iframe", $account = FALSE) {
   $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
   if ($account && $src == 'admin') {
     $order = variable_get('imagepicker_browser_order', $default_order);
+    $searchs = variable_get('imagepicker_browser_search', '');
   }
   else {
-    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order );
+    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order);
+    $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
   }
+  $searchs = trim($searchs);
+  $sarr = '';
+
+  if ($searchs) {
+    $xarr = _imagepicker_search_opts($searchs);
+    $searchsql = $xarr[0];
+    $sarr = $xarr[1];
+    if ($gid) {
+      $rarr = array_merge(array($user->uid, $gid), $sarr);
+      $rarr = array_merge($rarr, array("i.$order"));
+    }
+    else {
+      $rarr = array_merge(array($user->uid), $sarr);
+      $rarr = array_merge($rarr, array("i.$order"));
+    }
+  }
+  else {
+    if ($gid) {
+      $rarr = array($user->uid, $gid, "i.$order");
+    }
+    else {
+      $rarr = array($user->uid, "i.$order");
+    }
+  }
+
   // filter by selected group
   if ($gid) {
     $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
       FROM {imagepicker} i, {imagepicker_group_images} g
-      WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d
-      ORDER BY i.$order";
-    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid, $gid));
+      WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d ";
+    if ($searchsql) {
+      $sql .= $searchsql;
+    }
+    $sql .= " ORDER BY %s";
+    $result = pager_query($sql, $how_many, 0, NULL, $rarr);
   }
   else {
-    $sql = "SELECT * FROM {imagepicker}
-      WHERE uid=%d
-      ORDER BY $order";
-    $result = pager_query($sql, $how_many, 0, NULL, array($user->uid));
+    $sql = "SELECT * FROM {imagepicker} i
+      WHERE i.uid=%d ";
+    if ($searchsql) {
+      $sql .= $searchsql;
+    }
+    $sql .= " ORDER BY %s";
+    $result = pager_query($sql, $how_many, 0, NULL, $rarr);
   }
 
   $content_main = _imagepicker_thumbs_display($result, FALSE, $src);
   if ( empty($content_main) ) {
-    return '<div class="messages">'. t('You do not have any uploaded images') .'</div>';
+    if ($searchs) {
+      $content_main = '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      if ($src == 'admin') {
+        imagepicker_browse_search_form_reset_func(TRUE);
+      }
+      else {
+        imagepicker_browse_search_form_reset_func(FALSE);
+      }
+    }
+    elseif ($gid) {
+      $content_main = '<div class="messages">'. t('You do not have any images in the selected group') .'</div>';
+    }
+    else {
+      return '<div class="messages">'. t('You do not have any uploaded images') .'</div>';
+    }
   }
 
   $content_head = "";
@@ -1172,6 +1219,11 @@ function _imagepicker_browse($src="iframe", $account = FALSE) {
     // add groups select here
     $content_head .= drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE));
   }
+
+  if (variable_get('imagepicker_show_browse_search_form', 1)) {
+    $content_head .= drupal_get_form('imagepicker_browse_search_form', $user, ($src == 'admin' ? TRUE : FALSE));
+  }
+
   if ($src == "account" || $src == "admin") {
     $content_head .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
   }
@@ -1190,42 +1242,80 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
   $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
   $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order );
 
+  $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
+  $searchs = trim($searchs);
+  $sarr = '';
+  if ($searchs) {
+    $xarr = _imagepicker_search_opts($searchs);
+    $searchsql = $xarr[0];
+    $sarr = $xarr[1];
+  }
+
+  // Build sql for public with role restriction matching
+  $rarr = array();
   if ($range == 1) {
-    // Build sql for role restriction matching
     if (variable_get('imagepicker_publicroles_enabled', 1) &&  $src != 'admin') {
       $x=1;
+      $rolesarr = array();
+      $rolesql = "";
       foreach ($user->roles as $role) {
-        if ($x==1) $rolesql = "AND (u.avail_roles = 'all' OR u.avail_roles LIKE '%%". $role ."%%'";
-        else $rolesql .= " OR u.avail_roles LIKE '%%". $role ."%%'";
-        if ($x==count($user->roles)) $rolesql .= ")";
+        $rolesarr[] = $role;
+        if ($x == 1) {
+          $rolesql = " AND (u.avail_roles = 'all' OR u.avail_roles LIKE '%%%s%%'";
+        }
+        else {
+          $rolesql .= " OR u.avail_roles LIKE '%%%s%%'";
+        }
+        if ($x == count($user->roles)) {
+          $rolesql .= ")";
+        }
         $x++;
       }
     }
     $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
       FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-      WHERE i.uid = n.uid
-      AND u.public = 1
-      $rolesql
-      AND g.img_id = i.img_id
-      AND u.gid = g.gid
-      ORDER BY i.$order";
+      WHERE i.uid=n.uid AND u.public=1";
+    if ($rolesql) {
+      $sql .= $rolesql;
+    }
+    $sql .= " AND g.img_id=i.img_id AND u.gid=g.gid";
+    if ($searchsql) {
+      $sql .= $searchsql;
+    }
+    $sql .= " ORDER BY %s";
+    if ( count($rolesarr) > 0 ) {
+      $rarr = $rolesarr;
+    }
+    if ( is_array($sarr) ) {
+      $rarr = array_merge($rarr, $sarr);
+    }
   }
   elseif ($range == 2) {
-    $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
       FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-      WHERE i.uid = n.uid
-      AND u.public = 0
-      AND g.img_id = i.img_id
-      AND u.gid = g.gid
-      ORDER BY i.$order";
+      WHERE i.uid=n.uid AND u.public=0 AND g.img_id=i.img_id AND u.gid=g.gid";
+    if ($searchsql) {
+      $sql .= $searchsql;
+    }
+    $sql .= " ORDER BY %s";
+    if ( is_array($sarr) ) {
+      $rarr = $sarr;
+    }
   }
   else {
     $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-      FROM {imagepicker} i, {users} n
-      WHERE i.uid = n.uid
-      ORDER BY i.$order";
+      FROM {imagepicker} i, {users} n WHERE i.uid=n.uid";
+    if ($searchsql) {
+      $sql .= $searchsql;
+    }
+    $sql .= " ORDER BY %s";
+    if ( is_array($sarr) ) {
+      $rarr = $sarr;
+    }
   }
-  $result = pager_query($sql, $how_many, 0, NULL);
+  $rarr = array_merge($rarr, array("i.$order"));
+
+  $result = pager_query($sql, $how_many, 0, NULL, $rarr);
 
   $content_main = _imagepicker_thumbs_display($result, TRUE, $src);
   if (empty($content_main) ) {
@@ -1240,7 +1330,18 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
       $ibpout = "";
     }
     variable_set('imagepicker_browse_public', 0);
-    return '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+    if ($searchs) {
+      $content_main = '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      if ($src == 'admin') {
+        imagepicker_browse_search_form_reset_func(TRUE);
+      }
+      else {
+        imagepicker_browse_search_form_reset_func(FALSE);
+      }
+    }
+    else {
+      $content_main = '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+    }
   }
 
   $content_head = "";
@@ -1250,6 +1351,9 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
 
   if ( $src == 'admin' ) {
     $content_head .= drupal_get_form('imagepicker_browse_public_form');
+  }
+  if (variable_get('imagepicker_show_browse_search_form', 1)) {
+    $content_head .= drupal_get_form('imagepicker_browse_search_form');
   }
 
   if ($src == "account" || $src == 'admin') {
@@ -1367,8 +1471,20 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
       }
     }
   }
+  if (variable_get('imagepicker_show_browse_search_form', 1)) {
+    $content .= drupal_get_form('imagepicker_browse_search_form');
+  }
 
   $how_many = variable_get('imagepicker_advanced_browser_page', 25);
+  $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
+  $searchs = trim($searchs);
+  $sarr = '';
+  if ($searchs) {
+    $xarr = _imagepicker_search_opts($searchs);
+    $searchsql = $xarr[0];
+    $sarr = $xarr[1];
+  }
+
   // tablesort
   if ($public && $src == 'admin') {
     $header = array(
@@ -1394,40 +1510,71 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
     if ($range == 1) {
       $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
         FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-        WHERE i.uid = n.uid
-        AND u.public = 1
-        AND g.img_id = i.img_id
-        AND u.gid = g.gid". tablesort_sql($header);
+        WHERE i.uid=n.uid AND u.public=1 AND g.img_id=i.img_id AND u.gid=g.gid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
     }
     elseif ($range == 2) {
       $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
         FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-        WHERE i.uid = n.uid
-        AND u.public = 0
-        AND g.img_id = i.img_id
-        AND u.gid = g.gid". tablesort_sql($header);
+        WHERE i.uid=n.uid AND u.public=0 AND g.img_id=i.img_id AND u.gid=g.gid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
     }
     else {
       $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
         FROM {imagepicker} i, {users} n
-        WHERE i.uid = n.uid". tablesort_sql($header);
+        WHERE i.uid = n.uid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
     }
-    $result = pager_query($sql, $how_many, 0, NULL);
+    if (is_array($sarr) ) {
+      $result = pager_query($sql, $how_many, 0, NULL, $sarr);
+    }
+    else {
+      $result = pager_query($sql, $how_many, 0, NULL);
+    }
   }
   else {
     // filter by selected group
     if ($gid) {
       $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
         FROM {imagepicker} i, {imagepicker_group_images} g
-        WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d". tablesort_sql($header);
-      $result = pager_query($sql, $how_many, 0, NULL, array($user->uid, $gid));
+        WHERE i.uid=%d AND i.img_id=g.img_id AND g.gid=%d";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
+      if ($searchsql) {
+        $rarr = array_merge(array($user->uid, $gid), $sarr);
+      }
+      else {
+        $rarr = array($user->uid, $gid);
+      }
     }
     else {
       $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
         FROM {imagepicker} i
-        WHERE i.uid=%d". tablesort_sql($header);
-      $result = pager_query($sql, $how_many, 0, NULL, array($user->uid) );
+        WHERE i.uid=%d";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+
+      $sql .= tablesort_sql($header);
+      if ($searchsql) {
+        $rarr = array_merge(array($user->uid), $sarr);
+      }
+      else {
+        $rarr = array($user->uid);
+      }
     }
+    $result = pager_query($sql, $how_many, 0, NULL, $rarr);
   }
 
   $rows = array();
@@ -1488,7 +1635,18 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
       $ibpout = "";
     }
     variable_set('imagepicker_browse_public', 0);
-    $content = '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+    if ($searchs) {
+      $content .= '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      if ($src == 'admin') {
+        imagepicker_browse_search_form_reset_func(TRUE);
+      }
+      else {
+        imagepicker_browse_search_form_reset_func(FALSE);
+      }
+    }
+    else {
+      $content .= '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+    }
   }
   return $content;
 }
@@ -2466,4 +2624,158 @@ function imagepicker_thickbox_js() {
       )), 'setting');
     drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js');
   }
+}
+
+// browse search
+function imagepicker_browse_search_form(&$form_state, $account = FALSE, $admin = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  $sarr = '';
+  if ($admin) {
+    $search = variable_get('imagepicker_browser_search', '');
+    $sarr = variable_get('imagepicker_browser_search_opts', '');
+    $form['admin'] = array(
+      '#type' => 'hidden',
+      '#value' => TRUE,
+    );
+  }
+  else {
+    $search = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
+    $sarr = ($user->imagepicker_browser_search_opts ? $user->imagepicker_browser_search_opts : '');
+  }
+
+  $form['imagepicker_browser_search'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Search'),
+    '#size' => 10,
+    '#default_value' => $search,
+    '#prefix' => '<div id="imgp_search_form" class="container-inline">',
+  );
+  $form['imagepicker_browser_search_by_name'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('By Name'),
+    '#default_value' => ( is_array($sarr) ? $sarr['name'] : 0),
+  );
+  $form['imagepicker_browser_search_by_desc'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('By Description'),
+    '#default_value' => ( is_array($sarr) ? $sarr['desc'] : 0),
+  );
+  $form['imagepicker_browser_search_by_title'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('By Title'),
+    '#default_value' => ( is_array($sarr) ? $sarr['title'] : 0),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+  );
+    $form['reset'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset'),
+      '#submit' => array('imagepicker_browse_search_form_reset'),
+      '#suffix' => '</div>'
+    );
+
+  return $form;
+}
+
+/**
+ * Submit form
+ */
+function imagepicker_browse_search_form_submit($form, &$form_state) {
+  global $user;
+  if ($form_state['values']['imagepicker_browser_search'] != '') {
+    $arr = array(
+        'name' => $form_state['values']['imagepicker_browser_search_by_name'],
+        'desc' => $form_state['values']['imagepicker_browser_search_by_desc'],
+        'title' => $form_state['values']['imagepicker_browser_search_by_title']);
+    $search = $form_state['values']['imagepicker_browser_search'];
+    if ($form_state['values']['admin']) {
+      variable_set('imagepicker_browser_search', $search);
+      variable_set('imagepicker_browser_search_opts', $arr);
+    }
+    else {
+      user_save($user, array('imagepicker_browser_search' => $search));
+      user_save($user, array('imagepicker_browser_search_opts' => $arr));
+    }
+  }
+  else {
+    if ($form_state['values']['admin']) {
+      variable_del('imagepicker_browser_search');
+      variable_del('imagepicker_browser_search_opts');
+    }
+    else {
+      user_save($user, array('imagepicker_browser_search' => NULL));
+      user_save($user, array('imagepicker_browser_search_opts' => NULL));
+    }
+  }
+}
+
+/**
+ * Submit Reset button.
+ */
+function imagepicker_browse_search_form_reset($form, &$form_state) {
+  imagepicker_browse_search_form_reset_func($form_state['values']['admin']);
+}
+
+function imagepicker_browse_search_form_reset_func($admin = FALSE) {
+  global $user;
+    if ($admin) {
+      variable_del('imagepicker_browser_search');
+      variable_del('imagepicker_browser_search_opts');
+    }
+    else {
+      user_save($user, array('imagepicker_browser_search' => NULL));
+      user_save($user, array('imagepicker_browser_search_opts' => NULL));
+    }
+}
+
+function _imagepicker_search_opts($searchs) {
+  $search_opts = variable_get('imagepicker_browser_search_opts', array());
+  if (   $search_opts['name']
+    && ! $search_opts['desc']
+    && ! $search_opts['title']) {
+    $s = " AND i.img_name LIKE '%%%s%%' ";
+    $sarr = array($searchs);
+  }
+  elseif ( $search_opts['name']
+    &&     $search_opts['desc']
+    &&   ! $search_opts['title']) {
+    $s = " AND (i.img_name LIKE '%%%s%%' OR i.img_description LIKE '%%%s%%') ";
+    $sarr = array($searchs, $searchs);
+  }
+  elseif ( $search_opts['name']
+    &&   ! $search_opts['desc']
+    &&     $search_opts['title']) {
+    $s = " AND (i.img_name LIKE '%%%s%%' OR i.img_title LIKE '%%%s%%') ";
+    $sarr = array($searchs, $searchs);
+  }
+  elseif (! $search_opts['name']
+    &&      $search_opts['desc']
+    &&      $search_opts['title']) {
+    $s = " AND (i.img_description LIKE '%%%s%%' OR i.img_title LIKE '%%%s%%') ";
+    $sarr = array($searchs, $searchs);
+  }
+  elseif (! $search_opts['name']
+    &&    ! $search_opts['desc']
+    &&      $search_opts['title']) {
+    $s = " AND i.img_title LIKE '%%%s%%' ";
+    $sarr = array($searchs);
+  }
+  elseif (! $search_opts['name']
+    &&      $search_opts['desc']
+    &&    ! $search_opts['title']) {
+    $s = " AND i.img_description LIKE '%%%s%%' ";
+    $sarr = array($searchs);
+  }
+  else {
+    $s = " AND (i.img_name LIKE '%%%s%%' OR i.img_description LIKE '%%%s%%' OR i.img_title LIKE '%%%s%%') ";
+    $sarr = array($searchs, $searchs, $searchs);
+  }
+  return (array(0 => $s, 1 => $sarr));
 }

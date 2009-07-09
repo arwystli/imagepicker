@@ -320,6 +320,13 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Default order'),
     '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
   );
+  $form['imagepicker_advanced']['imagepicker_show_browse_search_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show the search form in the browser'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_show_browse_search_form', 1),
+    '#description' => t(''),
+  );
   $form['imagepicker_advanced']['imagepicker_public_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Public option'),
@@ -562,7 +569,7 @@ function imagepicker_user_search_form($form_state, $dir) {
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
-    '#prefix' => '<div class="container-inline">',
+    '#prefix' => '<div id="imgp_users_form" class="container-inline">',
   );
   $form['dir'] = array(
     '#type' => 'hidden',

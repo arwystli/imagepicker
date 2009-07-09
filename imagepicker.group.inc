@@ -87,7 +87,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
       $form['groupsave']['group_public_roles'] = array(
         '#type' => 'fieldset',
         '#title' => ( $record->gid ?  t('Edit group roles') : t('Add public group roles')),
-        '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all groups.)'),
+        '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all roles.)'),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
       );

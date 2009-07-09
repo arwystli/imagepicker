@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-07-09
+------------------------------------
+by hutch, added search to browse and list images
+cleaned up noisy messages
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-07-01
 ------------------------------------
 by hutch, added thickbox integration

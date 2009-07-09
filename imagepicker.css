@@ -97,6 +97,12 @@
 #imgp_groups_form {
 	margin: 8px 0px 8px 0px;
 }
+#imgp_search_form {
+  margin: 8px 0px 8px 0px;
+}
+#imgp_users_form {
+  margin: 8px 0px 8px 0px;
+}
 
 .imgp_title {
 	font-weight: bold;

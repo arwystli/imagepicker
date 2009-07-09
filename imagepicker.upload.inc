@@ -157,6 +157,8 @@ function imagepicker_upload_form_submit($form, &$form_state) {
     $browserdir = $destination . IMAGEPICKER_BROWSER_DIR;
 
     if (file_check_directory($destination, TRUE) && file_check_directory($thumbsdir, TRUE) && file_check_directory($browserdir, TRUE)) {
+      // clear out the noisy 'created' messages
+      drupal_get_messages('status', TRUE);
       // Add DIRECTORY_SEPARATORS here because drupals' functions remove trailing slashes
       $destination .= DIRECTORY_SEPARATOR;
       $thumbsdir = $thumbsdir . DIRECTORY_SEPARATOR;
