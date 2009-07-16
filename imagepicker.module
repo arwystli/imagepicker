@@ -389,7 +389,7 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   }
   // blocks
   $block = FALSE;
-  if (preg_match('/block_form$/i', $form_id) && variable_get('imagepicker_blocks_enabled', 0)) {
+  if (($form_id == 'block_add_block_form' || $form_id == 'block_admin_configure') && variable_get('imagepicker_blocks_enabled', 0)) {
     $block = TRUE;
     $weight = 1;
   }
