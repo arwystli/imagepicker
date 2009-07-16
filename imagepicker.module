@@ -148,7 +148,7 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_admin_groups',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
-    'weight'           => -8
+    'weight'           => -7
   );
   $items['admin/settings/imagepicker/groups/user/%imagepicker_id/stats'] = array(
     'title'            => 'Stats',
@@ -247,6 +247,15 @@ function imagepicker_menu() {
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -4
+  );
+  $items['admin/settings/imagepicker/images/user/%imagepicker_id/groups'] = array(
+    'title'            => 'Groups',
+    'description'      => 'List user groups.',
+    'access arguments' => array('administer imagepicker'),
+    'page callback'    => 'imagepicker_admin_images',
+    'type'             => MENU_LOCAL_TASK,
+    'file'             => 'imagepicker.admin.inc',
+    'weight'           => -3
   );
   $items['admin/settings/imagepicker/images/autocomplete'] = array(
     'title'            => '',
@@ -667,6 +676,7 @@ function imagepicker_image_page($img_id) {
  * theming
  */
 function theme_imagepicker(&$content) {
+  global $language;
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
   $vars['content'] = $content;
@@ -675,6 +685,7 @@ function theme_imagepicker(&$content) {
   $vars['scripts'] = drupal_get_js();
   $vars['tabs'] = theme('menu_local_tasks');
   $vars['messages'] = imagepicker_strip_messages(theme('status_messages'));
+  $vars['language'] = $language;
   $template = 'imagepicker-page.tpl.php';
   $defaulttemplate = variable_get('theme_default', '');
   if ($defaulttemplate) {

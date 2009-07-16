@@ -1258,7 +1258,6 @@ function imagepicker_admin_images() {
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
-    #$action = 'browse_public';
     $action = 'users';
   }
   $uid = variable_get('imagepicker_currentuser', '');
@@ -1278,6 +1277,7 @@ function imagepicker_admin_images() {
     || arg(6) == 'browseadmin'
     || arg(6) == 'upload'
     || arg(6) == 'stats'
+    || arg(6) == 'groups'
     || arg(6) == 'quota') {
     $imgaction = arg(6);
   }
@@ -1349,6 +1349,9 @@ function imagepicker_admin_images() {
       }
       $content .= drupal_get_form('imagepicker_quota_form', $user);
       $content .= '</fieldset>';
+    }
+    elseif ($imgaction == 'groups') {
+      drupal_goto('admin/settings/imagepicker/groups/user/'. $uid);
     }
     else {
       $content .= '<fieldset><legend>'. t('Browse images for %name', array('%name' => $name)) .'</legend>';
