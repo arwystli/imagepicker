@@ -3,6 +3,10 @@
 
 Image Picker  for D6 in DRUPAL-6--2, 2009-07-16
 ------------------------------------
+by hutch, added imagepicker.theme.inc
+
+Image Picker  for D6 in DRUPAL-6--2, 2009-07-16
+------------------------------------
 by hutch, fixed bug in form_alter re block form
 
 Image Picker  for D6 in DRUPAL-6--2, 2009-07-16

@@ -154,8 +154,7 @@ function _imagepicker_edit_img($img_id, $src='iframe', $account=FALSE) {
   $img =  _imagepicker_get_img($img_id, ($src=='admin'? FALSE: TRUE), $account);
   if ($img) {
     $imgsrc = imagepicker_get_image_path($img, 'browser', $userdir);
-    $content .= "<div class='imgp_help'>". t('Edit image details') ."</div>";
-    $content .= '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
+    $content .= theme('imagepicker_image_edit_header', $img, $imgsrc);
     $content .= drupal_get_form('imagepicker_edit_form', $img, $src, $account);
   }
   else {

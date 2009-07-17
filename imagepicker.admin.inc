@@ -427,7 +427,7 @@ function imagepicker_settings_form_validate($form_id, $form_state) {
 /**
  * Administration functions
  */
-function imagepicker_admin_users_list($dir) {
+function imagepicker_admin_users_list($dir, $label='') {
 
   $how_many = variable_get('imagepicker_rows_per_page', 25);
   $header = array(
@@ -456,16 +456,10 @@ function imagepicker_admin_users_list($dir) {
     $rows[] = $row_data;
     $rowcount++;
   }
-  if (count($rows)) {
-    $content .= '<div>'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
-  }
-  else {
-    $content = '<div class="messages">'. t('No users found.') .'</div>';
-  }
-  return $content;
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No users found.'), '', '', $label);
 }
 
-function imagepicker_admin_groups_list() {
+function imagepicker_admin_groups_list($label="") {
   $how_many = variable_get('imagepicker_rows_per_page', 25);
     $header = array(
       array('data' => t('Group Name'), 'field' => 'g.group_name'),
@@ -492,13 +486,9 @@ function imagepicker_admin_groups_list() {
     $rows[] = $row_data;
     $rowcount++;
   }
-  if (count($rows)) {
-    $content .= '<div>'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
-  }
-  else {
-    $content = '<div class="messages">'. t('No groups found.') .'</div>';
-  }
-  return $content;
+  $pref = '';
+  $suff = '';
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), $pref, $suff, $label);
 }
 
 function imagepicker_admin_view($img_id, $account = FALSE) {
@@ -515,7 +505,7 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
     $info = image_get_info(imagepicker_get_path(FALSE, $userdir) . $img['img_name']);
-    $content = _imagepicker_view_content($img, $imgpath, $info) .
+    $content = theme('imagepicker_view', $img, $imgpath, $info) .
     drupal_get_form('imagepicker_admin_image_form', $img_id, $user) .
     '<br />'.
     (_imagepicker_has_groups($user) ? drupal_get_form('imagepicker_group_images_form', $img['img_id'], $user) : '');
@@ -1226,27 +1216,19 @@ function imagepicker_admin_groups() {
       }
     }
     elseif (arg(6) == 'stats') {
-      $content .= "<fieldset><legend>" . t('Statistics for %name', array('%name' => $name)) ."</legend>";
-      $content .= imagepicker_group_stats($user);
-      $content .= '</fieldset>';
+      $content .= imagepicker_group_stats($user, t('Statistics for %name', array('%name' => $name)));
     }
     else {
-      $content .= "<fieldset><legend>" . t('Groups for %name', array('%name' => $name)) ."</legend>";
-      $content .= imagepicker_groups_list('admin', $user);
-      $content .= '</fieldset>';
+      $content .= imagepicker_groups_list('admin', $user, t('Groups for %name', array('%name' => $name)));
       $content .= drupal_get_form('imagepicker_groups_form', 0, $user);
     }
   }
   else {
     if ($action == 'stats') {
-      $content .= '<fieldset><legend>'. t('Statistics') .'</legend>';
-      $content .= imagepicker_group_stats();
-      $content .= '</fieldset>';
+      $content .= imagepicker_group_stats(FALSE, t('Statistics'));
     }
     else {
-      $content .= '<fieldset><legend>'. t('Groups') .'</legend>';
-      $content .= imagepicker_admin_groups_list('groups');
-      $content .= '</fieldset>';
+      $content .= imagepicker_admin_groups_list(t('Groups'));
     }
   }
   return $content;
@@ -1305,8 +1287,7 @@ function imagepicker_admin_images() {
         include_once('imagepicker.edit.inc');
         $img =  _imagepicker_get_img($img_id, FALSE, $user);
         $imgsrc = imagepicker_get_image_path($img, 'browser', array('uid' => $user->uid , 'name' => $user->name) );
-        $content .= "<div class='imgp_help'>". t('Edit image details') ."</div>";
-        $content .= '<div id="imgp_img_holder"><img src="'. $imgsrc .'" alt="'. check_plain($img['img_title']) .'" /></div>';
+        $content .= theme('imagepicker_image_edit_header', $img, $imgsrc);
         $content .= drupal_get_form('imagepicker_edit_form', $img, 'admin', $user);
       }
       elseif ($imgaction == 'delete') {
@@ -1317,19 +1298,13 @@ function imagepicker_admin_images() {
       }
     }
     elseif ($imgaction == 'upload') {
-      $content .= '<fieldset><legend>'. t('Upload file for %name', array('%name' => $name)) .'</legend>';
-      $content .= imagepicker_quota_ok('admin', $user);
-      $content .= '</fieldset>';
+      $content .= imagepicker_quota_ok('admin', $user, t('Upload file for %name', array('%name' => $name)));
     }
     elseif ($imgaction == 'stats') {
-      $content .= '<fieldset><legend>'. t('Statistics for %name', array('%name' => $name)) .'</legend>';
-      $content .= imagepicker_group_stats($user);
-      $content .= '</fieldset>';
+      $content .= imagepicker_group_stats($user, t('Statistics for %name', array('%name' => $name)));
     }
     elseif ($imgaction == 'browseadmin') {
-      $content .= '<fieldset><legend>'. t('List images for %name', array('%name' => $name)) .'</legend>';
-      $content .= _imagepicker_browse_admin('admin', $user);
-      $content .= '</fieldset>';
+      $content .= _imagepicker_browse_admin('admin', $user, FALSE, 1, t('List images for %name', array('%name' => $name)));
     }
     elseif ($imgaction == 'quota') {
       $usedbytes = imagepicker_get_all_bytes($user)+1;
@@ -1338,47 +1313,38 @@ function imagepicker_admin_images() {
       if ( variable_get('imagepicker_quota_enable', 1) ) {
         $quota = (isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 1));
       }
-      $content .= '<fieldset><legend>'. t('Quota for %name', array('%name' => $name)) .'</legend>';
+      $label = t('Quota for %name', array('%name' => $name));
       $imgtot = _imagepicker_user_has_img($user);
+      $pl = format_plural($imgtot, '1 image', '@count images');
       if ($quota) {
         $pused = round($usedbytes / ($quota*1000000) * 100, 2);
-        $content .= '<p>'. t('User %name has used %pused percent or %usedbytesprint of quota and has %imgtot images.', array('%name' => $name, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+        $message = t('User %name has used %pused percent or %usedbytesprint of quota and has %pl.', array('%name' => $name, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
       else {
-        $content .= '<p>'. t('User %name has used %usedbytesprint and has %imgtot images.', array('%name' => $name, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot) ) .'</p>';
+        $message = t('User %name has used %usedbytesprint and has %pl.', array('%name' => $name, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
-      $content .= drupal_get_form('imagepicker_quota_form', $user);
-      $content .= '</fieldset>';
+      $form = drupal_get_form('imagepicker_quota_form', $user);
+      $content .= theme('imagepicker_quota', $form, $message, $label);
     }
     elseif ($imgaction == 'groups') {
       drupal_goto('admin/settings/imagepicker/groups/user/'. $uid);
     }
     else {
-      $content .= '<fieldset><legend>'. t('Browse images for %name', array('%name' => $name)) .'</legend>';
-      $content .= _imagepicker_browse('admin', $user);
-      $content .= '</fieldset>';
+      $content .= _imagepicker_browse('admin', $user, t('Browse images for %name', array('%name' => $name)));
     }
   }
   else {
     if ($action == 'stats') {
-      $content .= '<fieldset><legend>'. t('Statistics') .'</legend>';
-      $content .= imagepicker_group_stats();
-      $content .= '</fieldset>';
+      $content .= imagepicker_group_stats(FALSE, t('Statistics'));
     }
     elseif ($action == 'browse_public') {
-      $content .= '<fieldset><legend>'. t('Browse All Images') .'</legend>';
-      $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 0));
-      $content .= '</fieldset>';
+      $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 0), t('Browse All Images'));
     }
     elseif ($action == 'list_public') {
-      $content .= '<fieldset><legend>'. t('List All Images') .'</legend>';
-      $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 0));
-      $content .= '</fieldset>';
+      $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 0), t('List All Images'));
     }
     else {
-      $content .= '<fieldset><legend>'. t('Users') .'</legend>';
-      $content .= imagepicker_admin_users_list('images');
-      $content .= '</fieldset>';
+      $content .= imagepicker_admin_users_list('images', t('Users'));
     }
   }
   return $content;
@@ -1394,7 +1360,7 @@ function imagepicker_group_search_form($form_state, $dir = 'groups') {
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
-    '#prefix' => '<div class="container-inline">',
+    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   $form['dir'] = array(
     '#type' => 'hidden',

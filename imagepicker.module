@@ -29,6 +29,10 @@ function imagepicker_perm() {
   return array('administer imagepicker', 'use imagepicker', 'access own imagepicker', 'use public imagepicker', 'create public groups');
 }
 
+function imagepicker_init() {
+  include('imagepicker.theme.inc');
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -389,7 +393,7 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   }
   // blocks
   $block = FALSE;
-  if (($form_id == 'block_add_block_form' || $form_id == 'block_admin_configure') && variable_get('imagepicker_blocks_enabled', 0)) {
+  if ( ( $form_id == 'block_add_block_form' || $form_id == 'block_admin_configure' ) && variable_get('imagepicker_blocks_enabled', 0)) {
     $block = TRUE;
     $weight = 1;
   }
@@ -443,6 +447,71 @@ function imagepicker_theme() {
       'arguments' => array(
         'content' => NULL),
     ),
+    'imagepicker_list' => array(
+      'arguments' => array(
+        'header' => array(),
+        'rows' => array(),
+        $max = 50,
+        $message = "",
+        $pref = "",
+        $suff = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_stats' => array(
+      'arguments' => array(
+        'header' => array(),
+        'rows' => array(),
+        $pref = "",
+        $suff = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_browser' => array(
+      'arguments' => array(
+        'content' => array(),
+        'forms' => array(),
+        $message = "",
+        $help = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_fullpage' => array(
+      'arguments' => array(
+        'image' => array(),
+        $source = "",
+        $link = 1,
+      ),
+    ),
+    'imagepicker_quota_message' => array(
+      'arguments' => array(
+        $message1 = "",
+        $message2 = "",
+        $form = "",
+        $label = "",
+        $help = "",
+      ),
+    ),
+    'imagepicker_view' => array(
+      'arguments' => array(
+        'img' => array(),
+        $imgpath = "",
+        'info' => array(),
+      ),
+    ),
+    'imagepicker_image_edit_header' => array(
+      'arguments' => array(
+        'image' => array(),
+        $source = "",
+      ),
+    ),
+    'imagepicker_quota' => array(
+      'arguments' => array(
+        $form = "",
+        $message = "",
+        $label = "",
+      ),
+    ),
   );
 }
 
@@ -455,9 +524,7 @@ function imagepicker_browse($img_id=0) {
     imagepicker_image_select($img_id);
     exit();
   }
-
-  $content = _imagepicker_browse();
-  theme('imagepicker', $content);
+  return theme('imagepicker', _imagepicker_browse());
 }
 
 function imagepicker_browse_public($img_id=0) {
@@ -466,9 +533,7 @@ function imagepicker_browse_public($img_id=0) {
     imagepicker_image_select($img_id, FALSE, TRUE);
     exit();
   }
-
-  $content = _imagepicker_browse_public();
-  theme('imagepicker', $content);
+  return theme('imagepicker', _imagepicker_browse_public());
 }
 
 function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $account = FALSE) {
@@ -508,7 +573,7 @@ function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $ac
     $content = '';
   }
 
-  theme('imagepicker', $content);
+  return theme('imagepicker', $content);
 }
 
 function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
@@ -645,61 +710,22 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
 function imagepicker_image_page($img_id) {
   global $base_url;
 
+  $content = '';
   $result = db_query_range("SELECT i.*, u.name FROM {imagepicker} AS i JOIN {users} AS u USING (uid) WHERE img_id = '%d'", $img_id, 0, 1);
   $img = db_fetch_array($result);
   if ($img && is_array($img) && count($img)) {
     $path = drupal_get_path('module', 'imagepicker');
     drupal_add_css($path .'/imagepicker.css');
     drupal_set_title($img['img_title']);
-    $imgsrc = imagepicker_get_path(TRUE, $img) . $img['img_name'];
-    $content = '
-<div id="imgp_page"><div id="imgp_page_img">
-<a href="'. $imgsrc .'" alt="'. $img['img_title'] .'" target="_blank">
-<img src="'. $imgsrc .'" alt="'. $img['img_title'] .'" /></a></div>
-<div>'. nl2br($img['img_description']) .'</div>
-';
-
-    if (variable_get('imagepicker_default_pagelink', 1)) {
-      $content .= '<div><a href="#" onclick="history.back()">'. t('Return to page') .'</a></div>';
-    }
-    $content .= '</div>';
+    $content = theme('imagepicker_fullpage', $img, imagepicker_get_path(TRUE, $img) . $img['img_name'], variable_get('imagepicker_default_pagelink', 1));
   }
   else {
     drupal_set_message(t('Image not found in page.'), 'error');
-    $content = '';
   }
 
   return $content;
 }
 
-/**
- * theming
- */
-function theme_imagepicker(&$content) {
-  global $language;
-  $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css($path .'/imagepicker.css');
-  $vars['content'] = $content;
-  $vars['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
-  $vars['styles'] = drupal_get_css();
-  $vars['scripts'] = drupal_get_js();
-  $vars['tabs'] = theme('menu_local_tasks');
-  $vars['messages'] = imagepicker_strip_messages(theme('status_messages'));
-  $vars['language'] = $language;
-  $template = 'imagepicker-page.tpl.php';
-  $defaulttemplate = variable_get('theme_default', '');
-  if ($defaulttemplate) {
-    $templatepath = drupal_get_path('theme', $defaulttemplate);
-    if (file_exists($templatepath .'/'. $template)) {
-      $template = $templatepath .'/'. $template;
-    }
-    else {
-      $template = $path . '/' . $template;
-    }
-  }
-  echo theme_render_template($template, $vars);
-  exit;
-}
 
 /**
  * some common utilities
@@ -1069,7 +1095,7 @@ function imagepicker_user_view($img_id) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full');
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
-    $content = _imagepicker_view_content($img, $imgpath, $info) .
+    $content = theme('imagepicker_view', $img, $imgpath, $info) .
     drupal_get_form('imagepicker_user_image_form', $img_id) .
     '<br />'.
     (_imagepicker_has_groups() ? drupal_get_form('imagepicker_group_images_form', $img['img_id']) : '');
@@ -1092,7 +1118,7 @@ function imagepicker_user_view_public($img_id) {
 
     $imgpath = imagepicker_get_image_path($img, 'full', array('name' => $img['name'] , 'uid' => $img['uid'] ));
     $info = image_get_info(imagepicker_get_path(FALSE, array('name' => $img['name'] , 'uid' => $img['uid'] )) . $img['img_name']);
-    $content = _imagepicker_view_content($img, $imgpath, $info);
+    $content = theme('imagepicker_view', $img, $imgpath, $info);
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
@@ -1128,7 +1154,7 @@ function imagepicker_user_image_form_edit($form, &$form_state) {
   drupal_goto('user/'. $user->uid .'/imagepicker/images/edit/'. $form_state['values']['img_id']);
 }
 
-function _imagepicker_browse($src="iframe", $account = FALSE) {
+function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
   if ($account) {
     $user = $account;
     $userdir = array( 'uid' => $user->uid, 'name' => $user->name);
@@ -1203,10 +1229,12 @@ function _imagepicker_browse($src="iframe", $account = FALSE) {
     $result = pager_query($sql, $how_many, 0, NULL, $rarr);
   }
 
-  $content_main = _imagepicker_thumbs_display($result, FALSE, $src);
-  if ( empty($content_main) ) {
+  $content = _imagepicker_thumbs_getrows($result, FALSE, $src);
+
+  $message = "";
+  if (! is_array($content) ) {
     if ($searchs) {
-      $content_main = '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      $message = t('Your search for %searchs found nothing', array('%searchs' => $searchs));
       if ($src == 'admin') {
         imagepicker_browse_search_form_reset_func(TRUE);
       }
@@ -1215,38 +1243,36 @@ function _imagepicker_browse($src="iframe", $account = FALSE) {
       }
     }
     elseif ($gid) {
-      $content_main = '<div class="messages">'. t('You do not have any images in the selected group') .'</div>';
+      $message = t('You do not have any images in the selected group');
     }
     else {
-      return '<div class="messages">'. t('You do not have any uploaded images') .'</div>';
+      $message = t('You do not have any uploaded images');
     }
   }
 
-  $content_head = "";
+  $forms = array();
   if (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $content_head .= drupal_get_form('imagepicker_browse_order_form', $user, ($src == 'admin' ? TRUE : FALSE));
+    $forms[] = drupal_get_form('imagepicker_browse_order_form', $user, ($src == 'admin' ? TRUE : FALSE));
   }
   if (_imagepicker_has_groups($user) && imagepicker_has_grouplist($user)) {
     // add groups select here
-    $content_head .= drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE));
+    $forms[] = drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE));
   }
-
   if (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $content_head .= drupal_get_form('imagepicker_browse_search_form', $user, ($src == 'admin' ? TRUE : FALSE));
+    $forms[] = drupal_get_form('imagepicker_browse_search_form', $user, ($src == 'admin' ? TRUE : FALSE));
   }
 
   if ($src == "account" || $src == "admin") {
-    $content_head .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
+    $help = t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.');
   }
   else {
-    $content_head .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.') .'</div>';
+    $help = t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.');
   }
 
-  $content = $content_head . $content_main;
-  return $content;
+  return theme('imagepicker_browser', $content, $forms, $message, $help, $label);
 }
 
-function _imagepicker_browse_public($src="iframe", $range=1) {
+function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   global $user;
 
   $how_many = variable_get('imagepicker_advanced_browser_page', 25);
@@ -1328,13 +1354,15 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
 
   $result = pager_query($sql, $how_many, 0, NULL, $rarr);
 
-  $content_main = _imagepicker_thumbs_display($result, TRUE, $src);
-  if (empty($content_main) ) {
+  $content = _imagepicker_thumbs_getrows($result, TRUE, $src);
+
+  $message = "";
+  if (! is_array($content) ) {
     $ibp = variable_get('imagepicker_browse_public', 0);
-    if ($ibp == 1) {
+    if ($ibp == 1 || $range == 1) {
       $ibpout = "public";
     }
-    elseif ($ibp == 2) {
+    elseif ($ibp == 2 || $range == 2) {
       $ibpout = "private";
     }
     else {
@@ -1342,7 +1370,7 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
     }
     variable_set('imagepicker_browse_public', 0);
     if ($searchs) {
-      $content_main = '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      $message = t('Your search for %searchs found nothing', array('%searchs' => $searchs));
       if ($src == 'admin') {
         imagepicker_browse_search_form_reset_func(TRUE);
       }
@@ -1351,87 +1379,77 @@ function _imagepicker_browse_public($src="iframe", $range=1) {
       }
     }
     else {
-      $content_main = '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+      $message = t('There are no !status images', array('!status' => $ibpout));
     }
   }
 
-  $content_head = "";
+  $forms = array();
   if (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $content_head .= drupal_get_form('imagepicker_browse_order_form');
+    $forms[] = drupal_get_form('imagepicker_browse_order_form');
   }
-
   if ( $src == 'admin' ) {
-    $content_head .= drupal_get_form('imagepicker_browse_public_form');
+    $forms[] = drupal_get_form('imagepicker_browse_public_form');
   }
   if (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $content_head .= drupal_get_form('imagepicker_browse_search_form');
+    $forms[] = drupal_get_form('imagepicker_browse_search_form');
   }
 
   if ($src == "account" || $src == 'admin') {
-    $content_head .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
+    $help = '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
   }
   else {
-    $content_head .= '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.') .'</div>';
+    $help = '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to use.') .'</div>';
   }
 
-  $content = $content_head . $content_main;
-  return $content;
+  return theme('imagepicker_browser', $content, $forms, $message, $help, $label);
 }
 
-function _imagepicker_thumbs_display($result, $public = FALSE, $src = 'account') {
+function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account') {
 
   global $user;
-  $how_many = variable_get('imagepicker_advanced_browser_page', 25);
-  $browsercols = variable_get('imagepicker_advanced_browser_columns', 0);
   $ct = 0;
   $imgct = 0;
   if ($result) {
-    $content = '<div class="clear-block">';
+
     while ($img = db_fetch_array($result)) {
       if ($public || $src == 'admin') {
-        $userdir = array('name' => $img['name'], 'uid' => $img['uid']);
+        $rows[$imgct]['userdir'] = array('name' => $img['name'], 'uid' => $img['uid']);
       }
       else {
-        $userdir = array( 'uid' => $user->uid, 'name' => $user->name);
+        $rows[$imgct]['userdir'] = array( 'uid' => $user->uid, 'name' => $user->name);
       }
       // img_id img_name 	img_title 	img_description
-      $imgpath = imagepicker_get_image_path($img, 'browser', $userdir);
-      if ($imgpath) {
+      $rows[$imgct]['imgpath'] = imagepicker_get_image_path($img, 'browser', $rows[$imgct]['userdir']);
+      if ($rows[$imgct]['imgpath']) {
         if ($public) {
           // paths
           if ($src == 'account') {
-            $imgurl = 'user/'. $user->uid .'/imagepicker/images/browse_public/';
+            $rows[$imgct]['imgurl'] = 'user/'. $user->uid .'/imagepicker/images/browse_public/';
           }
           elseif ($src == 'admin') {
-            $imgurl = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
+            $rows[$imgct]['imgurl'] = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
           }
           else {
-            $imgurl = 'imagepicker/browse_public/';
+            $rows[$imgct]['imgurl'] = 'imagepicker/browse_public/';
           }
         }
         else {
           // paths
           if ($src == 'account') {
-            $imgurl = 'user/'. $user->uid .'/imagepicker/images/browse/';
+            $rows[$imgct]['imgurl'] = 'user/'. $user->uid .'/imagepicker/images/browse/';
           }
           elseif ($src == 'admin') {
-            $imgurl = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
+            $rows[$imgct]['imgurl'] = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
           }
           else {
-            $imgurl = 'imagepicker/browse/';
+            $rows[$imgct]['imgurl'] = 'imagepicker/browse/';
           }
         }
 
-        $tooltip =  $img['img_name'] .': '. $img['img_title'] .' '. $img['img_description'];
-        $imglink = ('<img src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $tooltip .'" />');
-        $content .= '<div class="imgp_holder">';
-        $content .= l($imglink, $imgurl . $img['img_id'], array('html' => TRUE));
-        $content .= '</div>';
-        $ct++;
-        if ($browsercols > 0 && $ct >= $browsercols) {
-          $content .= '</div><div class="clear-block">';
-          $ct = 0;
-        }
+        $rows[$imgct]['img_name'] = $img['img_name'];
+        $rows[$imgct]['img_title'] = $img['img_title'];
+        $rows[$imgct]['img_description'] = $img['img_description'];
+        $rows[$imgct]['img_id'] = $img['img_id'];
         $imgct++;
       }
     }
@@ -1439,12 +1457,11 @@ function _imagepicker_thumbs_display($result, $public = FALSE, $src = 'account')
   if (! $imgct) {
     return;
   }
-  $content .= '</div>';
-  $content .= theme('pager', NULL, $how_many);
-  return $content;
+
+  return array($rows, variable_get('imagepicker_advanced_browser_page', 25), variable_get('imagepicker_advanced_browser_columns', 0), array('<div class="clear-block">', '<div class="imgp_holder">'), array('</div>', '</div>'));
 }
 
-function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = FALSE, $range = 1) {
+function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE, $range=1, $label='') {
   if ($account) {
     $user = $account;
   }
@@ -1626,20 +1643,20 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
     $rows[] = $row_data;
   }
 
+  $content = "";
+  $pref = '<div class="imgp_imgs_list">';
+  $suff = '</div>';
   if (count($rows)) {
     if ($public && $src == 'admin') {
       $content .= drupal_get_form('imagepicker_browse_public_form');
     }
-    $content .= '<div class="imgp_imgs_list">';
-    $content .= theme('table', $header, $rows) . theme('pager', NULL, $how_many);
-    $content .= '</div>';
   }
   else {
     $ibp = variable_get('imagepicker_browse_public', 0);
-    if ($ibp == 1) {
+    if ($ibp == 1 || $range == 1) {
       $ibpout = "public";
     }
-    elseif ($ibp == 2) {
+    elseif ($ibp == 2 || $range == 2) {
       $ibpout = "private";
     }
     else {
@@ -1647,7 +1664,7 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
     }
     variable_set('imagepicker_browse_public', 0);
     if ($searchs) {
-      $content .= '<div class="messages">'. t('Your search for %searchs found nothing', array('%searchs' => $searchs)) .'</div>';
+      $message = t('Your search for %searchs found nothing', array('%searchs' => $searchs));
       if ($src == 'admin') {
         imagepicker_browse_search_form_reset_func(TRUE);
       }
@@ -1656,9 +1673,10 @@ function _imagepicker_browse_admin($src = "iframe", $account = FALSE, $public = 
       }
     }
     else {
-      $content .= '<div class="messages">'. t('There are no !status images', array('!status' => $ibpout)) .'</div>';
+      $message = t('There are no !status images', array('!status' => $ibpout));
     }
   }
+  $content .= theme('imagepicker_list', $header, $rows, $how_many, $message, '<div class="imgp_imgs_list">', '</div>', $label);
   return $content;
 }
 
@@ -2141,7 +2159,7 @@ function _imagepicker_get_img($img_id, $checkuser=TRUE, $account = FALSE) {
 /**
  * statistics
  */
-function imagepicker_group_stats($account = FALSE) {
+function imagepicker_group_stats($account = FALSE, $label = '') {
   // stats
   $usercount = FALSE;
   $bytecount = 0;
@@ -2205,7 +2223,7 @@ function imagepicker_group_stats($account = FALSE) {
   }
   $bytecount = _imagepicker_bkmg($bytecount);
 
-  $headers = array(
+  $header = array(
     array('data' =>  t('Group statistics'), 'colspan' => 2),
     array('data' =>  t('Image statistics'), 'colspan' => 2),
   );
@@ -2229,14 +2247,11 @@ function imagepicker_group_stats($account = FALSE) {
       array(($usercount ? t('Users') .": " : ''), ($usercount ? $usercount : ''), t('Space used')  .": ", $bytecount),
     );
   }
-
-  $content .= '<div class="imgp_groups_info">'. theme('table', $headers, $rows) .'</div>';
-  return $content;
-
+  return theme('imagepicker_stats', $header, $rows, '<div class="imgp_groups_info">', '</div>', $label);
 }
 
 // build a table
-function imagepicker_groups_list($src=FALSE, $account=FALSE) {
+function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   if ($account) {
     $user = $account;
   }
@@ -2319,14 +2334,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE) {
     $rows[] = $row_data;
     $rowcount++;
   }
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), '<div class="imgp_groups_list">', '</div>', $label);
 
-  if (count($rows)) {
-    $content .= '<div class="imgp_groups_list">'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
-    return $content;
-  }
-  else {
-    return '<div class="messages">'. t('No groups found.') .'</div>';
-  }
 }
 
 function imagepicker_get_group_images_count($gid) {
@@ -2389,19 +2398,6 @@ function imagepicker_browse_public_form(&$form_state) {
 
 function imagepicker_browse_public_form_submit($form, &$form_state) {
   variable_set('imagepicker_browse_public', $form_state['values']['imagepicker_browse_public']);
-}
-
-function _imagepicker_view_content($img, $imgpath, $info) {
-  return '<div id="imgp_img_view">'.
-    ($img['img_title'] ? '<div id="imgp_img_view_title">'. $img['img_title'] .'</div>' : '') .
-    '<img id="imgp_img_view_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_name'] .'" />'.
-    ($img['img_description'] ? '<div id="imgp_img_view_desc">'. nl2br($img['img_description']) .'</div>' : '') .
-    '<div>'.
-    t('Width')  .": ". $info['width'] ."&nbsp;&nbsp;&nbsp;".
-    t('Height') .": ". $info['height'] ."&nbsp;&nbsp;&nbsp;".
-    t('Type')   .": ". $info['extension'] ."&nbsp;&nbsp;&nbsp;".
-    t('Size')   .": ". $info['file_size'] .
-    '</div></div>';
 }
 
 function _imagepicker_get_bytes($img_id, $account = FALSE) {
@@ -2476,7 +2472,6 @@ function _imagepicker_bkmg($number) {
  *
  */
 function imagepicker_quota_form(&$form_state, $account=FALSE) {
-
   $list = imagepicker_get_quota_list();
   $default = variable_get('imagepicker_quota_default', 0);
   $quota = $default;
@@ -2488,12 +2483,12 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
       $quota = $default;
     }
   }
-
   $form['imagepicker_quota'] = array(
     '#type' => 'select',
     '#default_value' => $quota,
     '#options' => $list,
     '#title' => $title,
+    '#prefix' => '<div id="imgp_quota_form" class="container-inline">',
   );
   $form['account'] = array(
     '#type' => 'hidden',
@@ -2502,10 +2497,9 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
+    '#suffix' => '</div>'
   );
-
   return $form;
-
 }
 
 function imagepicker_quota_form_submit($form, &$form_state) {
@@ -2544,7 +2538,7 @@ function imagepicker_get_quota_list($key = 'x') {
   return $value;
 }
 
-function imagepicker_quota_ok($src, $account = FALSE) {
+function imagepicker_quota_ok($src, $account = FALSE, $label="", $help="") {
   if ($account) {
     $user = $account;
   }
@@ -2569,58 +2563,61 @@ function imagepicker_quota_ok($src, $account = FALSE) {
   }
 
   $imgtot = _imagepicker_user_has_img($user);
+  $pl = format_plural($imgtot, '1 image', '@count images');
+  $message1 = '';
+  $message2 = '';
+  $form = '';
   if ($quota_enabled) {
     if ($quota > 0) {
       $pused = round($usedbytes / ($quota*1000000) * 100, 2);
       $quotaprint = imagepicker_get_quota_list($quota+1);
       if ($src == 'admin') {
-        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %pused percent, or %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+        $message1 = t('The quota for %name is %quotaprint and has used %pused percent, or %usedbytesprint in %pl', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
       else {
-        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %pused percent, or %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+        $message1 = t('Your quota is %quotaprint and you have used %pused percent, or %usedbytesprint in %pl', array('%quotaprint' => $quotaprint, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
     }
     else {
       $quotaprint = imagepicker_get_quota_list($quota+1);
       if ($src == 'admin') {
-        $content .= '<p class="messages">'. t('The quota for %name is %quotaprint and has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+        $message1 = t('The quota for %name is %quotaprint and has used %usedbytesprint in %pl', array('%name' => $user->name, '%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
       else {
-        $content .= '<p class="messages">'. t('Your quota is %quotaprint and you have used %usedbytesprint in %imgtot images', array('%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+        $message1 = t('Your quota is %quotaprint and you have used %usedbytesprint in %pl', array('%quotaprint' => $quotaprint, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
     }
   }
   else {
     if ($src == 'admin') {
-      $content .= '<p class="messages">'. t('%name has used %usedbytesprint in %imgtot images', array('%name' => $user->name, '%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      $message1 = t('%name has used %usedbytesprint in %pl', array('%name' => $user->name, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
     }
     else {
-      $content .= '<p class="messages">'. t('You have used %usedbytesprint in %imgtot images', array('%usedbytesprint' => $usedbytesprint, '%imgtot' => $imgtot)) .'</p>';
+      $message1 = t('You have used %usedbytesprint in %pl', array('%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
     }
   }
   if ($quota_ok) {
     if ($account) {
       if ($src == 'admin') {
-        $content .= drupal_get_form('imagepicker_upload_form', $user, TRUE);
+        $form = drupal_get_form('imagepicker_upload_form', $user, TRUE);
       }
       elseif ($src == 'user') {
-        $content .= drupal_get_form('imagepicker_upload_form', $user);
+        $form = drupal_get_form('imagepicker_upload_form', $user);
       }
     }
     else {
-      $content .= drupal_get_form('imagepicker_upload_form');
+      $form = drupal_get_form('imagepicker_upload_form');
     }
   }
   else {
     if ($account) {
-      $content .= '<p class="messages">'. t('%name has used all of quota, please delete some files to make some room.', array('%name' => $user->name)) .'</p>';
+      $message2 = t('%name has used all of quota, please delete some files to make some room.', array('%name' => $user->name));
     }
     else {
-      $content .= '<p class="messages">'. t('You have used all of your quota, please delete some files to make some room.') .'</p>';
+      $message2 = t('You have used all of your quota, please delete some files to make some room.');
     }
   }
-
-  return $content;
+  return theme('imagepicker_quota_message', $message1, $message2, $form, $label, $help);
 }
 
 /**
