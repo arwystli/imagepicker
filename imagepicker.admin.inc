@@ -299,6 +299,13 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_use_full_url', 1),
     '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an absolute path.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
   );
+  $form['imagepicker_advanced']['imagepicker_use_cssbox'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow additional css'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_cssbox', 0),
+    '#description' => t('Setting this option will provide a textfield where additional css can be added .'),
+  );
   $form['imagepicker_advanced']['imagepicker_show_browse_order_form'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the order select box in the browser'),

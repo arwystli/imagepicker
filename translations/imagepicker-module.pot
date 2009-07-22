@@ -3,20 +3,22 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  imagepicker.admin.inc,v 1.8.2.7 2009/07/16 11:45:45 hutch
-#  imagepicker.module,v 1.21.2.16 2009/07/16 11:45:45 hutch
-#  imagepicker.edit.inc,v 1.3.2.1 2009/03/07 21:19:34 hutch
-#  imagepicker.upload.inc,v 1.3.2.3 2009/07/09 10:50:55 hutch
+#  imagepicker.admin.inc,v 1.8.2.8 2009/07/17 19:43:22 hutch
+#  imagepicker.module,v 1.21.2.18 2009/07/17 19:43:22 hutch
+#  imagepicker.edit.inc,v 1.3.2.2 2009/07/17 19:43:22 hutch
+#  imagepicker.upload.inc,v 1.3.2.4 2009/07/17 19:43:22 hutch
+#  imagepicker.views_default.inc: n/a
 #  imagepicker.group.inc,v 1.1.2.4 2009/07/09 10:50:55 hutch
 #  imagepicker.install,v 1.6.2.3 2009/07/09 10:50:55 hutch
-#  imagepicker.theme.inc: n/a
+#  imagepicker.theme.inc,v 1.1.2.1 2009/07/17 19:43:22 hutch
+#  imagepicker.views.inc: n/a
 #  imagepicker.info,v 1.2.2.1 2009/03/07 21:19:34 hutch
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2009-07-17 20:26+0100\n"
+"POT-Creation-Date: 2009-07-22 09:14+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -109,7 +111,7 @@ msgstr ""
 msgid "Thumbnail"
 msgstr ""
 
-#: imagepicker.admin.inc:104 imagepicker.edit.inc:28 imagepicker.upload.inc:60 imagepicker.module:580;1520;1530
+#: imagepicker.admin.inc:104 imagepicker.edit.inc:28 imagepicker.upload.inc:59 imagepicker.module:580;1537;1547
 msgid "Title"
 msgstr ""
 
@@ -121,7 +123,7 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: imagepicker.admin.inc:105 imagepicker.module:581
+#: imagepicker.admin.inc:105 imagepicker.views_default.inc:72 imagepicker.module:581
 msgid "Page"
 msgstr ""
 
@@ -145,7 +147,7 @@ msgstr ""
 msgid "Align"
 msgstr ""
 
-#: imagepicker.admin.inc:124 imagepicker.module:603;2388
+#: imagepicker.admin.inc:124 imagepicker.module:603;2405
 msgid "Show"
 msgstr ""
 
@@ -225,7 +227,7 @@ msgstr ""
 msgid "Unsetting this option will disable Quotas in Imagepicker."
 msgstr ""
 
-#: imagepicker.admin.inc:229 imagepicker.module:2478
+#: imagepicker.admin.inc:229 imagepicker.module:2495
 msgid "Set default quota"
 msgstr ""
 
@@ -302,370 +304,378 @@ msgid "Setting this option will make imagepicker use a full url to the image bei
 msgstr ""
 
 #: imagepicker.admin.inc:304
+msgid "Allow additional css"
+msgstr ""
+
+#: imagepicker.admin.inc:307
+msgid "Setting this option will provide a textfield where additional css can be added ."
+msgstr ""
+
+#: imagepicker.admin.inc:311
 msgid "Show the order select box in the browser"
 msgstr ""
 
-#: imagepicker.admin.inc:307;328;356 imagepicker.group.inc:65 imagepicker.module:167;168;265;266
+#: imagepicker.admin.inc:314;335;363 imagepicker.group.inc:65 imagepicker.module:167;168;265;266
 msgid ""
 msgstr ""
 
-#: imagepicker.admin.inc:310 imagepicker.module:2096
+#: imagepicker.admin.inc:317 imagepicker.module:2113
 msgid "Newest first"
 msgstr ""
 
-#: imagepicker.admin.inc:311 imagepicker.module:2097
+#: imagepicker.admin.inc:318 imagepicker.module:2114
 msgid "Newest last"
 msgstr ""
 
-#: imagepicker.admin.inc:312 imagepicker.module:2098
+#: imagepicker.admin.inc:319 imagepicker.module:2115
 msgid "Edited first"
 msgstr ""
 
-#: imagepicker.admin.inc:313 imagepicker.module:2099
+#: imagepicker.admin.inc:320 imagepicker.module:2116
 msgid "Edited last"
 msgstr ""
 
-#: imagepicker.admin.inc:314 imagepicker.module:2100
+#: imagepicker.admin.inc:321 imagepicker.module:2117
 msgid "By name"
 msgstr ""
 
-#: imagepicker.admin.inc:320
+#: imagepicker.admin.inc:327
 msgid "Default order"
 msgstr ""
 
-#: imagepicker.admin.inc:321
+#: imagepicker.admin.inc:328
 msgid "The default order used to sort the browser. This will be applied wether or not the select box is visible"
 msgstr ""
 
-#: imagepicker.admin.inc:325
+#: imagepicker.admin.inc:332
 msgid "Show the search form in the browser"
 msgstr ""
 
-#: imagepicker.admin.inc:332
+#: imagepicker.admin.inc:339
 msgid "Enable Public option"
 msgstr ""
 
-#: imagepicker.admin.inc:335
+#: imagepicker.admin.inc:342
 msgid "Allow users to make image groups publicly available."
 msgstr ""
 
-#: imagepicker.admin.inc:339
+#: imagepicker.admin.inc:346
 msgid "Enable Public Role Control option"
 msgstr ""
 
-#: imagepicker.admin.inc:342
+#: imagepicker.admin.inc:349
 msgid "Allow users to make publicly available image groups restricted by role."
 msgstr ""
 
-#: imagepicker.admin.inc:346
+#: imagepicker.admin.inc:353
 msgid "Enable Groups in upload form "
 msgstr ""
 
-#: imagepicker.admin.inc:349
+#: imagepicker.admin.inc:356
 msgid "Allow users to select a group in the upload form."
 msgstr ""
 
-#: imagepicker.admin.inc:353
+#: imagepicker.admin.inc:360
 msgid "Enable Progress bar in upload"
 msgstr ""
 
-#: imagepicker.admin.inc:360
+#: imagepicker.admin.inc:367
 msgid "Progress bar Delay"
 msgstr ""
 
-#: imagepicker.admin.inc:363
+#: imagepicker.admin.inc:370
 msgid "seconds"
 msgstr ""
 
-#: imagepicker.admin.inc:364
+#: imagepicker.admin.inc:371
 msgid "Show the progress bar if processing is longer than this value."
 msgstr ""
 
-#: imagepicker.admin.inc:369
+#: imagepicker.admin.inc:376
 msgid "Progress bar message"
 msgstr ""
 
-#: imagepicker.admin.inc:371 imagepicker.upload.inc:335
+#: imagepicker.admin.inc:378 imagepicker.upload.inc:334
 msgid "Processing form... please wait."
 msgstr ""
 
-#: imagepicker.admin.inc:372
+#: imagepicker.admin.inc:379
 msgid "Message to display while uploading."
 msgstr ""
 
-#: imagepicker.admin.inc:384
+#: imagepicker.admin.inc:391
 msgid "You must fill in the Thumbnail field"
 msgstr ""
 
-#: imagepicker.admin.inc:387
+#: imagepicker.admin.inc:394
 msgid "The Thumbnail field must be a number"
 msgstr ""
 
-#: imagepicker.admin.inc:390
+#: imagepicker.admin.inc:397
 msgid "You must fill in the Browser Thumbnail field"
 msgstr ""
 
-#: imagepicker.admin.inc:393
+#: imagepicker.admin.inc:400
 msgid "The Browser Thumbnail field must be a number"
 msgstr ""
 
-#: imagepicker.admin.inc:396
+#: imagepicker.admin.inc:403
 msgid "The Scale field must be a number"
 msgstr ""
 
-#: imagepicker.admin.inc:399
+#: imagepicker.admin.inc:406
 msgid "You must fill in the Left alignment field"
 msgstr ""
 
-#: imagepicker.admin.inc:402
+#: imagepicker.admin.inc:409
 msgid "You must fill in the Right alignment field"
 msgstr ""
 
-#: imagepicker.admin.inc:405
+#: imagepicker.admin.inc:412
 msgid "The Iframe height must be a number"
 msgstr ""
 
-#: imagepicker.admin.inc:408
+#: imagepicker.admin.inc:415
 msgid "You must fill in the Iframe width"
 msgstr ""
 
-#: imagepicker.admin.inc:411
+#: imagepicker.admin.inc:418
 msgid "You must fill in the Iframe border"
 msgstr ""
 
-#: imagepicker.admin.inc:414
+#: imagepicker.admin.inc:421
 msgid "You must fill in the default align field"
 msgstr ""
 
-#: imagepicker.admin.inc:417
+#: imagepicker.admin.inc:424
 msgid "You must fill in the default show field"
 msgstr ""
 
-#: imagepicker.admin.inc:420
+#: imagepicker.admin.inc:427
 msgid "You must fill in the default link field"
 msgstr ""
 
-#: imagepicker.admin.inc:434 imagepicker.module:1519;1529
+#: imagepicker.admin.inc:441 imagepicker.module:1536;1546
 msgid "Name"
 msgstr ""
 
-#: imagepicker.admin.inc:435;468 imagepicker.module:2233;2244;175
+#: imagepicker.admin.inc:442;475 imagepicker.module:2250;2261;175
 msgid "Images"
 msgstr ""
 
-#: imagepicker.admin.inc:436;1231;1357 imagepicker.module:1972;2233;2244;71;122;149;256;334
+#: imagepicker.admin.inc:443;1238;1364 imagepicker.module:1989;2250;2261;71;122;149;256;334
 msgid "Groups"
 msgstr ""
 
-#: imagepicker.admin.inc:437
+#: imagepicker.admin.inc:444
 msgid "Quotas"
 msgstr ""
 
-#: imagepicker.admin.inc:452
+#: imagepicker.admin.inc:459
 msgid "images"
 msgstr ""
 
-#: imagepicker.admin.inc:452;482
+#: imagepicker.admin.inc:459;489
 msgid "No images"
 msgstr ""
 
-#: imagepicker.admin.inc:453
+#: imagepicker.admin.inc:460
 msgid "groups"
 msgstr ""
 
-#: imagepicker.admin.inc:453
+#: imagepicker.admin.inc:460
 msgid "No groups"
 msgstr ""
 
-#: imagepicker.admin.inc:459
+#: imagepicker.admin.inc:466
 msgid "No users found."
 msgstr ""
 
-#: imagepicker.admin.inc:465
+#: imagepicker.admin.inc:472
 msgid "Group Name"
 msgstr ""
 
-#: imagepicker.admin.inc:466
+#: imagepicker.admin.inc:473
 msgid "User Name"
 msgstr ""
 
-#: imagepicker.admin.inc:467
+#: imagepicker.admin.inc:474
 msgid "Status"
 msgstr ""
 
-#: imagepicker.admin.inc:469 imagepicker.module:1524;1533;2289;2298
+#: imagepicker.admin.inc:476 imagepicker.module:1541;1550;2306;2315
 msgid "Actions"
 msgstr ""
 
-#: imagepicker.admin.inc:481 imagepicker.group.inc:80 imagepicker.module:1771;1835;2288;2381
+#: imagepicker.admin.inc:488 imagepicker.group.inc:80 imagepicker.module:1788;1852;2305;2398
 msgid "Public"
 msgstr ""
 
-#: imagepicker.admin.inc:481 imagepicker.module:1771;1835;2382
+#: imagepicker.admin.inc:488 imagepicker.module:1788;1852;2399
 msgid "Private"
 msgstr ""
 
-#: imagepicker.admin.inc:483 imagepicker.module:1628;1638;2320;2330
+#: imagepicker.admin.inc:490 imagepicker.module:1645;1655;2337;2347
 msgid "Edit"
 msgstr ""
 
-#: imagepicker.admin.inc:484 imagepicker.module:1629;1639;2321;2331
+#: imagepicker.admin.inc:491 imagepicker.module:1646;1656;2338;2348
 msgid "Delete"
 msgstr ""
 
-#: imagepicker.admin.inc:491 imagepicker.module:2337
+#: imagepicker.admin.inc:498 imagepicker.module:2354
 msgid "No groups found."
 msgstr ""
 
-#: imagepicker.admin.inc:514 imagepicker.edit.inc:139;161 imagepicker.module:572;702;1104;1124;2423
+#: imagepicker.admin.inc:521 imagepicker.edit.inc:139;161 imagepicker.module:572;710;1121;1141;2440
 msgid "Image not found."
 msgstr ""
 
-#: imagepicker.admin.inc:533;547 imagepicker.module:635;1133;87
+#: imagepicker.admin.inc:540;554 imagepicker.module:643;1150;87
 msgid "Edit image"
 msgstr ""
 
-#: imagepicker.admin.inc:537;543 imagepicker.module:640;1138
+#: imagepicker.admin.inc:544;550 imagepicker.module:648;1155
 msgid "Delete image"
 msgstr ""
 
-#: imagepicker.admin.inc:556;1347 imagepicker.module:2238;2247;131;211
+#: imagepicker.admin.inc:563;1354 imagepicker.module:2255;2264;131;211
 msgid "Users"
 msgstr ""
 
-#: imagepicker.admin.inc:638
+#: imagepicker.admin.inc:645
 msgid "Imagepicker files validation"
 msgstr ""
 
-#: imagepicker.admin.inc:639
+#: imagepicker.admin.inc:646
 msgid "The current filesystem type is %fstype and the current path is %dir"
 msgstr ""
 
-#: imagepicker.admin.inc:653;707
+#: imagepicker.admin.inc:660;714
 msgid "Validate"
 msgstr ""
 
-#: imagepicker.admin.inc:658
+#: imagepicker.admin.inc:665
 msgid "check the files directory for anomalies"
 msgstr ""
 
-#: imagepicker.admin.inc:670
+#: imagepicker.admin.inc:677
 msgid "Validation done"
 msgstr ""
 
-#: imagepicker.admin.inc:680
+#: imagepicker.admin.inc:687
 msgid "Next: Convert to numeric. Recommended"
 msgstr ""
 
-#: imagepicker.admin.inc:691
+#: imagepicker.admin.inc:698
 msgid "Convert to alpha"
 msgstr ""
 
-#: imagepicker.admin.inc:692
+#: imagepicker.admin.inc:699
 msgid "NOT recommended"
 msgstr ""
 
-#: imagepicker.admin.inc:707
+#: imagepicker.admin.inc:714
 msgid "Convert"
 msgstr ""
 
-#: imagepicker.admin.inc:863
+#: imagepicker.admin.inc:870
 msgid "Directories could not be created"
 msgstr ""
 
-#: imagepicker.admin.inc:966;983 imagepicker.install:22
+#: imagepicker.admin.inc:973;990 imagepicker.install:22
 msgid "Directory creation for the Imagepicker module was unsuccessful."
 msgstr ""
 
-#: imagepicker.admin.inc:973
+#: imagepicker.admin.inc:980
 msgid "Directory creation for the Imagepicker module was successful."
 msgstr ""
 
-#: imagepicker.admin.inc:1144
+#: imagepicker.admin.inc:1151
 msgid "file not found in database"
 msgstr ""
 
-#: imagepicker.admin.inc:1147
+#: imagepicker.admin.inc:1154
 msgid "database image name not found in files"
 msgstr ""
 
-#: imagepicker.admin.inc:1150
+#: imagepicker.admin.inc:1157
 msgid "thumbs file does not exist"
 msgstr ""
 
-#: imagepicker.admin.inc:1153
+#: imagepicker.admin.inc:1160
 msgid "browser file does not exist"
 msgstr ""
 
-#: imagepicker.admin.inc:1156
+#: imagepicker.admin.inc:1163
 msgid "uid has no files"
 msgstr ""
 
-#: imagepicker.admin.inc:1159
+#: imagepicker.admin.inc:1166
 msgid "file not writable"
 msgstr ""
 
-#: imagepicker.admin.inc:1166
+#: imagepicker.admin.inc:1173
 msgid "Validation of directory structure failed, please correct the above errors before continuing."
 msgstr ""
 
-#: imagepicker.admin.inc:1170
+#: imagepicker.admin.inc:1177
 msgid "Directory structure validated, %uidlist users found"
 msgstr ""
 
-#: imagepicker.admin.inc:1206
+#: imagepicker.admin.inc:1213
 msgid "Managing groups for "
 msgstr ""
 
-#: imagepicker.admin.inc:1219;1304
+#: imagepicker.admin.inc:1226;1311
 msgid "Statistics for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1222
+#: imagepicker.admin.inc:1229
 msgid "Groups for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1228;1338
+#: imagepicker.admin.inc:1235;1345
 msgid "Statistics"
 msgstr ""
 
-#: imagepicker.admin.inc:1282
+#: imagepicker.admin.inc:1289
 msgid "Managing images for "
 msgstr ""
 
-#: imagepicker.admin.inc:1301
+#: imagepicker.admin.inc:1308
 msgid "Upload file for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1307
+#: imagepicker.admin.inc:1314
 msgid "List images for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1316
+#: imagepicker.admin.inc:1323
 msgid "Quota for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1321
+#: imagepicker.admin.inc:1328
 msgid "User %name has used %pused percent or %usedbytesprint of quota and has %pl."
 msgstr ""
 
-#: imagepicker.admin.inc:1324
+#: imagepicker.admin.inc:1331
 msgid "User %name has used %usedbytesprint and has %pl."
 msgstr ""
 
-#: imagepicker.admin.inc:1333
+#: imagepicker.admin.inc:1340
 msgid "Browse images for %name"
 msgstr ""
 
-#: imagepicker.admin.inc:1341
+#: imagepicker.admin.inc:1348
 msgid "Browse All Images"
 msgstr ""
 
-#: imagepicker.admin.inc:1344
+#: imagepicker.admin.inc:1351
 msgid "List All Images"
 msgstr ""
 
-#: imagepicker.admin.inc:482;1318 imagepicker.module:2566
+#: imagepicker.admin.inc:489;1325 imagepicker.module:2583
 msgid "1 image"
 msgid_plural "@count images"
 msgstr[0] ""
@@ -675,7 +685,7 @@ msgstr[1] ""
 msgid "Edit title of your image"
 msgstr ""
 
-#: imagepicker.edit.inc:35 imagepicker.upload.inc:65 imagepicker.module:1521;1531;2285;2295
+#: imagepicker.edit.inc:35 imagepicker.upload.inc:64 imagepicker.module:1538;1548;2302;2312
 msgid "Description"
 msgstr ""
 
@@ -703,15 +713,15 @@ msgstr ""
 msgid "Error while updating image."
 msgstr ""
 
-#: imagepicker.edit.inc:134 imagepicker.module:2150
+#: imagepicker.edit.inc:134 imagepicker.module:2167
 msgid "This image does not belong to you."
 msgstr ""
 
-#: imagepicker.edit.inc:135 imagepicker.module:2151;0
+#: imagepicker.edit.inc:135 imagepicker.module:2168;0
 msgid "imagepicker"
 msgstr ""
 
-#: imagepicker.edit.inc:135 imagepicker.module:2151
+#: imagepicker.edit.inc:135 imagepicker.module:2168
 msgid "User uid %d attempted to edit image belonging to user uid %d"
 msgstr ""
 
@@ -727,7 +737,7 @@ msgstr ""
 msgid "Give your group a brief name and optionally put any additional information in the group description box"
 msgstr ""
 
-#: imagepicker.group.inc:62 imagepicker.module:2284;2294
+#: imagepicker.group.inc:62 imagepicker.module:2301;2311
 msgid "Group name"
 msgstr ""
 
@@ -763,7 +773,7 @@ msgstr ""
 msgid "Group was successfully inserted"
 msgstr ""
 
-#: imagepicker.group.inc:183 imagepicker.module:2054
+#: imagepicker.group.inc:183 imagepicker.module:2071
 msgid "Error while trying to insert your group."
 msgstr ""
 
@@ -811,100 +821,176 @@ msgstr ""
 msgid "Edit image details"
 msgstr ""
 
-#: imagepicker.upload.inc:19;30
+#: imagepicker.upload.inc:19;29
 msgid "Upload images. You can give them a title and description"
 msgstr ""
 
-#: imagepicker.upload.inc:38
+#: imagepicker.upload.inc:37
 msgid "Image file"
 msgstr ""
 
-#: imagepicker.upload.inc:39
+#: imagepicker.upload.inc:38
 msgid "Browse your computer for image file"
 msgstr ""
 
-#: imagepicker.upload.inc:45
+#: imagepicker.upload.inc:44
 msgid "Thumbnail size"
 msgstr ""
 
-#: imagepicker.upload.inc:48
+#: imagepicker.upload.inc:47
 msgid "Size in pixels of thumbnail's bigger side"
 msgstr ""
 
-#: imagepicker.upload.inc:53
+#: imagepicker.upload.inc:52
 msgid "Scale image"
 msgstr ""
 
-#: imagepicker.upload.inc:56
+#: imagepicker.upload.inc:55
 msgid "Scale image to this size in pixels if not left empty"
 msgstr ""
 
-#: imagepicker.upload.inc:61
+#: imagepicker.upload.inc:60
 msgid "Add a title for your image"
 msgstr ""
 
-#: imagepicker.upload.inc:68
+#: imagepicker.upload.inc:67
 msgid "Add a description for your image"
 msgstr ""
 
-#: imagepicker.upload.inc:78 imagepicker.module:1980
+#: imagepicker.upload.inc:77 imagepicker.module:1997
 msgid "Your Groups"
 msgstr ""
 
-#: imagepicker.upload.inc:79
+#: imagepicker.upload.inc:78
 msgid "Select a group to add your image to."
 msgstr ""
 
-#: imagepicker.upload.inc:98;147 imagepicker.module:49;238;296
+#: imagepicker.upload.inc:97;146 imagepicker.module:49;238;296
 msgid "Upload"
 msgstr ""
 
-#: imagepicker.upload.inc:115
+#: imagepicker.upload.inc:114
 msgid "Image file field is required."
 msgstr ""
 
-#: imagepicker.upload.inc:118
+#: imagepicker.upload.inc:117
 msgid "Error while uploading file."
 msgstr ""
 
-#: imagepicker.upload.inc:121
+#: imagepicker.upload.inc:120
 msgid "Uploaded file is not an image."
 msgstr ""
 
-#: imagepicker.upload.inc:124
+#: imagepicker.upload.inc:123
 msgid "Only .jpg, .gif and .png image files are accepted."
 msgstr ""
 
-#: imagepicker.upload.inc:130
+#: imagepicker.upload.inc:129
 msgid "Thumbnail size should be an integer between 1 and 999."
 msgstr ""
 
-#: imagepicker.upload.inc:136
+#: imagepicker.upload.inc:135
 msgid "Scale value should be an integer between 1 and 999 or leave it empty if you don't want to scale your image."
 msgstr ""
 
-#: imagepicker.upload.inc:206
+#: imagepicker.upload.inc:205
 msgid "Image was successfully uploaded."
 msgstr ""
 
-#: imagepicker.upload.inc:221
+#: imagepicker.upload.inc:220
 msgid "Error while saving information to database for uploaded image."
 msgstr ""
 
-#: imagepicker.upload.inc:225
+#: imagepicker.upload.inc:224
 msgid "Error while creating a thumbnail for uploaded image."
 msgstr ""
 
-#: imagepicker.upload.inc:230
+#: imagepicker.upload.inc:229
 msgid "Error while moving uploaded file to its destination."
 msgstr ""
 
-#: imagepicker.upload.inc:233
+#: imagepicker.upload.inc:232
 msgid "Error while scaling uploaded file."
 msgstr ""
 
-#: imagepicker.upload.inc:239
+#: imagepicker.upload.inc:238
 msgid "Unable to create a directory structure for your images."
+msgstr ""
+
+#: imagepicker.views.inc:29;36
+msgid "Example table"
+msgstr ""
+
+#: imagepicker.views.inc:37
+msgid "Example table contains example content and can be related to nodes."
+msgstr ""
+
+#: imagepicker.views.inc:61
+msgid "Example content"
+msgstr ""
+
+#: imagepicker.views.inc:62
+msgid "Some example content that references a node."
+msgstr ""
+
+#: imagepicker.views.inc:70
+msgid "Example node"
+msgstr ""
+
+#: imagepicker.views.inc:76
+msgid "Plain text field"
+msgstr ""
+
+#: imagepicker.views.inc:77
+msgid "Just a plain text field."
+msgstr ""
+
+#: imagepicker.views.inc:95
+msgid "Numeric field"
+msgstr ""
+
+#: imagepicker.views.inc:96
+msgid "Just a numeric field."
+msgstr ""
+
+#: imagepicker.views.inc:111
+msgid "Boolean field"
+msgstr ""
+
+#: imagepicker.views.inc:112
+msgid "Just an on/off field."
+msgstr ""
+
+#: imagepicker.views.inc:119
+msgid "Published"
+msgstr ""
+
+#: imagepicker.views.inc:129
+msgid "Timestamp field"
+msgstr ""
+
+#: imagepicker.views.inc:130
+msgid "Just a timestamp field."
+msgstr ""
+
+#: imagepicker.views_default.inc:6
+msgid "imagepicker view"
+msgstr ""
+
+#: imagepicker.views_default.inc:7
+msgid "default"
+msgstr ""
+
+#: imagepicker.views_default.inc:16
+msgid "Defaults"
+msgstr ""
+
+#: imagepicker.views_default.inc:117
+msgid "Feed"
+msgstr ""
+
+#: imagepicker.views_default.inc:171
+msgid "Front page feed"
 msgstr ""
 
 #: imagepicker.module:20
@@ -927,243 +1013,251 @@ msgstr ""
 msgid "Insert title and description"
 msgstr ""
 
-#: imagepicker.module:628
+#: imagepicker.module:629
+msgid "Add additional css"
+msgstr ""
+
+#: imagepicker.module:631
+msgid "You can add additional css here, eg. class=\"myclass\". This will be inserted into the image tag"
+msgstr ""
+
+#: imagepicker.module:636
 msgid "Insert image"
 msgstr ""
 
-#: imagepicker.module:695
+#: imagepicker.module:703
 msgid "Image was successfully deleted"
 msgstr ""
 
-#: imagepicker.module:698
+#: imagepicker.module:706
 msgid "Error while trying to delete your image from database."
 msgstr ""
 
-#: imagepicker.module:723
+#: imagepicker.module:731
 msgid "Image not found in page."
 msgstr ""
 
-#: imagepicker.module:830
+#: imagepicker.module:838
 msgid "Image"
 msgstr ""
 
-#: imagepicker.module:1237;1373;1667
+#: imagepicker.module:1254;1390;1684
 msgid "Your search for %searchs found nothing"
 msgstr ""
 
-#: imagepicker.module:1246
+#: imagepicker.module:1263
 msgid "You do not have any images in the selected group"
 msgstr ""
 
-#: imagepicker.module:1249
+#: imagepicker.module:1266
 msgid "You do not have any uploaded images"
 msgstr ""
 
-#: imagepicker.module:1266;1398
+#: imagepicker.module:1283;1415
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to view."
 msgstr ""
 
-#: imagepicker.module:1269;1401
+#: imagepicker.module:1286;1418
 msgid "Hold the mouse over an image to view Name, Title and Description, Click on it to use."
 msgstr ""
 
-#: imagepicker.module:1382;1676
+#: imagepicker.module:1399;1693
 msgid "There are no !status images"
 msgstr ""
 
-#: imagepicker.module:1522
+#: imagepicker.module:1539
 msgid "User"
 msgstr ""
 
-#: imagepicker.module:1523;1532
+#: imagepicker.module:1540;1549
 msgid "Date"
 msgstr ""
 
-#: imagepicker.module:1916
+#: imagepicker.module:1933
 msgid "Group"
 msgstr ""
 
-#: imagepicker.module:1927;2112;2393;2499;2683
+#: imagepicker.module:1944;2129;2410;2516;2700
 msgid "Go"
 msgstr ""
 
-#: imagepicker.module:1984
+#: imagepicker.module:2001
 msgid "Save group settings"
 msgstr ""
 
-#: imagepicker.module:2045
+#: imagepicker.module:2062
 msgid "Error while trying to delete your group."
 msgstr ""
 
-#: imagepicker.module:2107
+#: imagepicker.module:2124
 msgid "Order"
 msgstr ""
 
-#: imagepicker.module:2227
+#: imagepicker.module:2244
 msgid "Group statistics"
 msgstr ""
 
-#: imagepicker.module:2228
+#: imagepicker.module:2245
 msgid "Image statistics"
 msgstr ""
 
-#: imagepicker.module:2234
+#: imagepicker.module:2251
 msgid "Public groups"
 msgstr ""
 
-#: imagepicker.module:2234
+#: imagepicker.module:2251
 msgid "Public images"
 msgstr ""
 
-#: imagepicker.module:2235
+#: imagepicker.module:2252
 msgid "Private groups"
 msgstr ""
 
-#: imagepicker.module:2235
+#: imagepicker.module:2252
 msgid "Private images"
 msgstr ""
 
-#: imagepicker.module:2236;2245
+#: imagepicker.module:2253;2262
 msgid "Grouped images"
 msgstr ""
 
-#: imagepicker.module:2237;2246
+#: imagepicker.module:2254;2263
 msgid "Ungrouped images"
 msgstr ""
 
-#: imagepicker.module:2238;2247
+#: imagepicker.module:2255;2264
 msgid "Space used"
 msgstr ""
 
-#: imagepicker.module:2286;2296
+#: imagepicker.module:2303;2313
 msgid "No. images"
 msgstr ""
 
-#: imagepicker.module:2287;2297
+#: imagepicker.module:2304;2314
 msgid "State"
 msgstr ""
 
-#: imagepicker.module:2318;2329
+#: imagepicker.module:2335;2346
 msgid "selected"
 msgstr ""
 
-#: imagepicker.module:2319
+#: imagepicker.module:2336
 msgid "Yes"
 msgstr ""
 
-#: imagepicker.module:2319
+#: imagepicker.module:2336
 msgid "No"
 msgstr ""
 
-#: imagepicker.module:2380
+#: imagepicker.module:2397
 msgid "All"
 msgstr ""
 
-#: imagepicker.module:2480
+#: imagepicker.module:2497
 msgid "Set user quota"
 msgstr ""
 
-#: imagepicker.module:2518
+#: imagepicker.module:2535
 msgid "Unlimited"
 msgstr ""
 
-#: imagepicker.module:2519
+#: imagepicker.module:2536
 msgid "1 Meg"
 msgstr ""
 
-#: imagepicker.module:2520
+#: imagepicker.module:2537
 msgid "5 Meg"
 msgstr ""
 
-#: imagepicker.module:2521
+#: imagepicker.module:2538
 msgid "10 Meg"
 msgstr ""
 
-#: imagepicker.module:2522
+#: imagepicker.module:2539
 msgid "25 Meg"
 msgstr ""
 
-#: imagepicker.module:2523
+#: imagepicker.module:2540
 msgid "50 Meg"
 msgstr ""
 
-#: imagepicker.module:2524
+#: imagepicker.module:2541
 msgid "100 Meg"
 msgstr ""
 
-#: imagepicker.module:2525
+#: imagepicker.module:2542
 msgid "250 Meg"
 msgstr ""
 
-#: imagepicker.module:2526
+#: imagepicker.module:2543
 msgid "500 Meg"
 msgstr ""
 
-#: imagepicker.module:2527
+#: imagepicker.module:2544
 msgid "750 Meg"
 msgstr ""
 
-#: imagepicker.module:2528
+#: imagepicker.module:2545
 msgid "1 Gig"
 msgstr ""
 
-#: imagepicker.module:2529
+#: imagepicker.module:2546
 msgid "2 Gig"
 msgstr ""
 
-#: imagepicker.module:2530
+#: imagepicker.module:2547
 msgid "5 Gig"
 msgstr ""
 
-#: imagepicker.module:2575
+#: imagepicker.module:2592
 msgid "The quota for %name is %quotaprint and has used %pused percent, or %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2578
+#: imagepicker.module:2595
 msgid "Your quota is %quotaprint and you have used %pused percent, or %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2584
+#: imagepicker.module:2601
 msgid "The quota for %name is %quotaprint and has used %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2587
+#: imagepicker.module:2604
 msgid "Your quota is %quotaprint and you have used %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2593
+#: imagepicker.module:2610
 msgid "%name has used %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2596
+#: imagepicker.module:2613
 msgid "You have used %usedbytesprint in %pl"
 msgstr ""
 
-#: imagepicker.module:2614
+#: imagepicker.module:2631
 msgid "%name has used all of quota, please delete some files to make some room."
 msgstr ""
 
-#: imagepicker.module:2617
+#: imagepicker.module:2634
 msgid "You have used all of your quota, please delete some files to make some room."
 msgstr ""
 
-#: imagepicker.module:2661
+#: imagepicker.module:2678
 msgid "Search"
 msgstr ""
 
-#: imagepicker.module:2668
+#: imagepicker.module:2685
 msgid "By Name"
 msgstr ""
 
-#: imagepicker.module:2673
+#: imagepicker.module:2690
 msgid "By Description"
 msgstr ""
 
-#: imagepicker.module:2678
+#: imagepicker.module:2695
 msgid "By Title"
 msgstr ""
 
-#: imagepicker.module:2687
+#: imagepicker.module:2704
 msgid "Reset"
 msgstr ""
 

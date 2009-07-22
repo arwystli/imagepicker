@@ -623,6 +623,14 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
     '#prefix' => '<div id="imgp_desc_control">',
     '#suffix' => '</div>'
   );
+  if (variable_get('imagepicker_use_cssbox', 0)) {
+    $form['cssbox'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Add additional css'),
+      '#size' => 20,
+      '#description' => t('You can add additional css here, eg. class="myclass". This will be inserted into the image tag'),
+    );
+  }
   $form['insert'] = array(
     '#type' => 'button',
     '#value' => t('Insert image'),
@@ -835,6 +843,7 @@ function imagepicker_js($img, $public = FALSE) {
       var imgpImageElement;
       var imgpLinkElement;
       var imgpImageStyle;
+      var imgpImageCss = '';
       var isFCKeditor = '". (module_exists('fckeditor') ? 'yes' : 'no' ) ."'
       var isWysiwyg = '". (module_exists('wysiwyg') ? 'yes' : 'no' ) ."'
       var imgpInsertion;
@@ -853,6 +862,14 @@ function imagepicker_js($img, $public = FALSE) {
         }
       }
 ";
+  if (variable_get('imagepicker_use_cssbox', 0)) {
+    $ret .= "
+      // get css value
+      if(imgpForm.cssbox.value) {
+        var imgpImageCss = imgpForm.cssbox.value
+      }
+";
+  }
   if (variable_get('imagepicker_default_align_show', 1)) {
     $ret .= "
       // Get align value
@@ -894,7 +911,7 @@ function imagepicker_js($img, $public = FALSE) {
 
       // Create an image or span (containing title) HTML string
       if (imgpImagePath) {
-        imgpImageElement = '<img src=\"'+imgpImagePath+'\" alt=\"'+imgpImageTitle+'\" ' + imgpImageStyle + ' \/>';
+        imgpImageElement = '<img src=\"'+imgpImagePath+'\" alt=\"'+imgpImageTitle+'\" ' + imgpImageStyle + ' ' + imgpImageCss + ' \/>';
       }
       else {
         imgpImageElement = '<span>'+imgpImageTitle+'<\/span>'

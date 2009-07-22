@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-07-22
+------------------------------------
+by hutch, added additional css feature
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-07-16
 ------------------------------------
 by hutch, added imagepicker.theme.inc
