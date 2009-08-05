@@ -261,3 +261,98 @@ function imagepicker_role_has_permission($rid) {
   return $row['ct'];
 }
 
+// build a table
+function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  if ($src) {
+    if ($src == 'admin') {
+      $editpath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/edit/';
+      $deletepath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/delete/';
+      $browsepath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/browse/';
+    }
+    else {
+      $editpath = 'user/'. $user->uid .'/imagepicker/groups/edit/';
+      $deletepath = 'user/'. $user->uid .'/imagepicker/groups/delete/';
+      $browsepath = 'user/'. $user->uid .'/imagepicker/groups/browse/';
+    }
+  }
+  else {
+    $editpath = "imagepicker/groups/edit/";
+    $deletepath = "imagepicker/groups/delete/";
+    $browsepath = 'imagepicker/groups/';
+  }
+
+  $content = "";
+  $how_many = variable_get('imagepicker_rows_per_page', 25);
+
+  if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+    $header = array(
+      array('data' => t('Group name'), 'field' => 'g.group_name'),
+      array('data' => t('Description'), 'field' => 'g.group_description'),
+      array('data' => t('No. images'), 'field' => 'ct'),
+      t('State'),
+      array('data' => t('Public'), 'field' => 'g.public'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+  else {
+    $header = array(
+      array('data' => t('Group name'), 'field' => 'g.group_name'),
+      array('data' => t('Description'), 'field' => 'g.group_description'),
+      array('data' => t('No. images'), 'field' => 'ct'),
+      t('State'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+
+  $sql = "SELECT g.gid, g.group_name, g.group_description, g.public, COUNT(i.img_id) AS ct
+    FROM {imagepicker_user_groups} g LEFT JOIN {imagepicker_group_images} i USING(gid)
+    WHERE  uid=%d
+    GROUP BY g.gid". tablesort_sql($header);
+
+  $result = pager_query($sql, $how_many, 0, NULL, array($user->uid));
+  $rows = array();
+  $totcount = 0;
+  $rowcount = 0;
+  $enabledlist = imagepicker_get_enabled_group($account);
+  while ($row = db_fetch_array($result)) {
+    if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+      $row_data = array(
+        check_plain($row['group_name']),
+        check_plain($row['group_description']),
+        ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
+        (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
+        ($row['public'] ? t('Yes') : t('No')),
+        l(t('Edit'), $editpath . $row['gid']),
+        l(t('Delete'), $deletepath . $row['gid']),
+      );
+    }
+    else {
+      $row_data = array(
+        check_plain($row['group_name']),
+        check_plain($row['group_description']),
+        ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
+        (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
+        l(t('Edit'), $editpath . $row['gid']),
+        l(t('Delete'), $deletepath . $row['gid']),
+      );
+    }
+    $rows[] = $row_data;
+    $rowcount++;
+  }
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), '<div class="imgp_groups_list">', '</div>', $label);
+
+}
+
+// not in use I think
+function imagepicker_get_group_images_count($gid) {
+  $result = db_query("SELECT count(gid) as gidct FROM {imagepicker_group_images} WHERE gid = %d", array($gid));
+  $row = db_fetch_array($result);
+  return $row['gidct'];
+}
+

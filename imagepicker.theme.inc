@@ -7,6 +7,97 @@
  * Themimg functions for imagepicker.
  */
 
+/**
+ * theme registry
+ */
+function imagepicker_theme() {
+  return array(
+    'imagepicker' => array(
+      'arguments' => array(
+        'content' => NULL),
+    ),
+    'imagepicker_list' => array(
+      'arguments' => array(
+        'header' => array(),
+        'rows' => array(),
+        $max = 50,
+        $message = "",
+        $pref = "",
+        $suff = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_stats' => array(
+      'arguments' => array(
+        'header' => array(),
+        'rows' => array(),
+        $pref = "",
+        $suff = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_browser' => array(
+      'arguments' => array(
+        'content' => array(),
+        'forms' => array(),
+        $message = "",
+        $help = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_fullpage' => array(
+      'arguments' => array(
+        'image' => array(),
+        $source = "",
+        $link = 1,
+      ),
+    ),
+    'imagepicker_quota_message' => array(
+      'arguments' => array(
+        $message1 = "",
+        $message2 = "",
+        $form = "",
+        $label = "",
+        $help = "",
+      ),
+    ),
+    'imagepicker_view' => array(
+      'arguments' => array(
+        'img' => array(),
+        $imgpath = "",
+        'info' => array(),
+      ),
+    ),
+    'imagepicker_image_edit_header' => array(
+      'arguments' => array(
+        'image' => array(),
+        $source = "",
+      ),
+    ),
+    'imagepicker_quota' => array(
+      'arguments' => array(
+        $form = "",
+        $message = "",
+        $label = "",
+      ),
+    ),
+    'imagepicker_upload_progress_message' => array(
+      'arguments' => array(
+        $message = "",
+      ),
+    ),
+    'imagepicker_user_config' => array(
+      'arguments' => array(
+        $form = "",
+        $label = "",
+        $help = "",
+        $message1 = "",
+        $message2 = "",
+      ),
+    ),
+  );
+}
+
 function theme_imagepicker(&$content) {
   global $language;
   $path = drupal_get_path('module', 'imagepicker');
@@ -143,3 +234,19 @@ function theme_imagepicker_quota( $form, $message, $label) {
   return $output;
 }
 
+function theme_imagepicker_upload_progress_message($message) {
+  $output = '<div id="sending" class="progress" style="display: none;">';
+  $output .= '<div class="status">'. $message .'</div>';
+  $output .= '<div class="bar"></div></div>';
+  return $output;
+}
+
+function theme_imagepicker_user_config($form, $label='', $help='', $message1='', $message2='') {
+  $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
+  $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
+  $output .= ($message1 ? '<p class="messages">'. $message1 .'</p>' : '') ;
+  $output .= $form;
+  $output .= ($message2 ? '<p class="messages">'. $message2 .'</p>' : '') ;
+  $output .= ($label ? '</fieldset>' : '');
+  return $output;
+}

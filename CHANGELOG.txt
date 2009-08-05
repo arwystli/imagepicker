@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-08-05
+------------------------------------
+by hutch, added watermarks, save original
+and user config page
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-07-22
 ------------------------------------
 by hutch, added additional css feature

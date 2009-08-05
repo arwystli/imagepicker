@@ -31,6 +31,12 @@ function imagepicker_user_upload() {
 }
 
 function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
   $form['#attributes']['enctype'] = 'multipart/form-data';
   $form['file_upload'] = array(
     '#type' => 'file',
@@ -38,6 +44,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     '#description' => t('Browse your computer for image file'),
     '#required' => TRUE,
     '#value' => 1,
+    '#size' => 40,
   );
   $form['thumb'] = array(
     '#type' => 'textfield',
@@ -66,10 +73,27 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     '#cols' => 80,
     '#description' => t('Add a description for your image'),
   );
-
+  if ( imagepicker_image_check_functions() && variable_get('imagepicker_watermark_enable', 0)) {
+    if (! variable_get('imagepicker_watermark_image', '')
+      && ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : FALSE)
+      && $user->imagepicker_watermark_enable) {
+      $form['watermark'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use watermark'),
+        '#description' => t('Use watermark on this image.'),
+        '#default_value' => ($user->imagepicker_watermark_use ? $user->imagepicker_watermark_use : FALSE),
+      );
+    }
+    elseif (variable_get('imagepicker_watermark_image', '')) {
+      $form['watermark'] = array(
+        '#type' => 'hidden',
+        '#value' => 1,
+      );
+    }
+  }
   // groups
   if ( variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
-    $grouplist = imagepicker_get_groups( ($admin ? $account : FALSE));
+    $grouplist = imagepicker_get_groups( ($admin ? $user : FALSE));
     if ($grouplist) {
       $form['grouplist'] = array(
         '#type' => 'checkboxes',
@@ -83,7 +107,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
   if ($account) {
     $form['account'] = array(
       '#type' => 'hidden',
-      '#value' => $account->uid,
+      '#value' => $user->uid,
     );
   }
   if ($admin) {
@@ -150,41 +174,59 @@ function imagepicker_upload_form_submit($form, &$form_state) {
     else {
       global $user;
     }
-    $destination = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
-    $thumbsdir = $destination . IMAGEPICKER_THUMBS_DIR;
-    $browserdir = $destination . IMAGEPICKER_BROWSER_DIR;
+    $destdir = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
+    $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
+    $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
+    $origdir = $destdir . IMAGEPICKER_ORIG_DIR;
 
-    if (file_check_directory($destination, TRUE) && file_check_directory($thumbsdir, TRUE) && file_check_directory($browserdir, TRUE)) {
+    if (file_check_directory($destdir, TRUE)
+      && file_check_directory($thumbsdir, TRUE)
+      && file_check_directory($browserdir, TRUE)
+      && file_check_directory($origdir, TRUE)
+      ) {
       // clear out the noisy 'created' messages
       drupal_get_messages('status', TRUE);
       // Add DIRECTORY_SEPARATORS here because drupals' functions remove trailing slashes
-      $destination .= DIRECTORY_SEPARATOR;
+      $destdir .= DIRECTORY_SEPARATOR;
       $thumbsdir = $thumbsdir . DIRECTORY_SEPARATOR;
       $browserdir = $browserdir . DIRECTORY_SEPARATOR;
-
+      $origdir = $origdir . DIRECTORY_SEPARATOR;
       $maxthumbsize = $form_state['values']['thumb'] ? $form_state['values']['thumb'] : 100;
       $scaleto = $form_state['values']['scale'] ? $form_state['values']['scale'] : FALSE;
 
-      if (!$scaleto) {
-        // Use $path instead of original $destination variable cause this
-        // variable's value will be changed during copying file, so we won't
-        // loose it.
-        $path = $destination;
-        $imagemoved = imagepicker_copy_uploaded_file($path, 'file_upload');
-        $file = basename($path);
-      }
-      else {
-        $source = $_FILES['files']['tmp_name']['file_upload'];
-        $file = imagepicker_get_uploaded_file_name($destination, 'file_upload');
-        $imagescaled = imagepicker_scale_image($source, $destination . $file, $scaleto);
+      // $destination gets altered in imagepicker_copy_uploaded_file to give us the final path + name
+      $destination = $origdir;
+
+      // save the original and use that from here on
+      if ( $imagemoved = imagepicker_copy_uploaded_file($destination, 'file_upload') ) {
+        // $destination has been changed in imagepicker_copy_uploaded_file()
+        // to point to the new file
+        $file = basename($destination);
+        $source = $origdir . $file;
+        if ($scaleto) {
+          $imagescaled = imagepicker_scale_image($source, $destdir . $file, $scaleto);
+        }
+        else {
+          // no scaling, save direct from $origdir to $destdir
+          file_copy($source, $destdir, FILE_EXISTS_RENAME);
+        }
       }
 
       if (!$scaleto && $imagemoved || $scaleto && $imagescaled) {
 
         // Source file should still be an uploaded one, as scaled image
         // might have some watermarks etc. from drupal's filters/hooks.
-        $source = $_FILES['files']['tmp_name']['file_upload'];
 
+        // if watermark is enabled just apply to destdir image, not orig or the thumbs
+        if ( $form_state['values']['watermark'] ) {
+          if (! _imagepicker_watermark_process($destdir . $file, $user)) {
+            drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
+          }
+        }
+
+        // not sure why this has to be restated, but if not done the thumbs
+        // get wmarked too when not scaling image above
+        $source = $origdir . $file;
         if (imagepicker_scale_image($source, $thumbsdir . $file, $maxthumbsize)) {
           imagepicker_scale_image($source, $browserdir . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
           $title = htmlspecialchars($form_state['values']['title']);
@@ -217,6 +259,8 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           else {
             file_delete($thumbsdir . $file);
             file_delete($browserdir . $file);
+            file_delete($origdir . $file);
+            file_delete($destdir . $file);
             drupal_set_message(t('Error while saving information to database for uploaded image.'), 'error');
           }
         }
@@ -232,7 +276,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           drupal_set_message(t('Error while scaling uploaded file.'), 'error');
         }
       }
-      file_delete($destination . $file);
+      file_delete($destdir . $file);
     }
     else {
       drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
@@ -325,6 +369,222 @@ function imagepicker_scale_image($source, $destination, $maxsize) {
   return image_toolkit_invoke('resize', array($source, $destination, $width, $height));
 }
 
+
+/**
+ * Adapted from watermark module.
+ *
+ */
+function _imagepicker_watermark_process($image_path, $account=FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  $watermark_path = variable_get('imagepicker_watermark_image', FALSE);
+  $use_global_watermark = ($watermark_path ? TRUE : FALSE);
+  if (! $watermark_path ) {
+    $watermark_path = ($account->imagepicker_watermark_image ? $account->imagepicker_watermark_image : FALSE);
+  }
+  if (! $watermark_path ) {
+    return FALSE;
+  }
+  // init return status
+  $status = FALSE;
+
+  if ($use_global_watermark) {
+    $scaling = variable_get('imagepicker_watermark_scaling', FALSE);
+    $position = variable_get('imagepicker_watermark_position', 0);
+  }
+  else {
+    $scaling = ($user->imagepicker_watermark_scaling ? $user->imagepicker_watermark_scaling : FALSE);
+    $position = ($user->imagepicker_watermark_position ? $user->imagepicker_watermark_position : 0);
+    $wdir = imagepicker_get_watermarks_dir($user);
+    $watermark_path = $wdir . DIRECTORY_SEPARATOR . $watermark_path;
+  }
+
+  if (!$wm_info = _imagepicker_watermark_make_image($watermark_path)) {
+    return FALSE;
+  }
+  $wm = $wm_info['handle'];
+
+  if (!$im_info = _imagepicker_watermark_make_image($image_path)) {
+    return FALSE;
+  }
+  $im = $im_info['handle'];
+
+  if (!$im_info['truecolor']) {
+    // create truecolor image for alpha blending and better resampling
+    $new_im = imagecreatetruecolor($im_info['width'], $im_info['height']);
+    imagecopy($new_im, $im, 0, 0, 0, 0, $im_info['width'], $im_info['height']);
+    imagedestroy($im);
+    $im = $new_im;
+  }
+  imagealphablending($im, TRUE);
+
+  $im_x = $im_info['width'];
+  $im_y = $im_info['height'];
+
+  if ($scaling) {
+    // rescale wm image to desired percentage of dest image WIDTH
+    if ($use_global_watermark) {
+      $percentage = variable_get('imagepicker_watermark_scaling_percentage', 50) / 100;
+      $min_width = intval(variable_get('imagepicker_watermark_min_width', 0));
+    }
+    else {
+      $percentage = $user->imagepicker_watermark_scaling_percentage / 100;
+      $min_width = intval($user->imagepicker_watermark_min_width);
+    }
+
+    $desired_width = $im_x * $percentage;
+
+    if ($desired_width > $wm_info['width'] ) {
+      $desired_width = $wm_info['width'];
+    }
+
+    if ($desired_width < $min_width) {
+      $desired_width = $min_width;
+    }
+    $scale_ratio = $desired_width / $wm_info['width'];
+
+    // new size
+    $wm_x = $wm_info['width'] * $scale_ratio;
+    $wm_y = $wm_info['height'] * $scale_ratio;
+  }
+  else {
+    $wm_x = $wm_info['width'];
+    $wm_y = $wm_info['height'];
+  }
+
+  switch ($position) {
+    case 0:
+      //middle
+      $dest_x = ($im_x / 2) - ($wm_x / 2);
+      $dest_y = ($im_y / 2) - ($wm_y / 2);
+      break;
+    case 1:
+      //middle right
+      $dest_x = $im_x - $wm_x;
+      $dest_y = ($im_y / 2) - ($wm_y / 2);
+      break;
+    case 2:
+      //middle left
+      $dest_x = 0;
+      $dest_y = ($im_y / 2) - ($wm_y / 2);
+      break;
+    case 3:
+      //top middle
+      $dest_x = (($im_x - $wm_x) / 2);
+      $dest_y = 0;
+      break;
+    case 4:
+      //top left
+      $dest_x = 0;
+      $dest_y = 0;
+      break;
+    case 5:
+      //top right
+      $dest_x = $im_x - $wm_x;
+      $dest_y = 0;
+      break;
+    case 6:
+      //bottom middle
+      $dest_x = (($im_x - $wm_x) / 2);
+      $dest_y = $im_y - $wm_y;
+      break;
+    case 7:
+      //bottom right
+      $dest_x = $im_x - $wm_x;
+      $dest_y = $im_y - $wm_y;
+      break;
+    case 8:
+      //bottom left
+      $dest_x = 0;
+      $dest_y = $im_y - $wm_y;
+      break;
+  }
+
+  // image create function according to original image type
+  $img_create_func = 'image'. $im_info['type'];
+
+  // scaling on - resampling image
+  if ($scaling && !imagecopyresampled($im, $wm, $dest_x, $dest_y, 0, 0, $wm_x, $wm_y, $wm_info['width'], $wm_info['height'])) {
+      drupal_set_message(t('Failed to merge image with watermark.'), 'error');
+      watchdog('imagepicker', 'Failed to merge image with watermark.', array(), WATCHDOG_ERROR);
+  }
+  // scaling off
+  elseif (!$scaling && !imagecopy($im, $wm, $dest_x, $dest_y, 0, 0, $wm_x, $wm_y)) {
+    drupal_set_message(t('Failed to merge image with watermark.'), 'error');
+    watchdog('imagepicker', 'Failed to merge image with watermark.', array(), WATCHDOG_ERROR);
+  }
+  // create an image of the same type!
+  elseif (!$img_create_func($im, $image_path)) {
+    drupal_set_message(t('Failed to save merged image.'), 'error');
+    watchdog('imagepicker', 'Failed to save merged image.', array(), WATCHDOG_ERROR);
+  }
+  else {
+    $status = TRUE;
+  }
+
+  imagedestroy($im);
+  imagedestroy($wm);
+
+  return $status;
+}
+
+/**
+ * Adapted from watermark module.
+ *
+ */
+function _imagepicker_watermark_make_image($file) {
+
+  if (!file_exists($file)) {
+    drupal_set_message(t('Image file %file not found.', array('%file' => $file ) ), 'error');
+    return FALSE;
+  }
+
+  $type = exif_imagetype($file);
+
+  switch ($type) {
+    case IMAGETYPE_GIF:
+      $type = 'gif';
+      break;
+    case IMAGETYPE_JPEG:
+      $type = 'jpeg';
+      break;
+    case IMAGETYPE_PNG:
+      $type = 'png';
+      break;
+    case IMAGETYPE_WBMP:
+      $type = 'wbmp';
+      break;
+    default:
+      // Unsupported type
+      drupal_set_message(t('Image file %file is an unsupported format type=%type.', array( '%file' => $file, '%type' => $type ) ), 'error');
+      return FALSE;
+  }
+
+  $function = 'imagecreatefrom'. $type;
+  $handle = $function($file);
+
+  if (!$handle) {
+    drupal_set_message(t('Failed to create handle for image file %file via function %function.', array( '%file' => $file, '%function' => $function )), 'error');
+    return FALSE;
+  }
+
+  // create image info
+  $img_info = array(
+    'type' => $type,
+    'truecolor' => imageistruecolor($handle),
+    'colors' => imagecolorstotal($handle),
+    'handle' => $handle,
+    'width'  => imagesx($handle),
+    'height' => imagesy($handle),
+  );
+
+  return $img_info;
+}
+
 function imagepicker_upload_progress_get_script($delay) {
   drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
   drupal_add_js(array('imagepicker_upload_progress' => array('delay' => $delay[0])), 'setting');
@@ -332,11 +592,6 @@ function imagepicker_upload_progress_get_script($delay) {
 
 function imagepicker_upload_progress_busy() {
   $message = variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.'));
-
-  return <<<CONTENT
-  <div id="sending" class="progress" style="display: none;">
-    <div class="status">$message</div>
-    <div class="bar"></div>
-  </div>
-CONTENT;
+  return theme('imagepicker_upload_progress_message', $message);
 }
+
