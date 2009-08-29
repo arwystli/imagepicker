@@ -166,6 +166,14 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
   else {
     global $user;
   }
+  $form['imagepicker_advanced_browser_page'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Images per page'),
+    '#description' => t('Configure the number of images shown per page in the image browser. This must be a number, 0 for no paging'),
+    '#size' => 4,
+    '#required' => FALSE,
+    '#default_value' => ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25)),
+  );
 
   if ( imagepicker_image_check_functions()
     && variable_get('imagepicker_watermark_enable', 0)
@@ -185,14 +193,6 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
 
   $form['#attributes']['enctype'] = 'multipart/form-data';
 
-  $form['imagepicker_advanced_browser_page'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Images per page'),
-    '#description' => t('Configure the number of images shown per page in the image browser. This must be a number, 0 for no paging'),
-    '#size' => 4,
-    '#required' => FALSE,
-    '#default_value' => ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25)),
-  );
 
   $form['imagepicker_watermark'] = array(
     '#type' => 'fieldset',
