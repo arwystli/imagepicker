@@ -31,6 +31,7 @@ function imagepicker_install() {
  */
 function imagepicker_schema() {
   $schema['imagepicker'] = array(
+    'description' => t('The image table'),
     'fields' => array(
       'img_id' => array(
         'description' => t('The primary image identifier.'),
@@ -44,21 +45,25 @@ function imagepicker_schema() {
         'not null' => TRUE,
         'default' => 0),
       'img_name' => array(
+        'description' => t('The image name'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_title' => array(
+        'description' => t('The image title'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_description' => array(
+        'description' => t('The image description'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_date' => array(
+        'description' => t('The image date'),
         'type' => 'datetime',
         'not null' => TRUE),
     ),
@@ -69,6 +74,7 @@ function imagepicker_schema() {
   );
 
   $schema['imagepicker_user_groups'] = array(
+    'description' => t('The groups table'),
     'fields' => array(
       'gid' => array(
         'description' => t('The primary group identifier.'),
@@ -82,28 +88,33 @@ function imagepicker_schema() {
         'not null' => TRUE,
         'default' => 0),
       'group_name' => array(
+        'description' => t('The group name.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'group_description' => array(
+        'description' => t('The group description.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'state' => array(
+        'description' => t('The currently selected group.'),
         'type' => 'int',
         'size' => 'tiny',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
       'public' => array(
+        'description' => t('The public flag.'),
         'type' => 'int',
         'size' => 'tiny',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
       'avail_roles' => array(
+        'description' => t('List of roles that may view this group.'),
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -121,14 +132,19 @@ function imagepicker_schema() {
         'description' => t('The group identifier.'),
         'type' => 'int',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+        'default' => 0),
       'img_id' => array(
         'description' => t('The image identifier.'),
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
-    )
+    ),
+    'indexes' => array(
+      'gid' => array('gid'),
+      'img_id' => array('img_id'),
+    ),
   );
 
   return $schema;
