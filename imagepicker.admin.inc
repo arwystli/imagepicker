@@ -421,7 +421,7 @@ function imagepicker_settings_form($form_state) {
 /**
  * Validate settings form
  */
-function imagepicker_settings_form_validate($form, $form_state) {
+function imagepicker_settings_form_validate($form, &$form_state) {
   global $user;
   if (! drupal_strlen($form_state['values']['imagepicker_default_thumbnail_size'])) {
     form_set_error('imagepicker_default_thumbnail_size', t('You must fill in the Thumbnail field'));
@@ -473,7 +473,7 @@ function imagepicker_settings_form_validate($form, $form_state) {
   }
   if ( imagepicker_image_check_functions() && $form_state['values']['imagepicker_watermark_enable'] ) {
     include_once('imagepicker.user.inc');
-    imagepicker_user_config_admin_form_validate($form, &$form_state);
+    imagepicker_user_config_admin_form_validate($form, $form_state);
   }
 
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
