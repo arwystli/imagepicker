@@ -362,23 +362,38 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_show_browse_search_form', 1),
     '#description' => t(''),
   );
-  $form['imagepicker_advanced']['imagepicker_public_enabled'] = array(
+  // Groups
+  $form['imagepicker_advanced']['imagepicker_groups'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker group settings'),
+    '#description' => t('Enable and configure groups.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_groups_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Groups'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_groups_enabled', 1),
+    '#description' => t('Allow users to manage groups.'),
+  );
+  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_public_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Public option'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_public_enabled', 1),
     '#description' => t('Allow users to make image groups publicly available.'),
   );
-  $form['imagepicker_advanced']['imagepicker_publicroles_enabled'] = array(
+  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_publicroles_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Public Role Control option'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_publicroles_enabled', 1),
     '#description' => t('Allow users to make publicly available image groups restricted by role.'),
   );
-  $form['imagepicker_advanced']['imagepicker_groups_in_upload_enabled'] = array(
+  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_groups_in_upload_enabled'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable Groups in upload form '),
+    '#title' => t('Enable Groups in upload form'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
     '#description' => t('Allow users to select a group in the upload form.'),
@@ -479,6 +494,12 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
     user_save($user, array('imagepicker_browser_order' => NULL));
   }
+
+  if ($form_state['values']['imagepicker_groups_enabled'] != 1) {
+    $form_state['values']['imagepicker_public_enabled'] = 0;
+    $form_state['values']['imagepicker_publicroles_enabled'] = 0;
+    $form_state['values']['imagepicker_groups_in_upload_enabled'] = 0;
+  }
 }
 
 /**
@@ -490,7 +511,7 @@ function imagepicker_admin_users_list($dir, $label='') {
   $header = array(
     array('data' => t('Name'), 'field' => 'u.name'),
     t('Images'),
-    t('Groups'),
+    (variable_get('imagepicker_groups_enabled', 1) ? t('Groups') : ''),
     (variable_get('imagepicker_quota_enable', 1) ? t('Quotas') : ''),
   );
   $rowcount = 0;
@@ -507,7 +528,7 @@ function imagepicker_admin_users_list($dir, $label='') {
     $row_data = array(
       check_plain($row['name']),
       ($allcount ? $allcount .' '. l(t('images'), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
-      ($groupcount ? $groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' ) : t('No groups')),
+      (variable_get('imagepicker_groups_enabled', 1) ? ($groupcount ? ($groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' )) : t('No groups')) : ''),
       (variable_get('imagepicker_quota_enable', 1) ? l(imagepicker_get_quota_list($quota+1), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/quota') : ''),
     );
     $rows[] = $row_data;
@@ -1259,35 +1280,39 @@ function imagepicker_admin_groups() {
     $row = db_fetch_array($result);
     $name = $row['name'];
   }
-  $content .= drupal_get_form('imagepicker_group_search_form');
-  $content .= '<p>'. t('Managing groups for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
-  if ($uid) {
-    // show groups for $uid
-    if ($gid) {
-      if ($gidaction == 'edit') {
-        $record = imagepicker_get_user_group($gid);
-        $content .= drupal_get_form('imagepicker_groups_form', $record);
+
+  if (variable_get('imagepicker_groups_enabled', 1)) {
+    $content .= drupal_get_form('imagepicker_group_search_form');
+    $content .= '<p>'. t('Managing groups for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
+    if ($uid) {
+      // show groups for $uid
+      if ($gid) {
+        if ($gidaction == 'edit') {
+          $record = imagepicker_get_user_group($gid);
+          $content .= drupal_get_form('imagepicker_groups_form', $record);
+        }
+        elseif ($gidaction == 'delete') {
+          $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
+        }
       }
-      elseif ($gidaction == 'delete') {
-        $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
+      elseif (arg(6) == 'stats') {
+        $content .= imagepicker_group_stats($user, t('Statistics for %name', array('%name' => $name)));
       }
-    }
-    elseif (arg(6) == 'stats') {
-      $content .= imagepicker_group_stats($user, t('Statistics for %name', array('%name' => $name)));
+      else {
+        $content .= imagepicker_groups_list('admin', $user, t('Groups for %name', array('%name' => $name)));
+        $content .= drupal_get_form('imagepicker_groups_form', 0, $user);
+      }
     }
     else {
-      $content .= imagepicker_groups_list('admin', $user, t('Groups for %name', array('%name' => $name)));
-      $content .= drupal_get_form('imagepicker_groups_form', 0, $user);
+      if ($action == 'stats') {
+        $content .= imagepicker_group_stats(FALSE, t('Statistics'));
+      }
+      else {
+        $content .= imagepicker_admin_groups_list(t('Groups'));
+      }
     }
   }
-  else {
-    if ($action == 'stats') {
-      $content .= imagepicker_group_stats(FALSE, t('Statistics'));
-    }
-    else {
-      $content .= imagepicker_admin_groups_list(t('Groups'));
-    }
-  }
+
   return $content;
 }
 

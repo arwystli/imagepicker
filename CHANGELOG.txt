@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-09-09
+------------------------------------
+by hutch, added group enable/disable, added to contrib
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-08-29
 ------------------------------------
 by hutch, added indexes to imagepicker_group_images

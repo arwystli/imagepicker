@@ -12,3 +12,6 @@ immediately above
 
   drupal_add_js($path .'/thickbox.js');
 
+
+convert_name2uid.php is an example script for converting large numbers of nodes, comments etc
+Use at your own risk.

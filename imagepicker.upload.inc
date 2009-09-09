@@ -92,7 +92,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     }
   }
   // groups
-  if ( variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+  if (variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1)) {
     $grouplist = imagepicker_get_groups( ($admin ? $user : FALSE));
     if ($grouplist) {
       $form['grouplist'] = array(
@@ -235,7 +235,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
           $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($user->uid, $file, $title, $description, $date));
           if ($result) {
             $nextimgid = db_last_insert_id('imagepicker', 'img_id');
-            if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+            if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
               $result = db_query("SELECT img_id FROM {imagepicker} WHERE uid = '%d' AND img_name = '%s'", array($user->uid, $file));
               $row = db_fetch_array($result);
               $record['img_id']  = $row['img_id'];

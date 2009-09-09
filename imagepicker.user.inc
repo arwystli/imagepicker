@@ -36,7 +36,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       imagepicker_image_delete($id, FALSE, 'account');
     }
   }
-  elseif ($path == 'groups') {
+  elseif (variable_get('imagepicker_groups_enabled', 1) && $path == 'groups') {
     include_once('imagepicker.group.inc');
     if ($func == 'edit' && is_numeric($id) && $id > 0) {
       $content .= imagepicker_user_groups($func, $id);
