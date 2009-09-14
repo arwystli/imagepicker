@@ -314,15 +314,17 @@ function imagepicker_copy_uploaded_file(&$destination, $name) {
 
 function imagepicker_get_uploaded_file_extension($name) {
   switch ($_FILES['files']['type'][$name]) {
+    // For some reason Internet Explorer 7 and later decides to give us
+    // non-standard MIME types for jpg and png files, this is supposedly
+    // for 'backwards compatibility'. For more details see:
+    // http://msdn.microsoft.com/en-us/library/ms775147(VS.85).aspx#_replace
+    
+    // Non-standard MIME type:
     case 'image/pjpeg':
-      // "What genius at microsoft decided to rename the mime type for jpgs?"
-      // Thats a nice phrase I have found about this mime type :) Wonder what
-      // am I talking about? Try to upload some type of jpg image via IE7.
-      // Don't know if it's the same with IE6, but IE7 might give you a mime
-      // type of image/pjpeg. So lets just treat this 'progressive jpg' as a
-      // normal jpg image.
     case 'image/jpeg': $fileext = '.jpg'; break;
     case 'image/gif': $fileext = '.gif'; break;
+    // Non-standard MIME type:
+    case 'image/x-png':
     case 'image/png': $fileext = '.png'; break;
     default: $fileext = '';
   }
