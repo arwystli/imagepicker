@@ -20,79 +20,95 @@ function imagepicker_theme() {
       'arguments' => array(
         'header' => array(),
         'rows' => array(),
-        $max = 50,
-        $message = "",
-        $pref = "",
-        $suff = "",
-        $label = "",
+        'max' => 50,
+        'message' => "",
+        'pref' => "",
+        'suff' => "",
+        'label' => "",
       ),
     ),
     'imagepicker_stats' => array(
       'arguments' => array(
         'header' => array(),
         'rows' => array(),
-        $pref = "",
-        $suff = "",
-        $label = "",
+        'pref' => "",
+        'suff' => "",
+        'label' => "",
       ),
     ),
     'imagepicker_browser' => array(
       'arguments' => array(
         'content' => array(),
         'forms' => array(),
-        $message = "",
-        $help = "",
-        $label = "",
+        'message' => "",
+        'help' => "",
+        'label' => "",
       ),
     ),
     'imagepicker_fullpage' => array(
       'arguments' => array(
         'image' => array(),
-        $source = "",
-        $link = 1,
+        'source' => "",
+        'link' => 1,
       ),
     ),
     'imagepicker_quota_message' => array(
       'arguments' => array(
-        $message1 = "",
-        $message2 = "",
-        $form = "",
-        $label = "",
-        $help = "",
+        'message1' => "",
+        'message2' => "",
+        'form' => array(),
+        'label' => "",
+        'help' => "",
       ),
     ),
     'imagepicker_view' => array(
       'arguments' => array(
         'img' => array(),
-        $imgpath = "",
+        'imgpath' => "",
         'info' => array(),
       ),
     ),
     'imagepicker_image_edit_header' => array(
       'arguments' => array(
         'image' => array(),
-        $source = "",
+        'source' => "",
       ),
     ),
     'imagepicker_quota' => array(
       'arguments' => array(
-        $form = "",
-        $message = "",
-        $label = "",
+        'form' => array(),
+        'message' => "",
+        'label' => "",
       ),
     ),
     'imagepicker_upload_progress_message' => array(
       'arguments' => array(
-        $message = "",
+        'message' => "",
       ),
     ),
     'imagepicker_user_config' => array(
       'arguments' => array(
-        $form = "",
-        $label = "",
-        $help = "",
-        $message1 = "",
-        $message2 = "",
+        'form' => array(),
+        'label' => "",
+        'help' => "",
+        'message1' => "",
+        'message2' => "",
+      ),
+    ),
+    'imagepicker_user_view' => array(
+      'arguments' => array(
+        'view' => "",
+        'form1' => array(),
+        'form2' => array(),
+        'form3' => array(),
+      ),
+    ),
+    'imagepicker_admin_view' => array(
+      'arguments' => array(
+        'view' => "",
+        'form1' => array(),
+        'form2' => array(),
+        'form3' => array(),
       ),
     ),
   );
@@ -226,7 +242,7 @@ function theme_imagepicker_image_edit_header($image, $source) {
   return $output;
 }
 
-function theme_imagepicker_quota( $form, $message, $label) {
+function theme_imagepicker_quota($form, $message, $label) {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   $output .= ($message ? '<p class="messages">'. $message .'</p>' : '') ;
   $output .= $form;
@@ -250,3 +266,26 @@ function theme_imagepicker_user_config($form, $label='', $help='', $message1='',
   $output .= ($label ? '</fieldset>' : '');
   return $output;
 }
+
+function theme_imagepicker_user_view($view, $form1='', $form2='', $form3='') {
+  $output = "";
+  $output .= $view;
+  $output .= '<br />';
+  $output .= ($form1 ? $form1 : '') ;
+  $output .= '<br />';
+  $output .= ($form2 ? $form2 : '') ;
+  $output .= ($form3 ? $form3 : '') ;
+  return $output;
+}
+
+function theme_imagepicker_admin_view($view, $form1='', $form2='', $form3='') {
+  $output = "";
+  $output .= $view;
+  $output .= '<br />';
+  $output .= ($form1 ? $form1 : '') ;
+  $output .= '<br />';
+  $output .= ($form2 ? $form2 : '') ;
+  $output .= ($form3 ? $form3 : '') ;
+  return $output;
+}
+

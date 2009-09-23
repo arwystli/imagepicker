@@ -89,10 +89,17 @@ function imagepicker_user_view($img_id) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full');
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
-    $content = theme('imagepicker_view', $img, $imgpath, $info) .
-    drupal_get_form('imagepicker_user_image_form', $img_id) .
-    '<br />'.
-    (_imagepicker_has_groups() ? drupal_get_form('imagepicker_group_images_form', $img['img_id']) : '');
+    $view = theme('imagepicker_view', $img, $imgpath, $info);
+    $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
+    // copy form
+    if (variable_get('imagepicker_copy_enabled', 0)) {
+      $form2 = drupal_get_form('imagepicker_copy_form', $img['img_id'], $img['img_name']);
+    }
+    // group form
+    if (_imagepicker_has_groups($user)) {
+      $form3 = drupal_get_form('imagepicker_group_images_form', $img['img_id']);
+    }
+    $content = theme('imagepicker_user_view', $view, $form1, $form2, $form3);
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');

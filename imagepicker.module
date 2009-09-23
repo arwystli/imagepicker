@@ -292,6 +292,35 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -7
   );
+  // Import
+  if (variable_get('imagepicker_import_enabled', 0)) {
+    $items['admin/settings/imagepicker/import'] = array(
+      'title'            => 'Import',
+      'description'      => 'Manage bulk imports.',
+      'page callback'    => 'imagepicker_admin_import',
+      'access arguments' => array('administer imagepicker'),
+      'type'             => MENU_LOCAL_TASK,
+      'file'             => 'imagepicker.admin.inc',
+      'weight'           => -8
+    );
+    $items['admin/settings/imagepicker/import/autocomplete'] = array(
+      'title'            => '',
+      'description'      => '',
+      'access arguments' => array('administer imagepicker'),
+      'page callback'    => 'imagepicker_user_autocomplete',
+      'type'             => MENU_CALLBACK,
+      'file'             => 'imagepicker.admin.inc'
+    );
+    $items['admin/settings/imagepicker/import/user/%imagepicker_id'] = array(
+      'title'            => 'Import',
+      'description'      => 'Import files.',
+      'access arguments' => array('administer imagepicker'),
+      'page callback'    => 'imagepicker_admin_import',
+      'type'             => MENU_LOCAL_TASK,
+      'file'             => 'imagepicker.admin.inc',
+      'weight'           => -3
+    );
+  }
   // My imagepicker
   if (variable_get('imagepicker_account_enabled', 1)) {
     $items['user/%imagepicker_uid/imagepicker'] = array(
@@ -358,6 +387,7 @@ function imagepicker_menu() {
         'file'             => 'imagepicker.user.inc',
         'weight'           => -4
       );
+
       $items['user/%imagepicker_uid/imagepicker/stats'] = array(
         'title'            => 'Stats',
         'description'      => 'View your imagepicker statistics.',
@@ -369,6 +399,7 @@ function imagepicker_menu() {
         'weight'           => -3
       );
     }
+
     if (variable_get('imagepicker_user_config_enable', 1)) {
        $items['user/%imagepicker_uid/imagepicker/config'] = array(
         'title'            => 'Config',
@@ -682,7 +713,7 @@ function imagepicker_get_path($url = FALSE, $userdir = FALSE) {
   if (!$url) {
     $path = str_replace('/', DIRECTORY_SEPARATOR, getcwd());
   }
-  elseif (variable_get('imagepicker_use_full_url', 1)) {
+  elseif (variable_get('imagepicker_use_full_url', 0)) {
     $path = $base_url;
   }
   else {
@@ -1034,8 +1065,10 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
   // filter by selected group
   if ($gid) {
     $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
-      FROM {imagepicker} i, {imagepicker_group_images} g
-      WHERE i.uid = %d AND i.img_id = g.img_id AND g.gid = %d ";
+      FROM {imagepicker} AS i JOIN {imagepicker_group_images} AS g USING (img_id)
+      WHERE i.uid = %d
+      AND g.gid = %d ";
+
     if ($searchsql) {
       $sql .= $searchsql;
     }
@@ -1132,13 +1165,16 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
         $x++;
       }
     }
-    $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-      FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-      WHERE i.uid=n.uid AND u.public=1";
+    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+      FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
+      {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
+      WHERE g.img_id=i.img_id
+      AND u.public=1 ";
+
     if ($rolesql) {
       $sql .= $rolesql;
     }
-    $sql .= " AND g.img_id=i.img_id AND u.gid=g.gid";
+#    $sql .= " AND g.img_id=i.img_id AND u.gid=g.gid";
     if ($searchsql) {
       $sql .= $searchsql;
     }
@@ -1152,8 +1188,11 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   }
   elseif ($range == 2) {
     $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-      FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-      WHERE i.uid=n.uid AND u.public=0 AND g.img_id=i.img_id AND u.gid=g.gid";
+      FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
+      {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
+      WHERE g.img_id=i.img_id
+      AND u.public=0 ";
+
     if ($searchsql) {
       $sql .= $searchsql;
     }
@@ -1164,7 +1203,7 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   }
   else {
     $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-      FROM {imagepicker} i, {users} n WHERE i.uid=n.uid";
+      FROM {imagepicker} AS i JOIN {users} AS n USING (uid)";
     if ($searchsql) {
       $sql .= $searchsql;
     }
@@ -2237,7 +2276,7 @@ function imagepicker_get_quota_list($key = 'x') {
  *   Optional user account object.
  * @param $label
  *   Optional label to pass through to the theme
- * @param $label
+ * @param $help
  *   Optional help to pass through to the theme
  * @return
  *   Returns the quota message along with the upload form, all themed
@@ -2534,6 +2573,12 @@ function imagepicker_image_check_functions() {
   return TRUE;
 }
 
+/**
+ * options for dropdown.
+ *
+ * @return
+ *   Array for position select box.
+ */
 function imagepicker_watermark_opts() {
   return array(
     0 => t('Middle'),
@@ -2577,7 +2622,6 @@ function imagepicker_get_align_opts() {
   $form = array(
     '#type' => 'radios',
     '#title' => t('Align'),
-    '#default_value' => 'none',
     '#options' => $alignoptions,
     '#description' => '',
     '#default_value' => variable_get('imagepicker_insert_defaults_align', 'none'),
@@ -2593,7 +2637,6 @@ function imagepicker_get_show_opts() {
     '#type' => 'radios',
     '#id' => 'show',
     '#title' => t('Show'),
-    '#default_value' => 'full',
     '#options' => $showoptions,
     '#description' => '',
     '#default_value' => variable_get('imagepicker_insert_defaults_show', 'full'),
@@ -2614,7 +2657,6 @@ function imagepicker_get_link_opts() {
   $form = array(
     '#type' => 'radios',
     '#title' => t('Link'),
-    '#default_value' => 'none',
     '#options' => $linkoptions,
     '#description' => '',
     '#default_value' => variable_get('imagepicker_insert_defaults_link', 'none'),
@@ -2624,3 +2666,253 @@ function imagepicker_get_link_opts() {
   return $form;
 }
 
+/**
+ * Function to generate the copy form
+ *
+ * @param $img_id
+ *   Required image id
+ * @param $img_name
+ *   Required image name
+ * @param $account
+ *   Optional $user object
+ * @param $admin
+ *   Optional admin status
+ * @return
+ *   The form array
+ *
+ */
+function imagepicker_copy_form(&$form_state, $img_id, $img_name, $account = FALSE, $admin = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  if ($admin) {
+    $form['admin'] = array(
+      '#type' => 'hidden',
+      '#value' => TRUE,
+    );
+  }
+  if ($account) {
+    $form['uid'] = array(
+      '#type' => 'hidden',
+      '#value' => $user->uid,
+    );
+  }
+
+  $form['img_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $img_id,
+  );
+
+  $form['copy'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Copy'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#description' => $img_name,
+  );
+  $form['copy']['imagepicker_copy'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Copy to'),
+    '#size' => 25,
+    '#default_value' => '',
+  );
+  $form['copy']['scale'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Scale image'),
+    '#size' => 10,
+    '#default_value' => variable_get('imagepicker_default_scale', ''),
+    '#description' => t('Scale image to this size in pixels if not left empty'),
+  );
+
+  if ( imagepicker_image_check_functions() && variable_get('imagepicker_watermark_enable', 0)) {
+    if (! variable_get('imagepicker_watermark_image', '')
+      && ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : FALSE)
+      && $user->imagepicker_watermark_enable) {
+      $form['copy']['watermark'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use watermark'),
+        '#description' => t('Use watermark on this image.'),
+        '#default_value' => ($user->imagepicker_watermark_use ? $user->imagepicker_watermark_use : FALSE),
+      );
+    }
+    elseif (variable_get('imagepicker_watermark_image', '')) {
+      $form['watermark'] = array(
+        '#type' => 'hidden',
+        '#value' => 1,
+      );
+    }
+  }
+  $form['copy']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Copy image'),
+  );
+  return $form;
+
+}
+
+/**
+ * Function to validate the copy form
+ *
+ */
+function imagepicker_copy_form_validate($form, &$form_state) {
+  if (! drupal_strlen($form_state['values']['imagepicker_copy'])) {
+    form_set_error('imagepicker_copy', t('You must supply a name'));
+  }
+  elseif (! preg_match('/^[a-zA-Z0-9_ .-]+$/', $form_state['values']['imagepicker_copy'])) {
+    form_set_error('imagepicker_copy', t('You must supply a valid name'));
+  }
+
+  if ($form_state['values']['uid']) {
+    $user = user_load(array('uid' => $form_state['values']['uid']));
+  }
+  else {
+    global $user;
+  }
+
+  $img_id = $form_state['values']['img_id'];
+  $img = _imagepicker_get_img($img_id, TRUE, $user);
+  preg_match('/\.([a-zA-Z]+)$/', $img['img_name'] , $m);
+  $oldext = $m[1];
+  preg_match('/\.([a-zA-Z]+)$/', $form_state['values']['imagepicker_copy'] , $m);
+  $newext = $m[1];
+  if ( $oldext != $newext) {
+    form_set_error('imagepicker_copy', t('You must use the same extension'));
+  }
+  if ( $img['img_name'] == $form_state['values']['imagepicker_copy'] ) {
+    form_set_error('imagepicker_copy', t('You cannot copy a file onto itself'));
+  }
+
+  if (!preg_match('/^[0-9]{0,3}$/', $form_state['values']['scale'])) {
+    form_set_error($name, t('Scale value should be an integer between 1 and 999 or leave it empty if you don\'t want to scale your image.'));
+  }
+}
+
+/**
+ * Function to submit the copy form
+ *
+ */
+function imagepicker_copy_form_submit($form, &$form_state) {
+  include_once("imagepicker.imagefuncs.inc");
+  if ($form_state['values']['uid']) {
+    $user = user_load(array('uid' => $form_state['values']['uid']));
+  }
+  else {
+    global $user;
+  }
+
+  $img_id = $form_state['values']['img_id'];
+  $newname = $form_state['values']['imagepicker_copy'];
+  $img = _imagepicker_get_img($img_id, TRUE, $user);
+  if ($img) {
+    $destdir = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
+    $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
+    $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
+    $origdir = $destdir . IMAGEPICKER_ORIG_DIR;
+    if (file_check_directory($destdir, TRUE)
+      && file_check_directory($thumbsdir, TRUE)
+      && file_check_directory($browserdir, TRUE)
+      && file_check_directory($origdir, TRUE)
+      ) {
+      // clear out the noisy 'created' messages
+      drupal_get_messages('status', TRUE);
+      // Add DIRECTORY_SEPARATORS here because drupals' functions remove trailing slashes
+      $destdir = $destdir . DIRECTORY_SEPARATOR;
+      $thumbsdir = $thumbsdir . DIRECTORY_SEPARATOR;
+      $browserdir  = $browserdir . DIRECTORY_SEPARATOR;
+      $origdir  = $origdir . DIRECTORY_SEPARATOR;
+      $doinsert = TRUE;
+      if (file_exists($destdir . $newname)) {
+        $doinsert = FALSE;
+      }
+
+      $scaleto = $form_state['values']['scale'] ? $form_state['values']['scale'] : FALSE;
+      $dest = $destdir . $newname;
+      if ($scaleto) {
+        // as origdir is quite new...
+        $source = $origdir . $img['img_name'];
+        if (! file_exists($source) ) {
+          $source = $destdir . $img['img_name'];
+        }
+        $imagescaled = imagepicker_scale_image($source, $dest, $scaleto);
+
+        // if watermark is enabled just apply to destdir image, not orig or the thumbs
+        if ( $form_state['values']['watermark'] ) {
+          if (! imagepicker_watermark_process($dest, $user)) {
+            drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
+          }
+        }
+      }
+      else {
+        // no scaling, copy direct from $destdir to $destdir
+        $source =  $destdir. $img['img_name'];
+        file_copy($source, $dest, FILE_EXISTS_REPLACE);
+      }
+
+      $source = $thumbsdir . $img['img_name'];
+      $dest = $thumbsdir . $newname;
+      file_copy($source, $dest, FILE_EXISTS_REPLACE);
+
+      $source = $browserdir . $img['img_name'];
+      $dest = $browserdir . $newname;
+      file_copy($source, $dest, FILE_EXISTS_REPLACE);
+
+      $source = $origdir . $img['img_name'];
+      $dest = $origdir . $newname;
+      file_copy($source, $dest, FILE_EXISTS_REPLACE);
+
+      if ($doinsert) {
+        $nextimgid = imagepicker_insert_image($user->uid, $newname, $img['img_title'], $img['img_description']);
+        if ($nextimgid) {
+          $record['img_id'] = $nextimgid;
+          $gids = imagepicker_get_image_groups($img_id);
+          if (count($gids) ) {
+            foreach ($gids AS $gid) {
+              $record['gid'] = $gid;
+              imagepicker_insert_group_image($record);
+            }
+          }
+          drupal_set_message(t('Copy done.'));
+        }
+        else {
+          // rollback
+          file_delete($thumbsdir . $newname);
+          file_delete($browserdir . $newname);
+          file_delete($origdir . $newname);
+          file_delete($destdir . $newname);
+          // warn
+          drupal_set_message(t('Copy failed.'), 'warning');
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Function to insert the image data into db
+ *
+ * @param $uid
+ *   Required user id
+ * @param $img_name
+ *   Required image name
+ * @param $img_title
+ *   Optional image title
+ * @param $img_description
+ *   Optional image description
+ * @return
+ *   Returns the current img id
+ */
+function imagepicker_insert_image($uid, $img_name, $img_title="", $img_description="") {
+  if (! $uid || ! $img_name) {
+    return FALSE;
+  }
+  $date = date('Y-m-d H:i:s');
+  $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($uid, $img_name, $img_title, $img_description, $date));
+  if ($result) {
+    $nextimgid = db_last_insert_id("imagepicker", 'img_id');
+    return $nextimgid;
+  }
+  return FALSE;
+}

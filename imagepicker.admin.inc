@@ -76,6 +76,21 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_account_enabled', 1),
     '#description' => t('Setting this option enables Imagepicker in My Account.'),
   );
+  $form['imagepicker_settings']['imagepicker_copy_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable copy form'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_copy_enabled', 0),
+    '#description' => t('Allow users to copy an image.'),
+  );
+  $form['imagepicker_settings']['imagepicker_user_config_enable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable User config form'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_user_config_enable', 1),
+    '#description' => t('Allow users to select their own settings.'),
+  );
+
   // default options
   $form['imagepicker_defaults'] = array(
     '#type' => 'fieldset',
@@ -99,6 +114,22 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_default_scale', ''),
     '#description' => t('Configure the default scale. leave empty for no default scale'),
   );
+
+  $form['imagepicker_defaults']['imagepicker_use_full_url'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use full url'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_full_url', 0),
+    '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an path relative to the Drupal root.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
+  );
+  $form['imagepicker_defaults']['imagepicker_use_cssbox'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow additional css'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_cssbox', 0),
+    '#description' => t('Setting this option will provide a textfield where additional css can be added .'),
+  );
+
   // insert settings
   $form['imagepicker_insert_defaults'] = array(
     '#type' => 'fieldset',
@@ -116,7 +147,7 @@ function imagepicker_settings_form($form_state) {
     '#type' => 'fieldset',
     '#title' => t('Image alignment settings'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_default_align_show', 1) ? TRUE : FALSE),
   );
   $form['imagepicker_align']['imagepicker_default_align_show'] = array(
     '#type' => 'checkbox',
@@ -184,7 +215,7 @@ function imagepicker_settings_form($form_state) {
     '#type' => 'fieldset',
     '#title' => t('User quotas'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_quota_enable', 1) ? TRUE : FALSE),
   );
   $form['imagepicker_quotas']['imagepicker_quota_enable'] = array(
     '#type' => 'checkbox',
@@ -200,12 +231,12 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Set default quota'),
   );
   if ( imagepicker_image_check_functions() ) {
-    // advanced settings
+    // watermark settings
     $form['imagepicker_watermark'] = array(
       '#type' => 'fieldset',
       '#title' => t('Image watermark settings'),
       '#collapsible' => TRUE,
-      '#collapsed' => ( variable_get('imagepicker_watermark_enable', 0) ? FALSE : TRUE),
+      '#collapsed' => ( variable_get('imagepicker_watermark_enable', 0) ? TRUE : FALSE),
     );
     $form['imagepicker_watermark']['imagepicker_watermark_enable'] = array(
       '#type' => 'checkbox',
@@ -256,16 +287,16 @@ function imagepicker_settings_form($form_state) {
       '#default_value' => variable_get('imagepicker_watermark_min_width', 0),
     );
   }
-  // advanced settings
-  $form['imagepicker_advanced'] = array(
+  // Iframe
+  $form['imagepicker_iframe'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Advanced imagepicker settings'),
+    '#title' => t('Imagepicker Iframe settings'),
     '#description' => t('You can alter the default styling of the iframe here,<br />useful if the iframe is not fitting in with your theme.'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => FALSE,
   );
   if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
-    $form['imagepicker_advanced']['imagepicker_advanced_thickbox'] = array(
+    $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = array(
       '#type' => 'checkbox',
       '#title' => t('Thickbox Iframe'),
       '#return_value' => 1,
@@ -273,7 +304,7 @@ function imagepicker_settings_form($form_state) {
       '#description' => t('Use thickbox iframe instead of the builtin one. See the contribs folder in Imagepicker'),
     );
   }
-  $form['imagepicker_advanced']['imagepicker_advanced_iframe_width'] = array(
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = array(
     '#type' => 'textfield',
     '#title' => t('Iframe width'),
     '#description' => t('Configure the iframe width. This can be a number or a percentage, eg 400 or 100%'),
@@ -281,7 +312,7 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_iframe_width', "100%"),
   );
-  $form['imagepicker_advanced']['imagepicker_advanced_iframe_height'] = array(
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = array(
     '#type' => 'textfield',
     '#title' => t('Iframe height'),
     '#description' => t('Configure the iframe height. This must be a number, eg 500'),
@@ -289,7 +320,7 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_iframe_height', "500"),
   );
-  $form['imagepicker_advanced']['imagepicker_advanced_iframe_border'] = array(
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = array(
     '#type' => 'textfield',
     '#title' => t('Iframe border'),
     '#description' => t('Configure the iframe border. This can be a number, eg 0 or 1, or a css entry such as 1px solid #808080'),
@@ -297,7 +328,24 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_iframe_border', "0"),
   );
-  $form['imagepicker_advanced']['imagepicker_advanced_browser_columns'] = array(
+  $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Fieldset state'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_advanced_collapsed', 0),
+    '#description' => t('Setting this option will collapse the fieldset the iframe is in by default.'),
+  );
+
+  // browser
+  $form['imagepicker_browser'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker browser settings'),
+    '#description' => t('Enable and configure browser.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = array(
     '#type' => 'textfield',
     '#title' => t('Browser columns'),
     '#description' => t('Configure the number of columns in the image browser. This must be a number, 0 for normal wraparound'),
@@ -305,7 +353,7 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_browser_columns', 0),
   );
-  $form['imagepicker_advanced']['imagepicker_advanced_browser_page'] = array(
+  $form['imagepicker_browser']['imagepicker_advanced_browser_page'] = array(
     '#type' => 'textfield',
     '#title' => t('Images per page'),
     '#description' => t('Configure the number of images shown per page in the image browser. This must be a number, 0 for no paging'),
@@ -313,28 +361,7 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_advanced_browser_page', 20),
   );
-  $form['imagepicker_advanced']['imagepicker_advanced_collapsed'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Fieldset state'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_advanced_collapsed', 0),
-    '#description' => t('Setting this option will collapse the fieldset the iframe is in by default.'),
-  );
-  $form['imagepicker_advanced']['imagepicker_use_full_url'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use full url'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_use_full_url', 1),
-    '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an absolute path.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
-  );
-  $form['imagepicker_advanced']['imagepicker_use_cssbox'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Allow additional css'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_use_cssbox', 0),
-    '#description' => t('Setting this option will provide a textfield where additional css can be added .'),
-  );
-  $form['imagepicker_advanced']['imagepicker_show_browse_order_form'] = array(
+  $form['imagepicker_browser']['imagepicker_show_browse_order_form'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the order select box in the browser'),
     '#return_value' => 1,
@@ -348,73 +375,37 @@ function imagepicker_settings_form($form_state) {
     'img_date ASC' => t('Edited last'),
     'img_name' => t('By name'),
   );
-  $form['imagepicker_advanced']['imagepicker_default_browser_order'] = array(
+  $form['imagepicker_browser']['imagepicker_default_browser_order'] = array(
     '#type' => 'select',
     '#default_value' => variable_get('imagepicker_default_browser_order', 'img_id DESC'),
     '#options' => $orderlist,
     '#title' => t('Default order'),
     '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
   );
-  $form['imagepicker_advanced']['imagepicker_show_browse_search_form'] = array(
+  $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the search form in the browser'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_show_browse_search_form', 1),
     '#description' => t(''),
   );
-  // Groups
-  $form['imagepicker_advanced']['imagepicker_groups'] = array(
+
+  // progress bar
+  $form['imagepicker_progress'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Imagepicker group settings'),
-    '#description' => t('Enable and configure groups.'),
+    '#title' => t('Progress bar'),
+    '#description' => t('Enable and configure progress bar.'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_upload_progress_enabled', 1)),
   );
-  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_groups_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Groups'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_groups_enabled', 1),
-    '#description' => t('Allow users to manage groups.'),
-  );
-  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_public_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Public option'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_public_enabled', 1),
-    '#description' => t('Allow users to make image groups publicly available.'),
-  );
-  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_publicroles_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Public Role Control option'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_publicroles_enabled', 1),
-    '#description' => t('Allow users to make publicly available image groups restricted by role.'),
-  );
-  $form['imagepicker_advanced']['imagepicker_groups']['imagepicker_groups_in_upload_enabled'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Groups in upload form'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
-    '#description' => t('Allow users to select a group in the upload form.'),
-  );
-
-  $form['imagepicker_advanced']['imagepicker_user_config_enable'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable User config form'),
-    '#return_value' => 1,
-    '#default_value' => variable_get('imagepicker_user_config_enable', 1),
-    '#description' => t('Allow users to select their own settings.'),
-  );
-
-  $form['imagepicker_advanced']['imagepicker_upload_progress_enabled'] = array(
+  $form['imagepicker_progress']['imagepicker_upload_progress_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Progress bar in upload'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_upload_progress_enabled', 1),
     '#description' => t(''),
   );
-  $form['imagepicker_advanced']['imagepicker_upload_progress_delay'] = array(
+  $form['imagepicker_progress']['imagepicker_upload_progress_delay'] = array(
     '#type' => 'textfield',
     '#title' => t('Progress bar Delay'),
     '#size' => 3,
@@ -422,12 +413,72 @@ function imagepicker_settings_form($form_state) {
     '#field_suffix' => t('seconds'),
     '#description' => t('Show the progress bar if processing is longer than this value.'),
   );
-  $form['imagepicker_advanced']['imagepicker_upload_progress_message'] = array(
+  $form['imagepicker_progress']['imagepicker_upload_progress_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Progress bar message'),
     '#size' => 60,
     '#default_value' => variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
     '#description' => t('Message to display while uploading.'),
+  );
+
+  // Groups
+  $form['imagepicker_groups'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker group settings'),
+    '#description' => t('Enable and configure groups.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (variable_get('imagepicker_groups_enabled', 1) ? TRUE : FALSE),
+  );
+  $form['imagepicker_groups']['imagepicker_groups_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Groups'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_groups_enabled', 1),
+    '#description' => t('Allow users to manage groups.'),
+  );
+  $form['imagepicker_groups']['imagepicker_public_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Public option'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_public_enabled', 1),
+    '#description' => t('Allow users to make image groups publicly available.'),
+  );
+  $form['imagepicker_groups']['imagepicker_publicroles_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Public Role Control option'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_publicroles_enabled', 1),
+    '#description' => t('Allow users to make publicly available image groups restricted by role.'),
+  );
+  $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Groups in upload form'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
+    '#description' => t('Allow users to select a group in the upload form.'),
+  );
+
+  // Import
+  $form['imagepicker_import'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker Bulk Import'),
+    '#description' => t('Enable bulk import of images.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (variable_get('imagepicker_import_enabled', 0) ? TRUE : FALSE),
+  );
+  $form['imagepicker_import']['imagepicker_import_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Bulk import processing'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_import_enabled', 0),
+    '#description' => t('Import images into imagepicker from an import folder in the filesystem.<br />Requires FTP or SSH access'),
+  );
+  $form['imagepicker_import']['imagepicker_import_delete'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Bulk import deletion'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_import_delete', 0),
+    '#description' => t('Delete uploaded source images after succesful import into imagepicker.'),
   );
 
   return system_settings_form($form);
@@ -583,10 +634,18 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
     $info = image_get_info(imagepicker_get_path(FALSE, $userdir) . $img['img_name']);
-    $content = theme('imagepicker_view', $img, $imgpath, $info) .
-    drupal_get_form('imagepicker_admin_image_form', $img_id, $user) .
-    '<br />'.
-    (_imagepicker_has_groups($user) ? drupal_get_form('imagepicker_group_images_form', $img['img_id'], $user) : '');
+    $view = theme('imagepicker_view', $img, $imgpath, $info);
+
+    $form1 = drupal_get_form('imagepicker_admin_image_form', $img_id, $user);
+    // copy form
+    if (variable_get('imagepicker_copy_enabled', 0)) {
+      $form2 = drupal_get_form('imagepicker_copy_form', $img['img_id'], $img['img_name'], $user);
+    }
+    // group form
+    if (_imagepicker_has_groups($user)) {
+      $form3 = drupal_get_form('imagepicker_group_images_form', $img['img_id'], $user);
+    }
+    $content = theme('imagepicker_admin_view', $view, $form1, $form2, $form3);
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
@@ -1519,13 +1578,52 @@ function imagepicker_quota_form_submit($form, &$form_state) {
     }
 }
 
+function imagepicker_admin_import() {
+  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  include_once('imagepicker.import.inc');
+
+  if (! arg(4) ) {
+    variable_del('imagepicker_currentuser');
+  }
+  $uid = variable_get('imagepicker_currentuser', '');
+  if ( arg(4) == 'user' && is_numeric(arg(5))) {
+    $uid = arg(5);
+  }
+
+  $content = "";
+  if (! $importdir = variable_get('imagepicker_import_dir', '')) {
+    drupal_set_message(t('You need to set the import folder'));
+  }
+  $content = drupal_get_form('imagepicker_import_dir_form');
+
+  if ($importdir) {
+    if ($import_files = imagepicker_import_dir_check()) {
+      $content .= drupal_get_form('imagepicker_user_search_form', 'import');
+      if ($uid) {
+        $user = user_load(array('uid' => $uid));
+        $content .= drupal_get_form('imagepicker_import_form', count($import_files), $user, TRUE);
+      }
+      else {
+        drupal_set_message(t('Please select a user. You have %total files to be imported', array('%total' => count($import_files)) ));
+      }
+    }
+  }
+
+  if ($msg = $_SESSION['imagepicker_import_status']) {
+    drupal_set_message($msg);
+    unset($_SESSION['imagepicker_import_status']);
+  }
+
+  return $content;
+}
+
 /**
  * Retrieve a pipe delimited string of autocomplete suggestions for existing users
  */
 function imagepicker_user_autocomplete($string = '') {
   $matches = array();
   if ($string) {
-    $result = db_query_range("SELECT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
+    $result = db_query_range("SELECT DISTINCT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
     while ($user = db_fetch_object($result)) {
       $matches[$user->name] = check_plain($user->name);
     }
