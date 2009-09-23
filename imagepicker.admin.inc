@@ -1225,7 +1225,7 @@ function imagepicker_files_validate($dir) {
     while ($row = db_fetch_array($result)) {
       array_push($imgnames, $row['img_name']);
     }
-    $filestmp = file_scan_directory($filepath, ".*", array('.', '..', 'CVS', IMAGEPICKER_THUMBS_DIR, IMAGEPICKER_BROWSER_DIR), 0, FALSE);
+    $filestmp = file_scan_directory($filepath, ".*", array('.', '..', 'CVS', IMAGEPICKER_THUMBS_DIR, IMAGEPICKER_BROWSER_DIR, IMAGEPICKER_WATERMARK_DIR, IMAGEPICKER_ORIG_DIR), 0, FALSE);
     if (count($filestmp)) {
       // compare files with db
       foreach ($filestmp AS $k => $v ) {
