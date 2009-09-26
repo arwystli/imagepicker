@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-09-27
+------------------------------------
+by hutch, added exif info, fixed noisy no-exif message
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-09-23
 ------------------------------------
 by hutch, added batch import, copy

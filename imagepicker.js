@@ -38,7 +38,17 @@ Drupal.imagepicker_upload_progress = function() {
   $('#imagepicker-upload-form').submit(Drupal.imagepicker_upload_progress_hide_timeout);
 }
 
+/**
+ * A toggle function for imagepicker.
+ */
+Drupal.imagepicker_toggle = function() {
+  $('#imgp_trig').click(function() {
+    $('#imgp_targ').toggle('slow');
+  });
+}
+
 // Global killswitch
 if (Drupal.jsEnabled) {
   $(document).ready(Drupal.imagepicker_upload_progress);
+  $(document).ready(Drupal.imagepicker_toggle);
 }

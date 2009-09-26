@@ -90,7 +90,6 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_user_config_enable', 1),
     '#description' => t('Allow users to select their own settings.'),
   );
-
   // default options
   $form['imagepicker_defaults'] = array(
     '#type' => 'fieldset',
@@ -230,7 +229,7 @@ function imagepicker_settings_form($form_state) {
     '#options' => imagepicker_get_quota_list(),
     '#title' => t('Set default quota'),
   );
-  if ( imagepicker_image_check_functions() ) {
+  if ( imagepicker_image_check_functions()) {
     // watermark settings
     $form['imagepicker_watermark'] = array(
       '#type' => 'fieldset',
@@ -285,6 +284,29 @@ function imagepicker_settings_form($form_state) {
       '#description' => t('The mimimum of the watermark in pixels. Type 0 to turn this option off.'),
       '#size' => 3,
       '#default_value' => variable_get('imagepicker_watermark_min_width', 0),
+    );
+    $form['imagepicker_exif'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Imagepicker Exif settings'),
+      '#description' => t('Enable exif display.'),
+      '#collapsible' => TRUE,
+      '#collapsed' => (variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
+    );
+    $form['imagepicker_exif']['imagepicker_exifinfo_enable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Display of Exif info'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_exifinfo_enable', 0),
+      '#description' => t('Enable Display of Extended file information'),
+    );
+    $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
+      '#type' => 'textfield',
+      '#size' => 55,
+      '#maxlength' => 100,
+      '#required' => FALSE,
+      '#title' => t('Use external program'),
+      '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
+      '#description' => t('Enter the external program to use for exif info.<br />For instance exiftool. Requires a full filesystem path.'),
     );
   }
   // Iframe
@@ -537,9 +559,12 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
-  if ( imagepicker_image_check_functions() && $form_state['values']['imagepicker_watermark_enable'] ) {
+  if ( imagepicker_image_check_functions(TRUE) && $form_state['values']['imagepicker_watermark_enable'] ) {
     include_once('imagepicker.user.inc');
     imagepicker_user_config_admin_form_validate($form, $form_state);
+  }
+  if ($form_state['values']['imagepicker_exifinfo_external'] != "" && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
+    form_set_error('imagepicker_exifinfo_external', t('file does not exist or is not executable'));
   }
 
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
@@ -629,13 +654,13 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
     global $user;
     $userdir = FALSE;
   }
-
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
   $img = _imagepicker_get_img($img_id, FALSE, $user);
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
     $info = image_get_info(imagepicker_get_path(FALSE, $userdir) . $img['img_name']);
-    $view = theme('imagepicker_view', $img, $imgpath, $info);
-
+    $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, $userdir) . $img['img_name']);
+    $view = theme('imagepicker_view', $img, $imgpath, $info, $exifinfo);
     $form1 = drupal_get_form('imagepicker_admin_image_form', $img_id, $user);
     // copy form
     if (variable_get('imagepicker_copy_enabled', 0)) {

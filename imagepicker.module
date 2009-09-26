@@ -2547,7 +2547,7 @@ function _imagepicker_search_opts($searchs) {
  * @return
  *   Status of function availability.
  */
-function imagepicker_image_check_functions() {
+function imagepicker_image_check_functions($silent = FALSE) {
   $errors = 0;
   $function_list = array();
   $function_list[] = 'exif_imagetype';
@@ -2561,9 +2561,9 @@ function imagepicker_image_check_functions() {
   }
   foreach ($function_list as $function) {
     if (!function_exists($function)) {
-      drupal_set_message(
-      t('Function %function does not exist. Advanced image manipulation cannot be done. Please make sure that you are running PHP 4.3 or higher, or that you (or your hosting provider) manually compile the GD library into your PHP installation. You also need PHP to be compiled with --enable-exif.',
-      array('%func' => $function)) , 'error');
+      if (! $silent) {
+        drupal_set_message(t('Function %function does not exist. Advanced image manipulation cannot be done. Please make sure that you are running PHP 4.3 or higher, or that you (or your hosting provider) manually compile the GD library into your PHP installation. You also need PHP to be compiled with --enable-exif.', array('%func' => $function)) , 'warning');
+      }
       $errors++;
     }
   }
@@ -2727,7 +2727,7 @@ function imagepicker_copy_form(&$form_state, $img_id, $img_name, $account = FALS
     '#description' => t('Scale image to this size in pixels if not left empty'),
   );
 
-  if ( imagepicker_image_check_functions() && variable_get('imagepicker_watermark_enable', 0)) {
+  if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
     if (! variable_get('imagepicker_watermark_image', '')
       && ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : FALSE)
       && $user->imagepicker_watermark_enable) {
@@ -2916,3 +2916,28 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
   }
   return FALSE;
 }
+
+/**
+ * Function to fetch exif info
+ *
+ * @param $image
+ *   Required image with full path
+ * @return
+ *   Returns the exif info
+ */
+function imagepicker_get_exifinfo($image) {
+  if (imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_exifinfo_enable', 0)) {
+    if (file_exists($image) ) {
+      $extprog = variable_get('imagepicker_exifinfo_external', '');
+      if ($extprog) {
+        $exif = shell_exec("$extprog $image");
+      }
+      else {
+        $exif = exif_read_data($image, 0, TRUE);
+      }
+      return $exif;
+    }
+  }
+  return "";
+}
+

@@ -91,7 +91,7 @@ function imagepicker_import_form($form_state, $total, $account=FALSE, $admin = F
     '#description' => t('Add a description to all images in this import'),
   );
 
-  if ( imagepicker_image_check_functions() && variable_get('imagepicker_watermark_enable', 0)) {
+  if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
     if (! variable_get('imagepicker_watermark_image', '')
       && ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : FALSE)
       && $user->imagepicker_watermark_enable) {

@@ -123,3 +123,11 @@
 .imgp_desc {
   font-style: italic;
 }
+
+#imgp_trig {
+  cursor: pointer;
+  color: #39c;
+}
+#imgp_targ {
+  display: none;
+}

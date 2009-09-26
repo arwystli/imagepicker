@@ -66,6 +66,7 @@ function imagepicker_theme() {
         'img' => array(),
         'imgpath' => "",
         'info' => array(),
+        'exifinfo' => array(),
       ),
     ),
     'imagepicker_image_edit_header' => array(
@@ -223,7 +224,7 @@ function theme_imagepicker_quota_message($message1, $message2, $form, $label, $h
   return $output;
 }
 
-function theme_imagepicker_view($img, $imgpath, $info) {
+function theme_imagepicker_view($img, $imgpath, $info, $exifinfo='') {
   $output = '<div id="imgp_img_view">';
   $output .= ($img['img_title'] ? '<div id="imgp_img_view_title">'. $img['img_title'] .'</div>' : '');
   $output .= '<img id="imgp_img_view_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_name'] .'" />';
@@ -232,7 +233,42 @@ function theme_imagepicker_view($img, $imgpath, $info) {
   $output .= t('Width')  .": ". $info['width']     ."&nbsp;&nbsp;&nbsp;";
   $output .= t('Height') .": ". $info['height']    ."&nbsp;&nbsp;&nbsp;";
   $output .= t('Type')   .": ". $info['extension'] ."&nbsp;&nbsp;&nbsp;";
-  $output .= t('Size')   .": ". $info['file_size'] . '</div></div>';
+  $output .= t('Size')   .": ". $info['file_size'] . '</div>';
+
+  if ($exifinfo) {
+    $output .= '<a id="imgp_trig">'. t('Show/Hide Exif Info') .'</a>';
+    $output .= '<div id="imgp_targ" >';
+    if (is_array($exifinfo)) {
+      // using php function exif_read_data().
+      foreach ($exifinfo AS $key => $section) {
+        $header = array(
+          array('data' => ucfirst(strtolower($key)), 'colspan' => 2),
+        );
+        $rows = array();
+        foreach ($section as $name => $val) {
+          if ($key == 'COMMENT') {
+            $a = split(':', $val);
+            $rows[] = array($a[0] . ':', $a[1]);
+          }
+          else {
+            $rows[] = array($name . ': ', $val);
+          }
+        }
+        $output .= theme('table', $header, $rows);
+        unset($header);
+        unset($rows);
+      }
+      $output .= '</div>';
+    }
+    else {
+      // from an external source eg exiftool
+      $output .= '<pre>';
+      $output .= check_plain($exifinfo);
+      $output .= '</pre>';
+      $output .= '</div>';
+    }
+  }
+  $output .= '</div>';
   return $output;
 }
 

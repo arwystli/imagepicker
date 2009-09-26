@@ -84,12 +84,14 @@ function imagepicker_user_browse_admin() {
 }
 
 function imagepicker_user_view($img_id) {
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
 
   $img = _imagepicker_get_img($img_id);
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full');
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
-    $view = theme('imagepicker_view', $img, $imgpath, $info);
+    $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
+    $view = theme('imagepicker_view', $img, $imgpath, $info, $exifinfo);
     $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
     // copy form
     if (variable_get('imagepicker_copy_enabled', 0)) {
@@ -182,7 +184,7 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
     '#default_value' => ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25)),
   );
 
-  if ( imagepicker_image_check_functions()
+  if ( imagepicker_image_check_functions(TRUE)
     && variable_get('imagepicker_watermark_enable', 0)
     && ! variable_get('imagepicker_watermark_image', '')
   ) {
