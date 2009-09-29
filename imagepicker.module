@@ -1174,7 +1174,6 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
     if ($rolesql) {
       $sql .= $rolesql;
     }
-#    $sql .= " AND g.img_id=i.img_id AND u.gid=g.gid";
     if ($searchsql) {
       $sql .= $searchsql;
     }

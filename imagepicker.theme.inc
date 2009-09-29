@@ -242,7 +242,7 @@ function theme_imagepicker_view($img, $imgpath, $info, $exifinfo='') {
       // using php function exif_read_data().
       foreach ($exifinfo AS $key => $section) {
         $header = array(
-          array('data' => ucfirst(strtolower($key)), 'colspan' => 2),
+          array('data' => drupal_ucfirst(drupal_strtolower($key)), 'colspan' => 2),
         );
         $rows = array();
         foreach ($section as $name => $val) {

@@ -90,7 +90,10 @@ function imagepicker_user_view($img_id) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full');
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
-    $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
+    $exifinfo = "";
+    if ($info['extension'] != 'gif' ) {
+      $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
+    }
     $view = theme('imagepicker_view', $img, $imgpath, $info, $exifinfo);
     $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
     // copy form

@@ -1,17 +1,17 @@
 <?php
-
-/*
-Contributed by RusRabbit, see http://drupal.org/comment/reply/568168
-
-Here's the code I used for nodes, teasers and comments conversion. The
-following example is for nodes; for teasers and comments we have to put
-correct table name (comments for comments) and columns names
-respectively (tid, cid instead of nid and teaser, comment instead of
-body). I put the code into the block on a certain page while site is
-offline, just for ease of use. The code is written to handle non-latin
-folder names, too (I had some folders named in Russian).
-
-*/
+// $Id$
+/**
+ * @file
+ * Contributed by RusRabbit, see http://drupal.org/comment/reply/568168
+ *
+ * Here's the code I used for nodes, teasers and comments conversion. The
+ * following example is for nodes; for teasers and comments we have to put
+ * correct table name (comments for comments) and columns names
+ * respectively (tid, cid instead of nid and teaser, comment instead of
+ * body). I put the code into the block on a certain page while site is
+ * offline, just for ease of use. The code is written to handle non-latin
+ * folder names, too (I had some folders named in Russian).
+ */
 
 $sql = "SELECT name, uid FROM {users}";
 $result = db_query(db_rewrite_sql($sql));
