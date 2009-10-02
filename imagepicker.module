@@ -2561,7 +2561,7 @@ function imagepicker_image_check_functions($silent = FALSE) {
   foreach ($function_list as $function) {
     if (!function_exists($function)) {
       if (! $silent) {
-        drupal_set_message(t('Function %function does not exist. Advanced image manipulation cannot be done. Please make sure that you are running PHP 4.3 or higher, or that you (or your hosting provider) manually compile the GD library into your PHP installation. You also need PHP to be compiled with --enable-exif.', array('%func' => $function)) , 'warning');
+        drupal_set_message(t('Function %func does not exist. Advanced image manipulation cannot be done. Please make sure that you are running PHP 4.3 or higher, or that you (or your hosting provider) manually compile the GD library into your PHP installation. You also need PHP to be compiled with --enable-exif.', array('%func' => $function)) , 'warning');
       }
       $errors++;
     }
