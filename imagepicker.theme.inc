@@ -144,7 +144,10 @@ function theme_imagepicker(&$content) {
 function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $suff="", $label="") {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   if ($rows) {
-    $pager = theme('pager', NULL, $max);
+    $pager = "";
+    if ( count($rows) > $max ) {
+      $pager = theme('pager', NULL, $max);
+    }
     $output .= $pref . theme('table', $header, $rows) . $pager . $suff;
   }
   else {

@@ -22,6 +22,7 @@ function imagepicker_settings_page($op = NULL) {
  *   Returns the form.
  */
 function imagepicker_settings_form($form_state) {
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
 
   // default settings
   $form['imagepicker_settings'] = array(
@@ -33,10 +34,10 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_settings']['imagepicker_default_browser_thumbnail_size'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Browser Thumbnail Size'),
+    '#description' => t('Configure the default browser thumbnail size'),
     '#size' => 10,
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_default_browser_thumbnail_size', 100),
-    '#description' => t('Configure the default browser thumbnail size'),
   );
   $node_types = node_get_types('names');
   $form['imagepicker_settings']['imagepicker_node_types_enabled'] = array(
@@ -50,45 +51,45 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_settings']['imagepicker_comment_enabled'] = array(
       '#type' => 'checkbox',
       '#title' => t('Comments'),
+      '#description' => t('Setting this option enables Imagepicker in comments.'),
       '#return_value' => 1,
       '#default_value' => variable_get('imagepicker_comment_enabled', 0),
-      '#description' => t('Setting this option enables Imagepicker in comments.'),
     );
   }
   $form['imagepicker_settings']['imagepicker_blocks_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Blocks'),
+    '#description' => t('Setting this option enables Imagepicker in blocks.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_blocks_enabled', 0),
-    '#description' => t('Setting this option enables Imagepicker in blocks.'),
   );
   $form['imagepicker_settings']['imagepicker_default_pagelink'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show return link in page'),
+    '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_default_pagelink', 1),
-    '#description' => t('Setting this option will add a link back to the thumbnail when using the page option. Uses javascript history(back).'),
   );
   $form['imagepicker_settings']['imagepicker_account_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Imagepicker in My Account'),
+    '#description' => t('Setting this option enables Imagepicker in My Account.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_account_enabled', 1),
-    '#description' => t('Setting this option enables Imagepicker in My Account.'),
   );
   $form['imagepicker_settings']['imagepicker_copy_enabled'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable copy form'),
+    '#title' => t('Enable copy feature'),
+    '#description' => t('Allow users to copy and optionally resize an image.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_copy_enabled', 0),
-    '#description' => t('Allow users to copy an image.'),
   );
   $form['imagepicker_settings']['imagepicker_user_config_enable'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable User config form'),
+    '#title' => t('Enable User config tab'),
+    '#description' => t('Allow users to select their own settings.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_user_config_enable', 1),
-    '#description' => t('Allow users to select their own settings.'),
   );
   // default options
   $form['imagepicker_defaults'] = array(
@@ -100,33 +101,33 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Thumbnail Size'),
+    '#description' => t('Configure the default thumbnail size'),
     '#size' => 10,
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_default_thumbnail_size', 100),
-    '#description' => t('Configure the default thumbnail size'),
   );
   $form['imagepicker_defaults']['imagepicker_default_scale'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Scale'),
+    '#description' => t('Configure the default scale. leave empty for no default scale'),
     '#size' => 10,
     '#required' => FALSE,
     '#default_value' => variable_get('imagepicker_default_scale', ''),
-    '#description' => t('Configure the default scale. leave empty for no default scale'),
   );
 
   $form['imagepicker_defaults']['imagepicker_use_full_url'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use full url'),
+    '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use a path relative to the Drupal root.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_use_full_url', 0),
-    '#description' => t('Setting this option will make imagepicker use a full url to the image being inserted, unsetting it will use an path relative to the Drupal root.<br />This is useful if you are developing a site with a different url than the production site will be on.'),
   );
   $form['imagepicker_defaults']['imagepicker_use_cssbox'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow additional css'),
+    '#description' => t('Setting this option will provide a textfield where additional css can be added .'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_use_cssbox', 0),
-    '#description' => t('Setting this option will provide a textfield where additional css can be added .'),
   );
 
   // insert settings
@@ -135,7 +136,6 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Set imagepicker insert defaults'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#description' => ''
   );
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts();
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts();
@@ -151,27 +151,27 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_align']['imagepicker_default_align_show'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Alignment options'),
+    '#description' => t('Unsetting this option will remove the alignment options from the insert page.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_default_align_show', 1),
-    '#description' => t('Unsetting this option will remove the alignment options from the insert page.'),
   );
   $form['imagepicker_align']['imagepicker_default_fleft'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Float left code'),
+    '#description' => t('Configure the default code used for float left styling.'),
     '#size' => 25,
     '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_default_fleft', 'style="float: left"'),
-    '#description' => t('Configure the default code used for float left styling.'),
   );
   $form['imagepicker_align']['imagepicker_default_fright'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Float right code'),
+    '#description' => t('Configure the default code used for float right styling.'),
     '#size' => 25,
     '#maxlength' => 50,
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_default_fright', 'style="float: right"'),
-    '#description' => t('Configure the default code used for float right styling.'),
   );
 
   if (module_exists('lightbox2') || module_exists('thickbox')) {
@@ -185,27 +185,27 @@ function imagepicker_settings_form($form_state) {
       $form['imagepicker_module']['imagepicker_lightbox2_enable'] = array(
         '#type' => 'checkbox',
         '#title' => t('Enable Lightbox2 in Imagepicker'),
+        '#description' => t('Unsetting this option will disable Lightbox2 in Imagepicker.'),
         '#return_value' => 1,
         '#default_value' => variable_get('imagepicker_lightbox2_enable', 1),
-        '#description' => t('Unsetting this option will disable Lightbox2 in Imagepicker.'),
       );
       $form['imagepicker_module']['imagepicker_lightbox2_insert'] = array(
         '#type' => 'textfield',
         '#title' => t('Default Lightbox insert'),
+        '#description' => t('Configure the default code inserted into the "rel" attribute.'),
         '#size' => 15,
         '#maxlength' => 30,
         '#required' => TRUE,
         '#default_value' => variable_get('imagepicker_lightbox2_insert', 'lightbox'),
-        '#description' => t('Configure the default code inserted into the "rel" attribute.'),
       );
     }
     if (module_exists('thickbox')) {
       $form['imagepicker_module']['imagepicker_thickbox_enable'] = array(
         '#type' => 'checkbox',
         '#title' => t('Enable Thickbox in Imagepicker'),
+        '#description' => t('Unsetting this option will disable Thickbox in Imagepicker.'),
         '#return_value' => 1,
         '#default_value' => variable_get('imagepicker_thickbox_enable', 1),
-        '#description' => t('Unsetting this option will disable Thickbox in Imagepicker.'),
       );
     }
   }
@@ -219,15 +219,30 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_quotas']['imagepicker_quota_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Quotas in Imagepicker'),
+    '#description' => t('Unsetting this option will disable Quotas in Imagepicker.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_quota_enable', 1),
-    '#description' => t('Unsetting this option will disable Quotas in Imagepicker.'),
+  );
+  $form['imagepicker_quotas']['imagepicker_quota_byrole'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Quotas by Role'),
+    '#description' => t("Setting this option will enable 'Quotas by Role' instead of 'Per User'."),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_quota_byrole', 0),
+  );
+  $form['imagepicker_quotas']['imagepicker_quota_role'] = array(
+    '#type' => 'radios',
+    '#title' => t('Available Roles'),
+    '#description' => t("Select which Role for 'Quotas by Role'."),
+    '#options' => user_roles(TRUE),
+    '#default_value' => variable_get('imagepicker_quota_role', 2),
   );
   $form['imagepicker_quotas']['imagepicker_quota_default'] = array(
     '#type' => 'select',
+    '#title' => t('Set Quota'),
+    '#description' => t("Select the Quota to apply for 'Quotas by Role' or the default for 'Per User'."),
     '#default_value' => variable_get('imagepicker_quota_default', 0),
     '#options' => imagepicker_get_quota_list(),
-    '#title' => t('Set default quota'),
   );
   if ( imagepicker_image_check_functions()) {
     // watermark settings
@@ -240,24 +255,24 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_watermark']['imagepicker_watermark_enable'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable Watermarks in Imagepicker'),
+      '#description' => t('Setting this option will enable Watermarks on new images in Imagepicker.'),
       '#return_value' => 1,
       '#default_value' => variable_get('imagepicker_watermark_enable', 0),
-      '#description' => t('Setting this option will enable Watermarks on new images in Imagepicker.'),
     );
     $form['imagepicker_watermark']['imagepicker_watermark_image'] = array(
       '#type' => 'textfield',
       '#title' => t('Default Watermark image'),
+      '#description' => t('Path of the image that should be used as the watermark image, relative to the Drupal root.  <br />This should be a truecolor (32 bit) PNG file with an alpha channel, but other formats may work.<br />If this field is used, the watermark will be applied to all new images uploaded to the site.<br />If this field is left empty users with access will have the option to apply their own watermark.'),
       '#size' => 55,
       '#maxlength' => 100,
       '#required' => FALSE,
       '#default_value' => variable_get('imagepicker_watermark_image', ''),
-      '#description' => t('Path of the image that should be used as the watermark image, relative to the Drupal root.  <br />This should be a truecolor (32 bit) PNG file with an alpha channel, but other formats may work.<br />If this field is used, the watermark will be applied to all new images uploaded to the site.<br />If this field is left empty users with access will have the option to apply their own watermark.'),
     );
     $form['imagepicker_watermark']['imagepicker_watermark_position'] = array(
       '#type' => 'select',
+      '#title' => t('Select default watermark position'),
       '#default_value' => variable_get('imagepicker_watermark_position', 0),
       '#options' => imagepicker_watermark_opts(),
-      '#title' => t('Select default watermark position'),
     );
     $form['imagepicker_watermark']['imagepicker_watermark_scale'] = array(
       '#type' => 'fieldset',
@@ -295,18 +310,18 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_exif']['imagepicker_exifinfo_enable'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable Display of Exif info'),
+      '#description' => t('Enable Display of Extended file information. Uses PHP builtin functions by default.'),
       '#return_value' => 1,
       '#default_value' => variable_get('imagepicker_exifinfo_enable', 0),
-      '#description' => t('Enable Display of Extended file information'),
     );
     $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
       '#type' => 'textfield',
+      '#title' => t('Use external program'),
+      '#description' => t('Enter an external program to use for exif info instead of builtin functions.<br />For instance exiftool. Requires a full filesystem path.'),
       '#size' => 55,
       '#maxlength' => 100,
       '#required' => FALSE,
-      '#title' => t('Use external program'),
       '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
-      '#description' => t('Enter the external program to use for exif info.<br />For instance exiftool. Requires a full filesystem path.'),
     );
   }
   // Iframe
@@ -321,9 +336,9 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = array(
       '#type' => 'checkbox',
       '#title' => t('Thickbox Iframe'),
+      '#description' => t('Use thickbox iframe instead of the builtin one. See the contribs folder in Imagepicker'),
       '#return_value' => 1,
       '#default_value' => variable_get('imagepicker_advanced_thickbox', 0),
-      '#description' => t('Use thickbox iframe instead of the builtin one. See the contribs folder in Imagepicker'),
     );
   }
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = array(
@@ -353,9 +368,9 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = array(
     '#type' => 'checkbox',
     '#title' => t('Fieldset state'),
+    '#description' => t('Setting this option will collapse the fieldset the iframe is in by default.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_advanced_collapsed', 0),
-    '#description' => t('Setting this option will collapse the fieldset the iframe is in by default.'),
   );
 
   // browser
@@ -388,7 +403,6 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Show the order select box in the browser'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_show_browse_order_form', 1),
-    '#description' => t(''),
   );
   $orderlist = array(
     'img_id DESC' => t('Newest first'),
@@ -399,17 +413,16 @@ function imagepicker_settings_form($form_state) {
   );
   $form['imagepicker_browser']['imagepicker_default_browser_order'] = array(
     '#type' => 'select',
-    '#default_value' => variable_get('imagepicker_default_browser_order', 'img_id DESC'),
-    '#options' => $orderlist,
     '#title' => t('Default order'),
     '#description' => t('The default order used to sort the browser. This will be applied wether or not the select box is visible'),
+    '#default_value' => variable_get('imagepicker_default_browser_order', 'img_id DESC'),
+    '#options' => $orderlist,
   );
   $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show the search form in the browser'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_show_browse_search_form', 1),
-    '#description' => t(''),
   );
 
   // progress bar
@@ -425,22 +438,21 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Enable Progress bar in upload'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_upload_progress_enabled', 1),
-    '#description' => t(''),
   );
   $form['imagepicker_progress']['imagepicker_upload_progress_delay'] = array(
     '#type' => 'textfield',
     '#title' => t('Progress bar Delay'),
+    '#description' => t('Show the progress bar if processing is longer than this value.'),
     '#size' => 3,
     '#default_value' => variable_get('imagepicker_upload_progress_delay', 3),
     '#field_suffix' => t('seconds'),
-    '#description' => t('Show the progress bar if processing is longer than this value.'),
   );
   $form['imagepicker_progress']['imagepicker_upload_progress_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Progress bar message'),
+    '#description' => t('Message to display while uploading.'),
     '#size' => 60,
     '#default_value' => variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
-    '#description' => t('Message to display while uploading.'),
   );
 
   // Groups
@@ -454,30 +466,30 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_groups']['imagepicker_groups_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Groups'),
+    '#description' => t('Allow users to manage groups.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_groups_enabled', 1),
-    '#description' => t('Allow users to manage groups.'),
   );
   $form['imagepicker_groups']['imagepicker_public_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Public option'),
+    '#description' => t('Allow users to make image groups publicly available.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_public_enabled', 1),
-    '#description' => t('Allow users to make image groups publicly available.'),
   );
   $form['imagepicker_groups']['imagepicker_publicroles_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Public Role Control option'),
+    '#description' => t('Allow users to make publicly available image groups restricted by role.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_publicroles_enabled', 1),
-    '#description' => t('Allow users to make publicly available image groups restricted by role.'),
   );
   $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Groups in upload form'),
+    '#description' => t('Allow users to select a group in the upload form.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
-    '#description' => t('Allow users to select a group in the upload form.'),
   );
 
   // Import
@@ -491,16 +503,16 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_import']['imagepicker_import_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Bulk import processing'),
+    '#description' => t('Import images into imagepicker from an import folder in the filesystem.<br />Requires FTP or SSH access'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_import_enabled', 0),
-    '#description' => t('Import images into imagepicker from an import folder in the filesystem.<br />Requires FTP or SSH access'),
   );
   $form['imagepicker_import']['imagepicker_import_delete'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Bulk import deletion'),
+    '#description' => t('Delete uploaded source images after succesful import into imagepicker.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_import_delete', 0),
-    '#description' => t('Delete uploaded source images after succesful import into imagepicker.'),
   );
 
   return system_settings_form($form);
@@ -576,6 +588,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
     $form_state['values']['imagepicker_publicroles_enabled'] = 0;
     $form_state['values']['imagepicker_groups_in_upload_enabled'] = 0;
   }
+  if ($form_state['values']['imagepicker_quota_enable'] != 1) {
+    $form_state['values']['imagepicker_quota_byrole'] = 0;
+  }
 }
 
 /**
@@ -599,7 +614,18 @@ function imagepicker_admin_users_list($dir, $label='') {
     $user = user_load( array('uid' => $row['uid']));
     $allcount = _imagepicker_user_has_img($user);
     $groupcount = _imagepicker_user_has_groups('all', $user);
-    $quota = isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 0);
+    $quota = 0;
+    if (variable_get('imagepicker_quota_enable', 1)) {
+      if (variable_get('imagepicker_quota_byrole', 0)) {
+        $roleid = variable_get('imagepicker_quota_role', 2);
+        if (imagepicker_user_has_role($roleid, $user) && $user->uid > 1) {
+          $quota = variable_get('imagepicker_quota_default', 0);
+        }
+      }
+      else {
+        $quota = (isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 0));
+      }
+    }
 
     $row_data = array(
       check_plain($row['name']),
@@ -682,6 +708,11 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
   return $content;
 }
 
+/**
+ * Function to display the image edit/delete form
+ * @return
+ *   Returns the form.
+ */
 function imagepicker_admin_image_form($form_state, $img_id, $account = FALSE) {
   if ($account) {
     $form['account'] = array(
@@ -714,8 +745,12 @@ function imagepicker_admin_image_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Function to display the imagepicker user search form
+ * @return
+ *   Returns the form.
+ */
 function imagepicker_user_search_form($form_state, $dir) {
-
   $form['imagepicker_currentuser'] = array(
     '#type' => 'textfield',
     '#title' => t('Users'),
@@ -771,11 +806,9 @@ function imagepicker_fstype() {
  * files and conversion
  */
 function imagepicker_convert_form($form_state) {
-
   $dir = imagepicker_get_files_directory();
   imagepicker_fstype();
   $fstype = variable_get('imagepicker_fstype', '');
-
   if ( empty($form_state['storage']['imagepicker_files_submit'])) {
     $step = 1;
     variable_del('imagepicker_files_validate_failed');
@@ -788,7 +821,6 @@ function imagepicker_convert_form($form_state) {
     $alpha_failed = variable_get('imagepicker_convert_to_alpha_failed', FALSE);
     if ($validate_failed || $numeric_failed || $alpha_failed) {
       $step = 1;
-
     }
     else {
       $step = $form_state['values']['step']+1;
@@ -797,7 +829,6 @@ function imagepicker_convert_form($form_state) {
       }
     }
   }
-
   $form['imagepicker_files'] = array(
     '#type' => 'fieldset',
     '#title' => t('Imagepicker files validation'),
@@ -810,7 +841,6 @@ function imagepicker_convert_form($form_state) {
     '#type' => 'hidden',
     '#value' => $step,
   );
-
   switch ($step) {
     case 1:
       $form['imagepicker_files']['imagepicker_files_validate_label'] = array(
@@ -828,7 +858,6 @@ function imagepicker_convert_form($form_state) {
         '#value' => 1,
       );
       break;
-
     case 2:
       $form['imagepicker_files']['imagepicker_files_validate_label'] = array(
         '#prefix' => '<p>',
@@ -861,7 +890,6 @@ function imagepicker_convert_form($form_state) {
       }
       break;
   }
-
   $form['imagepicker_files']['imagepicker_submit_label'] = array(
     '#prefix' => '<p>',
     '#value' => '&nbsp;',
@@ -906,10 +934,8 @@ function imagepicker_convert_form_submit($form, &$form_state) {
 }
 
 function imagepicker_convert_to_numeric($dir) {
-
   $result = TRUE;
   $errlist = array();
-
   // work over the oldstyle dirs
   $dirlist = range('a', 'z');
   array_push($dirlist, 'others');
@@ -944,7 +970,6 @@ function imagepicker_convert_to_numeric($dir) {
               if (! file_check_directory($browsertarget, TRUE)) {
                 $errlist[$browsertarget] = "Could not create browser dir";
               }
-
               if (! count($errlist) ) {
                 // clear
                 drupal_get_messages();
@@ -971,7 +996,6 @@ function imagepicker_convert_to_numeric($dir) {
                     }
                   }
                 }
-
                 if (! count($errlist)) {
                   $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR;
                   $delpath[] = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR;
@@ -992,7 +1016,6 @@ function imagepicker_convert_to_numeric($dir) {
       }
     }
   }
-
   if (! count($errlist)) {
     // tidy up
     if (count($delpath)) {
@@ -1008,7 +1031,6 @@ function imagepicker_convert_to_numeric($dir) {
       }
     }
   }
-
   if (count($errlist)) {
     foreach ($errlist as $key => $val) {
       drupal_set_message("ERRORS: $key: $val ", 'error');
@@ -1019,16 +1041,13 @@ function imagepicker_convert_to_numeric($dir) {
 }
 
 function imagepicker_convert_to_alpha($dir) {
-
   $result = TRUE;
   $errlist = array();
   $uiddirlist = file_scan_directory($dir, ".*", array('.', '..', 'CVS'), 0, FALSE);
-
   if (! imagepicker_make_alphadirs($dir) ) {
     drupal_set_message( t('Directories could not be created'), 'error');
     return FALSE;
   }
-
   if (count($uiddirlist)) {
     foreach ($uiddirlist AS $uiddir => $uid) {
       if ($uiddirlist[$uiddir]->basename) {
@@ -1092,7 +1111,6 @@ function imagepicker_convert_to_alpha($dir) {
       }
     }
   }
-
   if (! count($errlist) ) {
     // tidy up
     if ( count($delpath) ) {
@@ -1108,7 +1126,6 @@ function imagepicker_convert_to_alpha($dir) {
       }
     }
   }
-
   if (count($errlist)) {
     foreach ( $errlist as $key => $val ) {
       drupal_set_message("ERRORS: $key: $val ", 'error');
@@ -1116,7 +1133,6 @@ function imagepicker_convert_to_alpha($dir) {
     $result = FALSE;
   }
   return $result;
-
 }
 
 function imagepicker_make_alphadirs($dir) {
@@ -1235,7 +1251,6 @@ function imagepicker_files_validate($dir) {
       $errlist['bad usernames'] = implode(',', $badusernamelist);
     }
   }
-
   // check valid uids against the imagepicker table, get the file list for each
   $badfiledirs = array();
   $badfilelist = array();
@@ -1304,7 +1319,6 @@ function imagepicker_files_validate($dir) {
       }
     }
   }
-
   if (count($badfilelist)) {
     $errlist[t('file not found in database')] = implode(',', $badfilelist);
   }
@@ -1323,7 +1337,6 @@ function imagepicker_files_validate($dir) {
   if ( count($badwritefiles)) {
     $errlist[t('file not writable')] = implode(',', $badwritefiles);
   }
-
   if (count($errlist) ) {
     foreach ($errlist AS $k => $v) {
       drupal_set_message("$k: $v", 'error');
@@ -1367,7 +1380,6 @@ function imagepicker_admin_groups() {
     $row = db_fetch_array($result);
     $name = $row['name'];
   }
-
   if (variable_get('imagepicker_groups_enabled', 1)) {
     $content .= drupal_get_form('imagepicker_group_search_form');
     $content .= '<p>'. t('Managing groups for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
@@ -1399,13 +1411,11 @@ function imagepicker_admin_groups() {
       }
     }
   }
-
   return $content;
 }
 
 function imagepicker_admin_images() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
@@ -1441,7 +1451,6 @@ function imagepicker_admin_images() {
       $content .= imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
     }
   }
-
   $name = "";
   if ($uid) {
     $user = user_load(array('uid' => $uid));
@@ -1449,7 +1458,6 @@ function imagepicker_admin_images() {
   }
   $content .= drupal_get_form('imagepicker_user_search_form', 'images');
   $content .= '<p>'. t('Managing images for ') . ($name ? l($name, "user/$uid") : 'All') .'</p>';
-
   if ($uid) {
     if ($img_id) {
       if ($imgaction == 'edit' ) {
@@ -1479,20 +1487,33 @@ function imagepicker_admin_images() {
       $usedbytes = imagepicker_get_all_bytes($user)+1;
       $usedbytesprint = _imagepicker_bkmg($usedbytes);
       $quota = 0;
-      if ( variable_get('imagepicker_quota_enable', 1) ) {
-        $quota = (isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 1));
+      if (variable_get('imagepicker_quota_enable', 1)) {
+        if (variable_get('imagepicker_quota_byrole', 0)) {
+          $roleid = variable_get('imagepicker_quota_role', 2);
+          if (imagepicker_user_has_role($roleid, $user) && $user->uid > 1) {
+            $quota = variable_get('imagepicker_quota_default', 0);
+          }
+        }
+        else {
+          $quota = (isset($user->imagepicker_quota) ? $user->imagepicker_quota : variable_get('imagepicker_quota_default', 0));
+        }
       }
       $label = t('Quota for %name', array('%name' => $name));
       $imgtot = _imagepicker_user_has_img($user);
       $pl = format_plural($imgtot, '1 image', '@count images');
       if ($quota) {
         $pused = round($usedbytes / ($quota*1000000) * 100, 2);
-        $message = t('User %name has used %pused percent or %usedbytesprint of quota and has %pl.', array('%name' => $name, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
+        $message = t('User %name has used %pused percent or %usedbytesprint of quota %quotaprint and has %pl.', array('%name' => $name, '%pused' => $pused, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl, '%quotaprint' => imagepicker_get_quota_list($quota+1)));
       }
       else {
         $message = t('User %name has used %usedbytesprint and has %pl.', array('%name' => $name, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
-      $form = drupal_get_form('imagepicker_quota_form', $user);
+      if (! variable_get('imagepicker_quota_byrole', 0) ) {
+        $form = drupal_get_form('imagepicker_quota_form', $user);
+      }
+      else {
+        $form = "";
+      }
       $content .= theme('imagepicker_quota', $form, $message, $label);
     }
     elseif ($imgaction == 'groups') {
@@ -1519,8 +1540,12 @@ function imagepicker_admin_images() {
   return $content;
 }
 
+/**
+ * Function to display the imagepicker group search form
+ * @return
+ *   Returns the form.
+ */
 function imagepicker_group_search_form($form_state, $dir = 'groups') {
-
   $form['imagepicker_currentgroup'] = array(
     '#type' => 'textfield',
     '#title' => t('Groups'),
@@ -1561,8 +1586,9 @@ function imagepicker_group_search_form_submit($form, &$form_state) {
 }
 
 /**
- * quotas
- *
+ * Function to display the imagepicker quota form
+ * @return
+ *   Returns the form.
  */
 function imagepicker_quota_form(&$form_state, $account=FALSE) {
   $list = imagepicker_get_quota_list();
@@ -1596,7 +1622,6 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
 }
 
 function imagepicker_quota_form_submit($form, &$form_state) {
-
     if ( $form_state['values']['account'] > 0 ) {
       $user = user_load(array('uid' => $form_state['values']['account']));
       user_save($user, array('imagepicker_quota' => $form_state['values']['imagepicker_quota']));
@@ -1609,7 +1634,6 @@ function imagepicker_quota_form_submit($form, &$form_state) {
 function imagepicker_admin_import() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
   include_once('imagepicker.import.inc');
-
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
   }
@@ -1617,13 +1641,11 @@ function imagepicker_admin_import() {
   if ( arg(4) == 'user' && is_numeric(arg(5))) {
     $uid = arg(5);
   }
-
   $content = "";
   if (! $importdir = variable_get('imagepicker_import_dir', '')) {
     drupal_set_message(t('You need to set the import folder'));
   }
   $content = drupal_get_form('imagepicker_import_dir_form');
-
   if ($importdir) {
     if ($import_files = imagepicker_import_dir_check()) {
       $content .= drupal_get_form('imagepicker_user_search_form', 'import');
@@ -1636,12 +1658,10 @@ function imagepicker_admin_import() {
       }
     }
   }
-
   if ($msg = $_SESSION['imagepicker_import_status']) {
     drupal_set_message($msg);
     unset($_SESSION['imagepicker_import_status']);
   }
-
   return $content;
 }
 

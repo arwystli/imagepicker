@@ -31,24 +31,16 @@ Drupal.imagepicker_upload_progress_show = function() {
   window.location = window.location;
 }
 
-/**
- * Attaches the upload behaviour to the imagepicker upload form.
- */
-Drupal.imagepicker_upload_progress = function() {
-  $('#imagepicker-upload-form').submit(Drupal.imagepicker_upload_progress_hide_timeout);
-}
-
-/**
- * A toggle function for imagepicker.
- */
-Drupal.imagepicker_toggle = function() {
-  $('#imgp_trig').click(function() {
-    $('#imgp_targ').toggle('slow');
-  });
-}
-
 // Global killswitch
 if (Drupal.jsEnabled) {
-  $(document).ready(Drupal.imagepicker_upload_progress);
-  $(document).ready(Drupal.imagepicker_toggle);
+  $(document).ready( function() {
+    // Attaches the upload behaviour to the imagepicker upload form.
+    $('#imagepicker-upload-form').submit(Drupal.imagepicker_upload_progress_hide_timeout);
+
+    // exif info toggle
+    $('#imgp_trig').click(function() {
+      $('#imgp_targ').toggle('slow');
+    });
+
+  });
 }

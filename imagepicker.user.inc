@@ -413,18 +413,3 @@ function imagepicker_user_config_admin_form_delete($form, &$form_state) {
   }
 }
 
-// not in use I think
-/**
- * Helper function to check if a user has a specific role
- */
-function imagepicker_user_has_role($role, $user=NULL) {
-  if ($user == NULL) {
-    global $user;
-  }
-
-  if (is_array($user->roles) && in_array($role, array_values($user->roles))) {
-    return TRUE;
-  }
-
-  return FALSE;
-}
