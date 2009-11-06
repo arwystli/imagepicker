@@ -444,7 +444,7 @@ function theme_imagepicker_postlet_view($url, $destination, $endpage = "", $maxt
 
     $output = '<div class="imgp_help">'. t('Click the "Add" button and select the images you\'d like to upload') .'</div>';
     $output .= '<div class="imgp_help">'. t('Default thumbnail size of %thm px, scaling %scm%wm', array('%thm' => $maxthumbsize, '%scm' => ($scaleto ? $scaleto .' px' : 'none'), '%wm' => ($watermark ? t(', Watermarking enabled') : ''))) .'</div>';
-    $output .= '<div class="imagex postlet">
+    $output .= '<div class="postlet">
     <applet name="postlet" code="Main.class" archive="'. $url .'" width="'. $width .'" height="'. $height .'" mayscript>
       <param name = "maxthreads" value = "5" />
       <param name = "language" value = "EN" />
