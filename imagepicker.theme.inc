@@ -218,9 +218,9 @@ function theme_imagepicker_fullpage($image, $source, $link) {
 }
 
 function theme_imagepicker_quota_message($message1, $message2, $form, $label, $help) {
-  $output = ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
-  $output .= ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
+  $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   $output .= ($message1 ? '<p class="messages">'. $message1 .'</p>' : '') ;
+  $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
   $output .= $form;
   $output .= ($message2 ? '<p class="messages">'. $message2 .'</p>' : '') ;
   $output .= ($label ? '</fieldset>' : '');

@@ -30,6 +30,7 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Set imagepicker settings'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#weight' => -40,
   );
   $form['imagepicker_settings']['imagepicker_default_browser_thumbnail_size'] = array(
     '#type' => 'textfield',
@@ -97,6 +98,7 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Set imagepicker defaults'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#weight' => -38,
   );
   $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = array(
     '#type' => 'textfield',
@@ -136,6 +138,7 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Set imagepicker insert defaults'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#weight' => -36,
   );
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts();
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts();
@@ -147,6 +150,7 @@ function imagepicker_settings_form($form_state) {
     '#title' => t('Image alignment settings'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_default_align_show', 1) ? TRUE : FALSE),
+    '#weight' => -34,
   );
   $form['imagepicker_align']['imagepicker_default_align_show'] = array(
     '#type' => 'checkbox',
@@ -180,6 +184,7 @@ function imagepicker_settings_form($form_state) {
       '#title' => t('Module integration'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
+      '#weight' => -32,
     );
     if (module_exists('lightbox2')) {
       $form['imagepicker_module']['imagepicker_lightbox2_enable'] = array(
@@ -214,7 +219,8 @@ function imagepicker_settings_form($form_state) {
     '#type' => 'fieldset',
     '#title' => t('User quotas'),
     '#collapsible' => TRUE,
-    '#collapsed' => (variable_get('imagepicker_quota_enable', 1) ? TRUE : FALSE),
+    '#collapsed' => FALSE,
+    '#weight' => -30,
   );
   $form['imagepicker_quotas']['imagepicker_quota_enable'] = array(
     '#type' => 'checkbox',
@@ -236,6 +242,8 @@ function imagepicker_settings_form($form_state) {
     '#description' => t("Select which Role for 'Quotas by Role'."),
     '#options' => user_roles(TRUE),
     '#default_value' => variable_get('imagepicker_quota_role', 2),
+    '#prefix' => '<div id="wrap_imagepicker_quota_role">',
+    '#suffix' => '</div>',
   );
   $form['imagepicker_quotas']['imagepicker_quota_default'] = array(
     '#type' => 'select',
@@ -251,6 +259,7 @@ function imagepicker_settings_form($form_state) {
       '#title' => t('Image watermark settings'),
       '#collapsible' => TRUE,
       '#collapsed' => ( variable_get('imagepicker_watermark_enable', 0) ? TRUE : FALSE),
+      '#weight' => -28,
     );
     $form['imagepicker_watermark']['imagepicker_watermark_enable'] = array(
       '#type' => 'checkbox',
@@ -279,6 +288,7 @@ function imagepicker_settings_form($form_state) {
       '#title' => t('Watermark scaling'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
+      '#weight' => 1,
     );
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_scaling'] = array(
       '#type' => 'checkbox',
@@ -306,6 +316,7 @@ function imagepicker_settings_form($form_state) {
       '#description' => t('Enable exif display.'),
       '#collapsible' => TRUE,
       '#collapsed' => (variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
+      '#weight' => -24,
     );
     $form['imagepicker_exif']['imagepicker_exifinfo_enable'] = array(
       '#type' => 'checkbox',
@@ -331,6 +342,7 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('You can alter the default styling of the iframe here,<br />useful if the iframe is not fitting in with your theme.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#weight' => -22,
   );
   if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
     $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = array(
@@ -380,6 +392,7 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Enable and configure browser.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#weight' => -20,
   );
 
   $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = array(
@@ -432,6 +445,7 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Enable and configure progress bar.'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_upload_progress_enabled', 1)),
+    '#weight' => -18,
   );
   $form['imagepicker_progress']['imagepicker_upload_progress_enabled'] = array(
     '#type' => 'checkbox',
@@ -462,6 +476,7 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Enable and configure groups.'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_groups_enabled', 1) ? TRUE : FALSE),
+    '#weight' => -16,
   );
   $form['imagepicker_groups']['imagepicker_groups_enabled'] = array(
     '#type' => 'checkbox',
@@ -499,6 +514,7 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Enable bulk import of images.'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_import_enabled', 0) ? TRUE : FALSE),
+    '#weight' => -14,
   );
   $form['imagepicker_import']['imagepicker_import_enabled'] = array(
     '#type' => 'checkbox',

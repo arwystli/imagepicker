@@ -54,14 +54,14 @@ function imagepicker_menu() {
     'title'            => 'Upload',
     'access arguments' => array('use imagepicker'),
     'type'             => MENU_DEFAULT_LOCAL_TASK,
-    'weight'           => 1
+    'weight'           => 0,
   );
   $items['imagepicker/browse'] = array(
     'title'            => 'Browse',
     'page callback'    => 'imagepicker_browse',
     'access arguments' => array('use imagepicker'),
     'type'             => MENU_LOCAL_TASK,
-    'weight'           => 2
+    'weight'           => 2,
   );
   if (variable_get('imagepicker_public_enabled', 1)) {
     $items['imagepicker/browse_public'] = array(
@@ -232,7 +232,7 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_admin_images',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
-    'weight'           => -5
+    'weight'           => -4
   );
   $items['admin/settings/imagepicker/images/user/%imagepicker_id/browseadmin'] = array(
     'title'            => 'List',
@@ -241,7 +241,7 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_admin_images',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
-    'weight'           => -4
+    'weight'           => -3
   );
   $items['admin/settings/imagepicker/images/user/%imagepicker_id/upload'] = array(
     'title'            => 'Upload',
@@ -260,7 +260,7 @@ function imagepicker_menu() {
       'page callback'    => 'imagepicker_admin_images',
       'type'             => MENU_LOCAL_TASK,
       'file'             => 'imagepicker.admin.inc',
-      'weight'           => -4
+      'weight'           => -2
     );
     $items['admin/settings/imagepicker/images/user/%imagepicker_id/groups'] = array(
       'title'            => 'Groups',
@@ -269,7 +269,7 @@ function imagepicker_menu() {
       'page callback'    => 'imagepicker_admin_images',
       'type'             => MENU_LOCAL_TASK,
       'file'             => 'imagepicker.admin.inc',
-      'weight'           => -3
+      'weight'           => -1
     );
   }
 
@@ -341,7 +341,7 @@ function imagepicker_menu() {
       'access arguments' => array('access own imagepicker'),
       'type'             => MENU_LOCAL_TASK,
       'file'             => 'imagepicker.user.inc',
-      'weight'           => -8
+      'weight'           => -9
     );
     $items['user/%imagepicker_uid/imagepicker/images/browse'] = array(
       'title'            => 'Browse',
@@ -2287,6 +2287,36 @@ function imagepicker_quota_ok($src, $account = FALSE, $label="", $help="") {
   else {
     global $user;
   }
+
+  $ret = _imagepicker_quota_check($src, $account);
+  $quota_ok = $ret[0];
+  $message1 = $ret[1];
+  $message2 = $ret[2];
+  $form = '';
+
+  if ($quota_ok) {
+    if ($account) {
+      if ($src == 'admin') {
+        $form = drupal_get_form('imagepicker_upload_form', $user, TRUE);
+      }
+      elseif ($src == 'user') {
+        $form = drupal_get_form('imagepicker_upload_form', $user);
+      }
+    }
+    else {
+      $form = drupal_get_form('imagepicker_upload_form');
+    }
+  }
+  return theme('imagepicker_quota_message', $message1, $message2, $form, $label, $help);
+}
+
+function _imagepicker_quota_check($src, $account = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
   $usedbytes = imagepicker_get_all_bytes($user)+1;
   $usedbytesprint = _imagepicker_bkmg($usedbytes);
   $quota = 0;
@@ -2315,7 +2345,6 @@ function imagepicker_quota_ok($src, $account = FALSE, $label="", $help="") {
   $pl = format_plural($imgtot, '1 image', '@count images');
   $message1 = '';
   $message2 = '';
-  $form = '';
   if ($quota_enabled) {
     if ($quota > 0) {
       $pused = round($usedbytes / ($quota*1000000) * 100, 2);
@@ -2345,28 +2374,15 @@ function imagepicker_quota_ok($src, $account = FALSE, $label="", $help="") {
       $message1 = t('You have used %usedbytesprint in %pl', array('%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
     }
   }
-  if ($quota_ok) {
-    if ($account) {
-      if ($src == 'admin') {
-        $form = drupal_get_form('imagepicker_upload_form', $user, TRUE);
-      }
-      elseif ($src == 'user') {
-        $form = drupal_get_form('imagepicker_upload_form', $user);
-      }
-    }
-    else {
-      $form = drupal_get_form('imagepicker_upload_form');
-    }
-  }
-  else {
-    if ($account) {
+  if (! $quota_ok ) {
+    if ($src == 'admin') {
       $message2 = t('%name has used all of quota, please delete some files to make some room.', array('%name' => $user->name));
     }
     else {
       $message2 = t('You have used all of your quota, please delete some files to make some room.');
     }
   }
-  return theme('imagepicker_quota_message', $message1, $message2, $form, $label, $help);
+  return array($quota_ok, $message1, $message2);
 }
 
 /**

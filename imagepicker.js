@@ -42,5 +42,20 @@ if (Drupal.jsEnabled) {
       $('#imgp_targ').toggle('slow');
     });
 
+    // form enhancement
+    if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
+      $("#wrap_imagepicker_quota_role").show();
+    }
+    else {
+      $("#wrap_imagepicker_quota_role").hide();
+    }
+    $("#edit-imagepicker-quota-byrole").change(function() {
+      if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
+        $("#wrap_imagepicker_quota_role").show();
+      }
+      else {
+        $("#wrap_imagepicker_quota_role").hide();
+      }
+    });
   });
 }
