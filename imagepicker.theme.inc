@@ -144,10 +144,7 @@ function theme_imagepicker(&$content) {
 function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $suff="", $label="") {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   if ($rows) {
-    $pager = "";
-    if ( count($rows) > $max ) {
-      $pager = theme('pager', NULL, $max);
-    }
+    $pager = theme('pager', NULL, $max);
     $output .= $pref . theme('table', $header, $rows) . $pager . $suff;
   }
   else {
@@ -155,7 +152,6 @@ function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $su
   }
   $output .= ($label ? '</fieldset>' : '');
   return $output;
-
 }
 
 function theme_imagepicker_stats($header, $rows, $pref="", $suff="", $label="") {
