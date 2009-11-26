@@ -534,34 +534,26 @@ function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $ac
 
   $img = _imagepicker_get_img($img_id, ($public ? FALSE : TRUE));
   if ($img) {
-    drupal_add_js(imagepicker_js($img, $public), 'inline');
-    $imgpath = imagepicker_get_image_path($img, 'browser', ($public ? array('name' => $img['name'] , 'uid' => $img['uid']) : FALSE ));
-    $content = '<div class="imgp_help">'. t('Choose the settings you want, place the cursor in the Body box above and Insert image.') .'</div>';
-    if ($img['img_title']) {
-      $content .= '<div id="imgp_img_holder_title">'. check_plain($img['img_title']) .'</div>';
-    }
-    if ($img['img_description']) {
-      $content .= '<div id="imgp_img_holder_description">'. nl2br($img['img_description']) .'</div>';
-    }
-    $content .= '<div id="imgp_img_holder">';
-    $content .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. check_plain($img['img_title']) .'" title="'. $img['img_name'] .'" />';
-    $content .= '</div>';
-
+    $form1 = '';
     if ($user->uid == $img['uid'] || $public) {
-      $content .= drupal_get_form('imagepicker_image_form', $img['img_id'], $public);
+      $form1 = drupal_get_form('imagepicker_image_form', $img['img_id'], $public);
     }
 
     // groups
+    $form2 = '';
     if (_imagepicker_has_groups() && $showgroup) {
-      $content .= drupal_get_form('imagepicker_group_images_form', $img['img_id']);
+      $form2 = drupal_get_form('imagepicker_group_images_form', $img['img_id']);
     }
+
+    $content = theme('imagepicker_insert', $img, $public, $form1, $form2);
+
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
     $content = '';
   }
 
-  return theme('imagepicker', $content);
+  return theme('imagepicker', $content, $img, $public);
 }
 
 /**
@@ -796,215 +788,6 @@ function imagepicker_strip_messages($msg) {
     $msg = preg_replace($pattern, '', $msg);
   }
   return $msg;
-}
-
-/**
- * javascript insertion routine
- */
-function imagepicker_js($img, $public = FALSE) {
-
-  $ret = "
-  function imagepickerInsert(button) {
-    // Get the form element
-    var imgpForm = document.getElementById('imagepicker-image-form');
-    if (imgpForm) {
-      var imgpShow = 'thumb';
-      var imgpLink = 'file';
-      var imgpAlign = 'none';
-      var imgpImagePath;
-      var imgpImageAlt = '". ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ) ."';
-      var imgpImageTitle = '". ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : '') ."';
-      var imgpImageDesc = '". preg_replace("/(\n|\r)/", '', nl2br($img['img_description'])) ."';
-      var imgpFileLink = '". imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE) ) ."';
-      var imgpThumbLink = '". imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)) ."';
-      var imgpPageLink = '". url('imagepicker/image/'. $img['img_id']) ."';
-      var imgpImageElement;
-      var imgpLinkElement;
-      var imgpImageStyle;
-      var imgpImageCss = '';
-      var isFCKeditor = '". (module_exists('fckeditor') ? 'yes' : 'no' ) ."'
-      var isWysiwyg = '". (module_exists('wysiwyg') ? 'yes' : 'no' ) ."'
-      var imgpInsertion;
-      var i;
-
-      // Get show value
-      for (i = 0; i < imgpForm.show.length; i++) {
-        if(imgpForm.show[i].checked) {
-          var imgpShow = imgpForm.show[i].value
-        }
-      }
-      // Get link value
-      for (i = 0; i < imgpForm.link.length; i++) {
-        if(imgpForm.link[i].checked) {
-          var imgpLink = imgpForm.link[i].value
-        }
-      }
-";
-  if (variable_get('imagepicker_use_cssbox', 0)) {
-    $ret .= "
-      // get css value
-      if(imgpForm.cssbox.value) {
-        var imgpImageCss = imgpForm.cssbox.value
-      }
-";
-  }
-  if (variable_get('imagepicker_default_align_show', 1)) {
-    $ret .= "
-      // Get align value
-      for (i = 0; i < imgpForm.align.length; i++) {
-        if(imgpForm.align[i].checked) {
-          var imgpAlign = imgpForm.align[i].value
-        }
-      }
-
-      // Create a style for image holder
-      switch (imgpAlign) {
-        case 'fleft':
-          imgpImageStyle = '". variable_get('imagepicker_default_fleft', 'style="float: left"') ."';
-          break;
-
-        case 'fright':
-          imgpImageStyle = '". variable_get('imagepicker_default_fright', 'style="float: right"') ."';
-          break;
-
-        case 'none':
-        default:
-          imgpImageStyle = '';
-          break;
-      }
-";
-  }
-  else {
-    $ret .= "
-      imgpImageStyle = '';
-";
-  }
-  $ret .= "
-      switch (imgpShow) {
-        case 'full': imgpImagePath = imgpFileLink; break;
-        case 'title': imgpImagePath = ''; break;
-        case 'thumb':
-        default: imgpImagePath = imgpThumbLink; break;
-      }
-
-      // Create an image or span (containing title) HTML string
-      if (imgpImagePath) {
-        imgpImageElement = '<img src=\"'+imgpImagePath+'\" alt=\"' + imgpImageAlt + '\" ' + imgpImageStyle + ' ' + imgpImageCss + ' \/>';
-      }
-      else {
-        imgpImageElement = '<span>'+imgpImageTitle+'<\/span>'
-      }
-
-      // Create a link HTML string
-      switch (imgpLink) {
-        case 'none': imgpLinkElement = '%imgpImageElement%'; break;
-        case 'page': imgpLinkElement = '<a href=\"'+imgpPageLink+'\" title=\"'+imgpImageTitle+'\" >%imgpImageElement%<\/a>'; break;
-        case 'file': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
-";
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
-  $ret .= "
-        case 'lightbox': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" rel=\"". variable_get('imagepicker_lightbox2_insert', 'lightbox') ."\" >%imgpImageElement%<\/a>'; break;
-";
-  }
-  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1)) {
-  $ret .= "
-        case 'thickbox': imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" class=\"thickbox\" >%imgpImageElement%<\/a>'; break;
-";
-  }
-
-  $ret .= "
-        default: imgpLinkElement = '<a href=\"'+imgpFileLink+'\" title=\"'+imgpImageTitle+'\" target=\"_blank\" >%imgpImageElement%<\/a>'; break;
-      }
-      // add title and description if requested
-      if (imgpForm.desc.checked) {
-        imgpLinkElement = '<div class=\"imgp_title\">' + imgpImageTitle + '</div>' + imgpLinkElement + '<div class=\"imgp_desc\">' + imgpImageDesc + '</div>';
-      }
-      // Create a HTML string which should be inserted in the node body
-      imgpInsertion = imgpLinkElement.replace('%imgpImageElement%', imgpImageElement);
-
-      // Get the parent window of imagepicker iframe
-      var win = window.opener ? window.opener : window.dialogArguments;
-      if (!win) {
-        win = top;
-      }
-
-      // track down a wysiwyg editor
-      var jobdone = false;
-      var inst = false;
-      if (win.oFCK_1) {
-        inst = win.oFCK_1.InstanceName;
-      }
-      else if (win.oFCKeditor) {
-        inst = win.oFCKeditor.InstanceName;
-      }
-      else if (isWysiwyg == 'yes') {
-        inst = 'edit-body';
-      }
-
-      if (inst) {
-        if (win.FCKeditorAPI) {
-          myFCKeditor = win.FCKeditorAPI.GetInstance(inst);
-          if (myFCKeditor) {
-            myFCKeditor.InsertHtml(imgpInsertion);
-            jobdone = true;
-          }
-        }
-      }
-
-      //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
-      var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
-      if (isTinyMCE) {
-        win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
-        jobdone = true;
-      }
-
-      if (! jobdone) {
-        var nodeBody = win.document.getElementById('edit-body');
-        var commentBody = win.document.getElementById('edit-comment');
-        if (nodeBody) {
-          insertAtCursor(nodeBody, imgpInsertion);
-        }
-        if (commentBody) {
-          insertAtCursor(commentBody, imgpInsertion);
-        }
-      }
-      win.location.hash='body_hash';
-    }
-  }
-
-  // Copy pasted from internet...
-  function insertAtCursor(myField, myValue) {
-    //IE support
-    if (document.selection) {
-      myField.focus();
-
-      //in effect we are creating a text range with zero
-      //length at the cursor location and replacing it
-      //with myValue
-      sel = document.selection.createRange();
-      sel.text = myValue;
-    }
-
-    //Mozilla/Firefox/Netscape 7+ support
-    else if (myField.selectionStart || myField.selectionStart == '0') {
-
-      //Here we get the start and end points of the
-      //selection. Then we create substrings up to the
-      //start of the selection and from the end point
-      //of the selection to the end of the field value.
-      //Then we concatenate the first substring, myValue,
-      //and the second substring to get the new value.
-      var startPos = myField.selectionStart;
-      var endPos = myField.selectionEnd;
-      myField.value = myField.value.substring(0, startPos)+ myValue + myField.value.substring(endPos, myField.value.length);
-
-    }
-    else {
-      myField.value += myValue;
-    }
-  }
-";
-  return $ret;
 }
 
 function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {

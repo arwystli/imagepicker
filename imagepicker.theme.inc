@@ -14,7 +14,10 @@ function imagepicker_theme() {
   return array(
     'imagepicker' => array(
       'arguments' => array(
-        'content' => NULL),
+        'content' => NULL,
+        'img'  => NULL,
+        'public'  => NULL,
+      ),
     ),
     'imagepicker_list' => array(
       'arguments' => array(
@@ -112,13 +115,47 @@ function imagepicker_theme() {
         'form3' => array(),
       ),
     ),
+    'imagepicker_insert' => array(
+      'arguments' => array(
+        'img' => NULL,
+        'public' => NULL,
+        'form1' => array(),
+        'form2' => array(),
+      ),
+    ),
   );
 }
 
-function theme_imagepicker(&$content) {
+function theme_imagepicker($content, $img='', $public=FALSE) {
   global $language;
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
+  if ($img) {
+
+    $settings = array(
+      'imagepicker_iframe' => array(
+        'imgpImageAlt' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ),
+        'imgpImageTitle' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : ''),
+        'imgpImageDesc' => preg_replace("/(\n|\r)/", '', nl2br($img['img_description'])),
+        'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE) ),
+        'imgpThumbLink' => imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)),
+        'imgpPageLink' => url('imagepicker/image/'. $img['img_id']),
+        'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
+        'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
+        'use_cssbox' => variable_get('imagepicker_use_cssbox', 0),
+        'default_align_show' => variable_get('imagepicker_default_align_show', 1),
+        'default_fleft' => variable_get('imagepicker_default_fleft', 'style="float: left"'),
+        'default_fright' => variable_get('imagepicker_default_fright', 'style="float: right"'),
+        'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
+        'lightbox2_insert' => variable_get('imagepicker_lightbox2_insert', 'lightbox'),
+        'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1)),
+      ),
+    );
+    drupal_add_js($settings, 'setting');
+    drupal_add_js($path .'/imagepicker_iframe.js');
+
+  }
+
   $vars['content'] = $content;
   $vars['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
   $vars['styles'] = drupal_get_css();
@@ -144,7 +181,10 @@ function theme_imagepicker(&$content) {
 function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $suff="", $label="") {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   if ($rows) {
-    $pager = theme('pager', NULL, $max);
+    $pager = "";
+    if ( count($rows) > $max ) {
+      $pager = theme('pager', NULL, $max);
+    }
     $output .= $pref . theme('table', $header, $rows) . $pager . $suff;
   }
   else {
@@ -152,6 +192,7 @@ function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $su
   }
   $output .= ($label ? '</fieldset>' : '');
   return $output;
+
 }
 
 function theme_imagepicker_stats($header, $rows, $pref="", $suff="", $label="") {
@@ -324,3 +365,22 @@ function theme_imagepicker_admin_view($view, $form1='', $form2='', $form3='') {
   return $output;
 }
 
+function theme_imagepicker_insert($img='', $public=FALSE, $form1='', $form2='') {
+  $output = "";
+  if ($img) {
+    $imgpath = imagepicker_get_image_path($img, 'browser', ($public ? array('name' => $img['name'] , 'uid' => $img['uid']) : FALSE ));
+    $output .= '<div class="imgp_help">'. t('Choose the settings you want, place the cursor in the Body box above and Insert image.') .'</div>';
+    if ($img['img_title']) {
+      $output .= '<div id="imgp_img_holder_title">'. check_plain($img['img_title']) .'</div>';
+    }
+    if ($img['img_description']) {
+      $output .= '<div id="imgp_img_holder_description">'. nl2br($img['img_description']) .'</div>';
+    }
+    $output .= '<div id="imgp_img_holder">';
+    $output .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. check_plain($img['img_title']) .'" title="'. $img['img_name'] .'" />';
+    $output .= '</div>';
+    $output .= $form1;
+    $output .= $form2;
+  }
+  return $output;
+}
