@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 2009-11-29
+------------------------------------
+by hutch, fixed error in admin/settings/general path
+
 Image Picker  for D6 in DRUPAL-6--2, 2009-11-26
 ------------------------------------
 by hutch, improved js and theming, removed inline js, fixed opera bug
