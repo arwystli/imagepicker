@@ -90,6 +90,6 @@ more groups. There is also an Admin mode where your images are listed.
 
 	Imagepicker Administrator
 In the 2 series there is the ability for an administrator to
-view/add/edit/delete anything. Still BETA!
+view/add/edit/delete anything.
 The directories under files/imagepicker are now stored under uid. Older systems
 should still run. See the configuration tab 'Validate Files'

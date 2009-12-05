@@ -999,7 +999,6 @@ function imagepicker_convert_to_numeric($dir) {
                       $file = $oldfilelist[$k1]->filename;
                       $thumbsfile = $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $oldfilelist[$k1]->basename;
                       $browserfile =  $oldpath . DIRECTORY_SEPARATOR . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $oldfilelist[$k1]->basename;
-                      # file_move(&$source, $dest = 0, $replace = FILE_EXISTS_RENAME)  FILE_EXISTS_ERROR
                       if (! file_move($file,  $newpath, FILE_EXISTS_ERROR)) {
                         $errlist[$file] = "Could not move to $newpath";
                       }

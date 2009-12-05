@@ -9,6 +9,13 @@
 
 include_once("imagepicker.imagefuncs.inc");
 
+/**
+ * Function to check the import folder.
+ * @param $account
+ *   Optional. user override
+ * @return
+ *   Returns the number of images.
+ */
 function imagepicker_import_dir_check($account = FALSE) {
   if (! $importdir = variable_get('imagepicker_import_dir', '')) {
     return FALSE;
@@ -48,6 +55,18 @@ function imagepicker_import_dir_check($account = FALSE) {
   return (count($checked_importlist) > 0 ? $checked_importlist : 0);
 }
 
+/**
+ * Function to display the image import form.
+ *
+ * @param $total
+ *   Required. total number of images being imported.
+ * @param $account
+ *   Optional. user override
+ * @param $admin
+ *   Optional. admin switch
+ * @return
+ *   Returns the image form.
+ */
 function imagepicker_import_form($form_state, $total, $account=FALSE, $admin = FALSE) {
   if ($account) {
     $user = $account;
@@ -143,6 +162,10 @@ function imagepicker_import_form($form_state, $total, $account=FALSE, $admin = F
   return $form;
 
 }
+
+/**
+ * Validate form
+ */
 function imagepicker_import_form_validate($form, &$form_state) {
   foreach ($form_state['values'] as $name => $value) {
     $value = trim($value);
@@ -162,6 +185,9 @@ function imagepicker_import_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_import_form_submit($form, &$form_state) {
   $op = isset($form_state['values']['op']) ? $form_state['values']['op']: '';
   if ($op == t('Import')) {
@@ -238,7 +264,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
       $file = $filename;
 
       // copy original
-      if (file_copy(&$source, $options['origdir'], FILE_EXISTS_RENAME)) {
+      if (file_copy($source, $options['origdir'], FILE_EXISTS_RENAME)) {
         $file = basename($source);
         $orig = $options['origdir'] . $file;
         $scaleto = ($form_state['values']['scale'] !="" ? $form_state['values']['scale'] : FALSE );
@@ -247,7 +273,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
         }
         else {
           // no scaling, save direct from $origdir to $destdir
-          file_copy(&$source, $options['destdir'] , FILE_EXISTS_RENAME);
+          file_copy($source, $options['destdir'] , FILE_EXISTS_RENAME);
           $file = basename($source);
         }
         // if watermark is enabled just apply to destdir image, not orig or the thumbs
@@ -324,6 +350,12 @@ function imagepicker_import_finished($success, $results, $operations) {
   $_SESSION['imagepicker_import_status'] = $message;
 }
 
+/**
+ * Function to display the import folder form
+ *
+ * @return
+ *   Returns the import folder form.
+ */
 function imagepicker_import_dir_form($form_state) {
 
   $form['imagepicker_import'] = array(
@@ -349,6 +381,9 @@ function imagepicker_import_dir_form($form_state) {
   return $form;
 }
 
+/**
+ * Validate form
+ */
 function imagepicker_import_dir_form_validate($form, &$form_state) {
   $importdir = $form_state['values']['imagepicker_import_dir'];
   if ($importdir && ! file_check_directory($importdir, TRUE)) {
@@ -356,6 +391,9 @@ function imagepicker_import_dir_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_import_dir_form_submit($form, &$form_state) {
   variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
 }

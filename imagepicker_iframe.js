@@ -1,5 +1,14 @@
+// $Id$
+//$Name$
+
+/**
+ * @file
+ * Provides javascript for insertion of html from iframe to the body in the parent.
+ */
+
 if (Drupal.jsEnabled) {
 
+  // use jquery browser detection
   function imagepicker_browser_detect() {
     if ($.browser.msie) {
       return 'msie';
@@ -18,6 +27,7 @@ if (Drupal.jsEnabled) {
     }
   }
 
+  // collects settings, builds HTML string
   function imagepickerInsert(button) {
     // Get the form element
     var imgpForm = document.getElementById('imagepicker-image-form');
@@ -196,7 +206,6 @@ if (Drupal.jsEnabled) {
         //with myValue
         sel = document.selection.createRange();
         sel.text = myValue;
-        //alert('in one');
       }
     }
     else if (browser == 'opera' || browser == 'mozilla' || browser == 'safari' ) {
@@ -210,14 +219,10 @@ if (Drupal.jsEnabled) {
         var startPos = myField.selectionStart;
         var endPos = myField.selectionEnd;
         myField.value = myField.value.substring(0, startPos)+ myValue + myField.value.substring(endPos, myField.value.length);
-        //alert('in two');
       }
     }
     else {
       myField.value += myValue;
-      //alert('in three');
     }
   }
-
-
 }

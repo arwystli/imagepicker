@@ -131,7 +131,6 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
   if ($img) {
-
     $settings = array(
       'imagepicker_iframe' => array(
         'imgpImageAlt' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ),
@@ -153,7 +152,6 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
     );
     drupal_add_js($settings, 'setting');
     drupal_add_js($path .'/imagepicker_iframe.js');
-
   }
 
   $vars['content'] = $content;
@@ -171,7 +169,7 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
       $template = $templatepath .'/'. $template;
     }
     else {
-      $template = $path . '/' . $template;
+      $template = $path .'/'. $template;
     }
   }
   echo theme_render_template($template, $vars);
