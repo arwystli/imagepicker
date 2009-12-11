@@ -52,7 +52,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     '#type' => 'textfield',
     '#title' => t('Thumbnail size'),
     '#size' => 10,
-    '#default_value' => variable_get('imagepicker_default_thumbnail_size', 100),
+    '#default_value' => (isset($user->imagepicker_default_thumbnail_size) ? $user->imagepicker_default_thumbnail_size : variable_get('imagepicker_default_thumbnail_size', 100)),
     '#description' => t('Size in pixels of thumbnail\'s bigger side'),
     '#required' => TRUE,
   );
@@ -60,7 +60,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     '#type' => 'textfield',
     '#title' => t('Scale image'),
     '#size' => 10,
-    '#default_value' => variable_get('imagepicker_default_scale', ''),
+    '#default_value' => (isset($user->imagepicker_default_scale) ? $user->imagepicker_default_scale : variable_get('imagepicker_default_scale', '')),
     '#description' => t('Scale image to this size in pixels if not left empty'),
   );
   $form['title'] = array(
@@ -230,7 +230,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
         // get wmarked too when not scaling image above
         $source = $origdir . $file;
         if (imagepicker_scale_image($source, $thumbsdir . $file, $maxthumbsize)) {
-          imagepicker_scale_image($source, $browserdir . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
+          imagepicker_scale_image($source, $browserdir . $file, ($user->imagepicker_default_browser_thumbnail_size ? $user->imagepicker_default_browser_thumbnail_size : variable_get('imagepicker_default_browser_thumbnail_size', 100)));
           $title = htmlspecialchars($form_state['values']['title']);
           $description = htmlspecialchars($form_state['values']['description']);
           $nextimgid = imagepicker_insert_image($user->uid, $file, $title, $description);

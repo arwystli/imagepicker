@@ -57,5 +57,52 @@ if (Drupal.jsEnabled) {
         $("#wrap_imagepicker_quota_role").hide();
       }
     });
+
+    if ($("#edit-imagepicker-import-enabled").attr('checked')) {
+      $("#wrap-imagepicker-import").show();
+    }
+    else {
+      $("#wrap-imagepicker-import").hide();
+    }
+    $("#edit-imagepicker-import-enabled").change(function() {
+      if ($("#edit-imagepicker-import-enabled").attr('checked')) {
+        $("#wrap-imagepicker-import").show();
+      }
+      else {
+        $("#wrap-imagepicker-import").hide();
+      }
+    });
+
+    if ($("#edit-imagepicker-exifinfo-enable").attr('checked')) {
+      $("#wrap-imagepicker-exifinfo-external").show();
+    }
+    else {
+      $("#wrap-imagepicker-exifinfo-external").hide();
+    }
+    $("#edit-imagepicker-exifinfo-enable").change(function() {
+      if ($("#edit-imagepicker-exifinfo-enable").attr('checked')) {
+        $("#wrap-imagepicker-exifinfo-external").show();
+      }
+      else {
+        $("#wrap-imagepicker-exifinfo-external").hide();
+      }
+    });
+
+    if ($("#edit-imagepicker-upload-progress-enabled").attr('checked')) {
+      $("#wrap-imagepicker-upload-progress").show();
+    }
+    else {
+      $("#wrap-imagepicker-upload-progress").hide();
+    }
+    $("#edit-imagepicker-upload-progress-enabled").change(function() {
+      if ($("#edit-imagepicker-upload-progress-enabled").attr('checked')) {
+        $("#wrap-imagepicker-upload-progress").show();
+      }
+      else {
+        $("#wrap-imagepicker-upload-progress").hide();
+      }
+    });
+
+
   });
 }

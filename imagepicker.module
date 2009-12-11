@@ -36,6 +36,8 @@ function imagepicker_perm() {
  */
 function imagepicker_init() {
   include('imagepicker.theme.inc');
+  include('imagepicker.form-elements.inc');
+
 }
 
 /**
@@ -446,6 +448,7 @@ function imagepicker_func_load($arg) {
  * Implementation of hook_form_alter().
  */
 function imagepicker_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
   $node = $form['#node'];
   $node_types = node_get_types('names');
   $node_type = in_array($node->type, variable_get('imagepicker_node_types_enabled', array_keys($node_types)), TRUE);
@@ -463,11 +466,27 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     $weight = 1;
   }
   if (user_access('use imagepicker')) {
-    if (module_exists('thickbox') && variable_get('imagepicker_advanced_thickbox', 0)) {
+    $width = variable_get('imagepicker_advanced_iframe_width', "100%");
+    if ( isset($user->imagepicker_advanced_iframe_width) && $user->imagepicker_advanced_iframe_width ) {
+      $width = $user->imagepicker_advanced_iframe_width;
+    }
+    if (! preg_match("/%$/", $width)) {
+      $width .= 'px';
+    }
+    $height = variable_get('imagepicker_advanced_iframe_height', 500);
+    if (isset($user->imagepicker_advanced_iframe_height) && $user->imagepicker_advanced_iframe_height ) {
+      $height = $user->imagepicker_advanced_iframe_height;
+    }
+    $border = variable_get('imagepicker_advanced_iframe_border', "0");
+    if (isset($user->imagepicker_advanced_iframe_border)) {
+      $border = $user->imagepicker_advanced_iframe_border;
+    }
+
+    if (imagepicker_get_thickbox_perms()) {
       $iurl = l('Run imagepicker', 'imagepicker' );
     }
     else {
-      $iurl = '<iframe id="imagepicker" style="width: '. variable_get('imagepicker_advanced_iframe_width', "100%") .'; height: '. variable_get('imagepicker_advanced_iframe_height', 500) .'px; border: '. variable_get('imagepicker_advanced_iframe_border', "0") .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe>';
+      $iurl = '<iframe id="imagepicker" style="width: '. $width .'; height: '. $height .'px; border: '. $border .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe>';
     }
 
     if (($node_type && preg_match('/node_form$/i', $form_id) ) || $comment ) {
@@ -490,8 +509,8 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
       $form['block_settings']['file_upload'] = array(
         '#type' => 'fieldset',
         '#title' => t('Image picker'),
-        '#collapsible' => 1,
-        '#collapsed' => variable_get('imagepicker_advanced_collapsed', 0),
+        '#collapsible' => TRUE,
+        '#collapsed' => (isset($user->imagepicker_advanced_collapsed) ? $user->imagepicker_advanced_collapsed : variable_get('imagepicker_advanced_collapsed', 0)),
         '#weight' => $weight,
       );
       $form['block_settings']['file_upload']['mpframe'] = array(
@@ -502,7 +521,6 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 }
-
 
 /**
  * Menu local task; presents the browse and select pages for imagepicker
@@ -568,12 +586,12 @@ function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $ac
  *   Returns the image form.
  */
 function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
+  global $user;
   if (variable_get('imagepicker_default_align_show', 1)) {
-    $form['align'] = imagepicker_get_align_opts();
+    $form['align'] = imagepicker_get_align_opts(isset($user->imagepicker_insert_defaults_align) ? $user->imagepicker_insert_defaults_align : variable_get('imagepicker_insert_defaults_align', 'none'));
   }
-  $form['show'] = imagepicker_get_show_opts();
-  $form['link'] = imagepicker_get_link_opts();
-
+  $form['show'] = imagepicker_get_show_opts(isset($user->imagepicker_insert_defaults_show) ? $user->imagepicker_insert_defaults_show : variable_get('imagepicker_insert_defaults_show', 'full'));
+  $form['link'] = imagepicker_get_link_opts(isset($user->imagepicker_insert_defaults_link) ? $user->imagepicker_insert_defaults_link : variable_get('imagepicker_insert_defaults_link', 'none'));
   $form['desc'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Description'),
@@ -581,7 +599,11 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
     '#prefix' => '<div id="imgp_desc_control">',
     '#suffix' => '</div>'
   );
-  if (variable_get('imagepicker_use_cssbox', 0)) {
+  // allow override but only if admin allows
+  if ((variable_get('imagepicker_use_cssbox', 0)
+    && ! isset($user->imagepicker_use_cssbox))
+    || ((variable_get('imagepicker_use_cssbox', 0)
+    && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox))) {
     $form['cssbox'] = array(
       '#type' => 'textfield',
       '#title' => t('Add additional css'),
@@ -685,7 +707,10 @@ function imagepicker_image_page($img_id) {
     $path = drupal_get_path('module', 'imagepicker');
     drupal_add_css($path .'/imagepicker.css');
     drupal_set_title($img['img_title']);
-    $content = theme('imagepicker_fullpage', $img, imagepicker_get_path(TRUE, $img) . $img['img_name'], variable_get('imagepicker_default_pagelink', 1));
+    // js link
+    $account = user_load(array('uid' => $img['uid']));
+    $link = (isset($account->imagepicker_default_pagelink) ? $account->imagepicker_default_pagelink : variable_get('imagepicker_default_pagelink', 1));
+    $content = theme('imagepicker_fullpage', $img, imagepicker_get_path(TRUE, $img) . $img['img_name'], $link);
   }
   else {
     drupal_set_message(t('Image not found in page.'), 'error');
@@ -693,7 +718,6 @@ function imagepicker_image_page($img_id) {
 
   return $content;
 }
-
 
 /**
  * some common utilities
@@ -810,11 +834,11 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
       $gid = variable_get('imagepicker_currentgroup', 0);
     }
   }
-  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $default_order = ($user->imagepicker_default_browser_order ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   if ($account && $src == 'admin') {
-    $order = variable_get('imagepicker_browser_order', $default_order);
+    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : variable_get('imagepicker_browser_order', $default_order));
     $searchs = variable_get('imagepicker_browser_search', '');
-    $how_many = variable_get('imagepicker_advanced_browser_page', 25);
+    $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
   }
   else {
     $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order);
@@ -891,15 +915,30 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
   }
 
   $forms = array();
-  if (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $forms[] = drupal_get_form('imagepicker_browse_order_form', $user, ($src == 'admin' ? TRUE : FALSE));
+
+  if ( $src == 'admin') {
+    if (variable_get('imagepicker_show_browse_order_form', 1)) {
+      $forms[] = drupal_get_form('imagepicker_browse_order_form', $user, TRUE);
+    }
   }
+  elseif ((variable_get('imagepicker_show_browse_order_form', 1) && isset($user->imagepicker_show_browse_order_form) && $user->imagepicker_show_browse_order_form)
+    || (variable_get('imagepicker_show_browse_order_form', 1) && ! isset($user->imagepicker_show_browse_order_form) )) {
+    $forms[] = drupal_get_form('imagepicker_browse_order_form', $user, FALSE);
+  }
+
   if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_groups($user) && imagepicker_has_grouplist($user)) {
     // add groups select here
     $forms[] = drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE));
   }
-  if (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $forms[] = drupal_get_form('imagepicker_browse_search_form', $user, ($src == 'admin' ? TRUE : FALSE));
+
+  if ( $src == 'admin') {
+    if (variable_get('imagepicker_show_browse_search_form', 1)) {
+      $forms[] = drupal_get_form('imagepicker_browse_search_form', $user, TRUE);
+    }
+  }
+  elseif ((variable_get('imagepicker_show_browse_search_form', 1) && isset($user->imagepicker_show_browse_search_form) && $user->imagepicker_show_browse_search_form)
+    || (variable_get('imagepicker_show_browse_search_form', 1) && ! isset($user->imagepicker_show_browse_search_form) )) {
+    $forms[] = drupal_get_form('imagepicker_browse_search_form', $user, FALSE);
   }
 
   if ($src == "account" || $src == "admin") {
@@ -915,8 +954,8 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
 function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   global $user;
 
-  $how_many = variable_get('imagepicker_advanced_browser_page', 25);
-  $default_order = variable_get('imagepicker_default_browser_order', 'img_id DESC');
+  $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+  $default_order = ($user->imagepicker_default_browser_order ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order );
 
   $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
@@ -1029,13 +1068,25 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   }
 
   $forms = array();
-  if (variable_get('imagepicker_show_browse_order_form', 1)) {
+  if (isset($user->imagepicker_show_browse_order_form)) {
+    if ($user->imagepicker_show_browse_order_form) {
+      $forms[] = drupal_get_form('imagepicker_browse_order_form');
+    }
+  }
+  elseif (variable_get('imagepicker_show_browse_order_form', 1)) {
     $forms[] = drupal_get_form('imagepicker_browse_order_form');
   }
+
   if ( $src == 'admin' && variable_get('imagepicker_groups_enabled', 1)) {
     $forms[] = drupal_get_form('imagepicker_browse_public_form');
   }
-  if (variable_get('imagepicker_show_browse_search_form', 1)) {
+
+  if (isset($user->imagepicker_show_browse_search_form)) {
+    if ($user->imagepicker_show_browse_search_form) {
+      $forms[] = drupal_get_form('imagepicker_browse_search_form');
+    }
+  }
+  elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
     $forms[] = drupal_get_form('imagepicker_browse_search_form');
   }
 
@@ -1105,11 +1156,12 @@ function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account')
 
   if ($src == 'account') {
     $page = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $cols = (isset($user->imagepicker_advanced_browser_columns) ? $user->imagepicker_advanced_browser_columns : variable_get('imagepicker_advanced_browser_columns', 0));
   }
   else {
     $page = variable_get('imagepicker_advanced_browser_page', 25);
+    $cols = variable_get('imagepicker_advanced_browser_columns', 0);
   }
-  $cols = variable_get('imagepicker_advanced_browser_columns', 0);
 
   return array($rows, $page, $cols, array('<div class="clear-block">', '<div class="imgp_holder">'), array('</div>', '</div>'));
 }
@@ -1154,7 +1206,10 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
       }
     }
   }
-  if (variable_get('imagepicker_show_browse_search_form', 1)) {
+  if ($src != 'admin' && isset($user->imagepicker_show_browse_search_form) && $user->imagepicker_show_browse_search_form ) {
+    $content .= drupal_get_form('imagepicker_browse_search_form');
+  }
+  elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
     $content .= drupal_get_form('imagepicker_browse_search_form');
   }
 
@@ -1304,7 +1359,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
     $rows[] = $row_data;
   }
 
-  $content = "";
+
   $pref = '<div class="imgp_imgs_list">';
   $suff = '</div>';
   if (count($rows)) {
@@ -1603,9 +1658,9 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
  */
 function imagepicker_browse_groups_form_submit($form, &$form_state) {
   // need to get the users gids
-  $user = FALSE;
+  $account = FALSE;
   if ( $form_state['values']['uid'] ) {
-    $user = user_load(array('uid' => $form_state['values']['uid']));
+    $account = user_load(array('uid' => $form_state['values']['uid']));
     if ($form_state['values']['gid']) {
     variable_set('imagepicker_currentgroup', $form_state['values']['gid']);
     }
@@ -1614,7 +1669,7 @@ function imagepicker_browse_groups_form_submit($form, &$form_state) {
     }
   }
   else {
-    $gids = imagepicker_get_groups($user);
+    $gids = imagepicker_get_groups($account);
     $gids = array_keys($gids);
     foreach ($gids AS $gid) {
       $state = 0;
@@ -2174,15 +2229,37 @@ function _imagepicker_quota_check($src, $account = FALSE) {
  *
  */
 function imagepicker_thickbox_js() {
-  if (module_exists('thickbox') && variable_get('imagepicker_advanced_thickbox', 0)) {
-    drupal_add_js(array('imagepicker_thickbox' => array(
-      'width' => variable_get('imagepicker_advanced_iframe_width', "100%"),
-      'height' => variable_get('imagepicker_advanced_iframe_height', "500")
-      )), 'setting');
+  global $user;
+  if (imagepicker_get_thickbox_perms()) {
+    $width = variable_get('imagepicker_advanced_iframe_width', "100%");
+    if ( isset($user->imagepicker_advanced_iframe_width) && $user->imagepicker_advanced_iframe_width ) {
+      $width = $user->imagepicker_advanced_iframe_width;
+    }
+    if (preg_match("/%$/", $width)) {
+      $width = '630';
+    }
+    $height = variable_get('imagepicker_advanced_iframe_height', 500);
+    if (isset($user->imagepicker_advanced_iframe_height) && $user->imagepicker_advanced_iframe_height ) {
+      $height = $user->imagepicker_advanced_iframe_height;
+    }
+    drupal_add_js(array('imagepicker_thickbox' => array('width' => $width, 'height' => $height)), 'setting');
     drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js');
   }
 }
 
+function imagepicker_get_thickbox_perms() {
+  global $user;
+  if ((module_exists('thickbox')
+    && isset($user->imagepicker_advanced_thickbox)
+    && $user->imagepicker_advanced_thickbox
+    && variable_get('imagepicker_advanced_thickbox', 0 ))
+      || (module_exists('thickbox')
+    && ! isset($user->imagepicker_advanced_thickbox)
+    && variable_get('imagepicker_advanced_thickbox', 0))) {
+    return TRUE;
+  }
+  return FALSE;
+}
 
 /**
  * Function to display the image search form
@@ -2421,55 +2498,6 @@ function imagepicker_get_watermarks_dir($account=FALSE) {
   $destdir = imagepicker_get_path(FALSE, array('name' => $user->name, 'uid' => $user->uid ));
   return $destdir . IMAGEPICKER_WATERMARK_DIR;
 
-}
-
-function imagepicker_get_align_opts() {
-  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
-  $form = array(
-    '#type' => 'radios',
-    '#title' => t('Align'),
-    '#options' => $alignoptions,
-    '#description' => '',
-    '#default_value' => variable_get('imagepicker_insert_defaults_align', 'none'),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
-  );
-  return $form;
-}
-
-function imagepicker_get_show_opts() {
-  $showoptions = array('full' => t('Full size'), 'thumb' => t('Thumbnail'), 'title' => t('Title'));
-  $form = array(
-    '#type' => 'radios',
-    '#id' => 'show',
-    '#title' => t('Show'),
-    '#options' => $showoptions,
-    '#description' => '',
-    '#default_value' => variable_get('imagepicker_insert_defaults_show', 'full'),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
-  );
-  return $form;
-}
-
-function imagepicker_get_link_opts() {
-  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
-    $linkoptions['lightbox'] = t('Lightbox');
-  }
-  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1) ) {
-    $linkoptions['thickbox'] = t('Thickbox');
-  }
-  $form = array(
-    '#type' => 'radios',
-    '#title' => t('Link'),
-    '#options' => $linkoptions,
-    '#description' => '',
-    '#default_value' => variable_get('imagepicker_insert_defaults_link', 'none'),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
-  );
-  return $form;
 }
 
 /**

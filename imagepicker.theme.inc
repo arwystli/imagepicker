@@ -127,7 +127,7 @@ function imagepicker_theme() {
 }
 
 function theme_imagepicker($content, $img='', $public=FALSE) {
-  global $language;
+  global $language, $user;
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
   if ($img) {
@@ -141,15 +141,16 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
         'imgpPageLink' => url('imagepicker/image/'. $img['img_id']),
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
-        'use_cssbox' => variable_get('imagepicker_use_cssbox', 0),
-        'default_align_show' => variable_get('imagepicker_default_align_show', 1),
-        'default_fleft' => variable_get('imagepicker_default_fleft', 'style="float: left"'),
-        'default_fright' => variable_get('imagepicker_default_fright', 'style="float: right"'),
+        'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->imagepicker_use_cssbox) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox) ? 1 : 0),
+        'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->imagepicker_default_align_show) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->imagepicker_default_align_show) && $user->imagepicker_default_align_show) ? 1 : 0),
+        'default_fleft' => ($user->imagepicker_default_fleft ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
+        'default_fright' => ($user->imagepicker_default_fright ? $user->imagepicker_default_fright : variable_get('imagepicker_default_fright', 'style="float: right"')),
         'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
-        'lightbox2_insert' => variable_get('imagepicker_lightbox2_insert', 'lightbox'),
+        'lightbox2_insert' => ($user->imagepicker_lightbox2_insert ? $user->imagepicker_lightbox2_insert : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
         'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1)),
       ),
     );
+
     drupal_add_js($settings, 'setting');
     drupal_add_js($path .'/imagepicker_iframe.js');
   }
@@ -179,10 +180,7 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
 function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $suff="", $label="") {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   if ($rows) {
-    $pager = "";
-    if ( count($rows) > $max ) {
-      $pager = theme('pager', NULL, $max);
-    }
+    $pager = theme('pager', NULL, $max);
     $output .= $pref . theme('table', $header, $rows) . $pager . $suff;
   }
   else {
