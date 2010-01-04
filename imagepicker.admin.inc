@@ -502,6 +502,7 @@ function imagepicker_admin_users_list($dir, $label='') {
     t('Images'),
     (variable_get('imagepicker_groups_enabled', 1) ? t('Groups') : ''),
     (variable_get('imagepicker_quota_enable', 1) ? t('Quotas') : ''),
+    t('Used'),
   );
   $rowcount = 0;
   $result = db_query("
@@ -512,6 +513,7 @@ function imagepicker_admin_users_list($dir, $label='') {
     $account = user_load( array('uid' => $row['uid']));
     $allcount = _imagepicker_user_has_img($account);
     $groupcount = _imagepicker_user_has_groups('all', $account);
+    $usedbytesprint = _imagepicker_bkmg(imagepicker_get_all_bytes($account)+1);
     $quota = 0;
     if (variable_get('imagepicker_quota_enable', 1)) {
       if (variable_get('imagepicker_quota_byrole', 0)) {
@@ -530,6 +532,7 @@ function imagepicker_admin_users_list($dir, $label='') {
       ($allcount ? $allcount .' '. l(t('images'), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
       (variable_get('imagepicker_groups_enabled', 1) ? ($groupcount ? ($groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' )) : t('No groups')) : ''),
       (variable_get('imagepicker_quota_enable', 1) ? l(imagepicker_get_quota_list($quota+1), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/quota') : ''),
+      $usedbytesprint,
     );
     $rows[] = $row_data;
     $rowcount++;

@@ -148,7 +148,12 @@ if (Drupal.jsEnabled) {
       // Get the parent window of imagepicker iframe
       var win = window.opener ? window.opener : window.dialogArguments;
       if (!win) {
-        win = top;
+        if (window.parent) {
+          win = window.parent;
+        }
+        else {
+          win = top;
+        }
       }
 
       // track down a wysiwyg editor
