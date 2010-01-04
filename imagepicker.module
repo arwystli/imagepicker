@@ -1069,7 +1069,12 @@ function imagepicker_js($img, $public = FALSE) {
       // Get the parent window of imagepicker iframe
       var win = window.opener ? window.opener : window.dialogArguments;
       if (!win) {
-        win = top;
+        if (window.parent) {
+          win = window.parent;
+        }
+        else {
+          win = top;
+        }
       }
       //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
       var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
