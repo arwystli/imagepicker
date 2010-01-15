@@ -179,6 +179,14 @@ if (Drupal.jsEnabled) {
         }
       }
 
+      if (win.Drupal.ckeditorInstance && win.Drupal.ckeditorInsertHtml) {
+        if (win.Drupal.ckeditorInsertHtml(imgpInsertion)) {
+          jobdone = true;
+        }
+        else
+          return;
+      }
+
       //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
       var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
       if (isTinyMCE) {
