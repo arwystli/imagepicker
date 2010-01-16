@@ -127,6 +127,10 @@ function imagepicker_theme() {
 }
 
 function theme_imagepicker($content, $img='', $public=FALSE) {
+  if (module_exists('admin_menu')) {
+    admin_menu_suppress();
+  }
+
   global $language, $user;
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
