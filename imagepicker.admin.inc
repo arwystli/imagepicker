@@ -592,6 +592,8 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
     }
     $view = theme('imagepicker_view', $img, $imgpath, $info, $exifinfo);
     $form1 = drupal_get_form('imagepicker_admin_image_form', $img_id, $user);
+    $form2 = '';
+    $form3 = '';
     // copy form
     if (variable_get('imagepicker_copy_enabled', 0)) {
       $form2 = drupal_get_form('imagepicker_copy_form', $img['img_id'], $img['img_name'], $user);
@@ -1265,6 +1267,8 @@ function imagepicker_admin_groups() {
   elseif (arg(4) == 'stats' || arg(4) == 'users') {
     $action = arg(4);
   }
+  $gidaction = '';
+  $gid = 0;
   if ( (arg(6) == 'browse' || arg(6) == 'edit' || arg(6) == 'delete') && is_numeric(arg(7)) ) {
     $gidaction = arg(6);
     $gid = arg(7);
@@ -1273,7 +1277,8 @@ function imagepicker_admin_groups() {
       drupal_goto('admin/settings/imagepicker/images/user/'. $uid .'/browse');
     }
   }
-  $name = "";
+  $name = '';
+  $content = '';
   if ($uid) {
     $account = user_load(array('uid' => $uid));
     $result = db_query("SELECT u.name FROM {users} u, {imagepicker} i WHERE u.uid = %d AND u.uid=i.uid", $uid);
@@ -1331,6 +1336,7 @@ function imagepicker_admin_images() {
     variable_set('imagepicker_currentgroup', 0);
     $uid = variable_get('imagepicker_currentuser', '');
   }
+  $imgaction = '';
   if ( arg(6) == 'browse_public'
     || arg(6) == 'browse'
     || arg(6) == 'edit'
@@ -1342,9 +1348,11 @@ function imagepicker_admin_images() {
     || arg(6) == 'quota') {
     $imgaction = arg(6);
   }
+  $img_id = 0;
   if ( is_numeric(arg(7))) {
     $img_id = arg(7);
   }
+  $content = '';
   if (arg(6) == 'upload' ) {
     include_once('imagepicker.upload.inc');
     if (variable_get('imagepicker_upload_progress_enabled', 1)) {
@@ -1497,10 +1505,7 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
   $title = t('Set default quota');
   if ($account) {
     $title = t('Set user quota');
-    $quota = $account->imagepicker_quota;
-    if (! $quota) {
-      $quota = $default;
-    }
+    $quota = (isset($account->imagepicker_quota) && $account->imagepicker_quota ? $account->imagepicker_quota : $default);
   }
   $form['imagepicker_quota'] = array(
     '#type' => 'select',

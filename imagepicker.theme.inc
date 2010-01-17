@@ -130,7 +130,6 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
   if (module_exists('admin_menu')) {
     admin_menu_suppress();
   }
-
   global $language, $user;
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
@@ -147,10 +146,10 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->imagepicker_use_cssbox) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox) ? 1 : 0),
         'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->imagepicker_default_align_show) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->imagepicker_default_align_show) && $user->imagepicker_default_align_show) ? 1 : 0),
-        'default_fleft' => ($user->imagepicker_default_fleft ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
-        'default_fright' => ($user->imagepicker_default_fright ? $user->imagepicker_default_fright : variable_get('imagepicker_default_fright', 'style="float: right"')),
+        'default_fleft' => (isset($user->imagepicker_default_fleft) ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
+        'default_fright' => (isset($user->imagepicker_default_fright) ? $user->imagepicker_default_fright : variable_get('imagepicker_default_fright', 'style="float: right"')),
         'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
-        'lightbox2_insert' => ($user->imagepicker_lightbox2_insert ? $user->imagepicker_lightbox2_insert : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
+        'lightbox2_insert' => (isset($user->imagepicker_lightbox2_insert) ? $user->imagepicker_lightbox2_insert : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
         'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1)),
       ),
     );

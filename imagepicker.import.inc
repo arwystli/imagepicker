@@ -112,13 +112,14 @@ function imagepicker_import_form($form_state, $total, $account=FALSE, $admin = F
 
   if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
     if (! variable_get('imagepicker_watermark_image', '')
-      && ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : FALSE)
-      && $user->imagepicker_watermark_enable) {
+      && (isset($user->imagepicker_watermark_image) ? $user->imagepicker_watermark_image : FALSE)
+      && isset($user->imagepicker_watermark_enable)
+      && $user->imagepicker_watermark_enable ) {
       $form['watermark'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use watermark'),
         '#description' => t('Use watermark on all images in this import.'),
-        '#default_value' => ($user->imagepicker_watermark_use ? $user->imagepicker_watermark_use : FALSE),
+        '#default_value' => (isset($user->imagepicker_watermark_use) ? $user->imagepicker_watermark_use : FALSE),
       );
     }
     elseif (variable_get('imagepicker_watermark_image', '')) {
@@ -191,14 +192,14 @@ function imagepicker_import_form_validate($form, &$form_state) {
 function imagepicker_import_form_submit($form, &$form_state) {
   $op = isset($form_state['values']['op']) ? $form_state['values']['op']: '';
   if ($op == t('Import')) {
-    if ( $form_state['values']['account'] && $form_state['values']['admin'] ) {
+    if ( isset($form_state['values']['account']) && isset($form_state['values']['admin'])) {
       $user = user_load(array('uid' => $form_state['values']['account']));
     }
     else {
       global $user;
     }
 
-    $destdir = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
+    $destdir = imagepicker_get_path(FALSE, (isset($form_state['values']['admin']) ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
     $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
     $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
     $origdir = $destdir . IMAGEPICKER_ORIG_DIR;

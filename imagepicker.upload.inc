@@ -133,7 +133,6 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
  */
 function imagepicker_upload_form_validate($form, &$form_state) {
   foreach ($form_state['values'] as $name => $value) {
-    $value = trim($value);
     switch ($name) {
       case 'file_upload':
         if (empty($_FILES['files']['name']['file_upload'])) {
@@ -170,13 +169,13 @@ function imagepicker_upload_form_validate($form, &$form_state) {
  */
 function imagepicker_upload_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Upload')) {
-    if ( $form_state['values']['account'] && $form_state['values']['admin'] ) {
+    if ( isset($form_state['values']['account']) && isset($form_state['values']['admin'])) {
       $user = user_load(array('uid' => $form_state['values']['account']));
     }
     else {
       global $user;
     }
-    $destdir = imagepicker_get_path(FALSE, ($form_state['values']['admin'] ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
+    $destdir = imagepicker_get_path(FALSE, (isset($form_state['values']['admin']) ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE));
     $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
     $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
     $origdir = $destdir . IMAGEPICKER_ORIG_DIR;
@@ -220,7 +219,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
         // might have some watermarks etc. from drupal's filters/hooks.
 
         // if watermark is enabled just apply to destdir image, not orig or the thumbs
-        if ( $form_state['values']['watermark'] ) {
+        if ( isset($form_state['values']['watermark']) && $form_state['values']['watermark'] ) {
           if (! imagepicker_watermark_process($destdir . $file, $user)) {
             drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
           }
@@ -245,10 +244,10 @@ function imagepicker_upload_form_submit($form, &$form_state) {
               }
             }
             drupal_set_message(t('Image was successfully uploaded.'));
-            if ($form_state['values']['admin']) {
+            if (isset($form_state['values']['admin'])) {
               $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse';
             }
-            elseif ($form_state['values']['account']) {
+            elseif (isset($form_state['values']['account'])) {
               $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
             }
             else {

@@ -34,9 +34,10 @@ function imagepicker_groups() {
  * from imagepicker groups in my account
  */
 function imagepicker_user_groups($mode="", $gid=0) {
+  $content = '';
   // $mode is edit, delete or empty
   if (empty($mode)) {
-    $content = imagepicker_groups_list('account');
+    $content .= imagepicker_groups_list('account');
     $content .= drupal_get_form('imagepicker_groups_form');
   }
   elseif ($mode == 'edit') {
@@ -61,7 +62,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
     '#type' => 'textfield',
     '#title' => t('Group name'),
     '#size' => 20,
-    '#default_value' => ($record ? $record->group_name : ''),
+    '#default_value' => (isset($record->group_name) ? $record->group_name : ''),
     '#description' => t(''),
     '#required' => TRUE
   );
@@ -70,7 +71,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
     '#title' => t('group description'),
     '#size' => 50,
     '#maxlength' => 50,
-    '#default_value' => ($record ? $record->group_description : ''),
+    '#default_value' => (isset($record->group_description) ? $record->group_description : ''),
     '#description' => t('Maximum 50 characters'),
     '#required' => FALSE
   );
@@ -79,26 +80,26 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
       '#type' => 'checkbox',
       '#title' => t('Public'),
       '#return_value' => 1,
-      '#default_value' => ($record->public ? $record->public : ''),
+      '#default_value' => (isset($record->public) ? $record->public : ''),
       '#description' => t('Make this group publicly available'),
     );
     // Create role restrictions
     if (variable_get('imagepicker_publicroles_enabled', 1)) {
       $form['groupsave']['group_public_roles'] = array(
         '#type' => 'fieldset',
-        '#title' => ( $record->gid ?  t('Edit group roles') : t('Add public group roles')),
+        '#title' => ( isset($record->gid) ?  t('Edit group roles') : t('Add public group roles')),
         '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all roles.)'),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
       );
       // Output a list of available roles as checkboxes
       $form['groupsave']['group_public_roles']['roles']['#tree'] = TRUE;
-      if ($record->avail_roles) {
+      if (isset($record->avail_roles)) {
         if ($record->avail_roles != 'all') $availroles = explode(':', $record->avail_roles);
       }
       foreach (user_roles(TRUE) as $rid => $role) {
         if (imagepicker_role_has_permission($rid)) {
-          if (is_array($availroles) && in_array($role, array_values($availroles))) $checked = TRUE;
+          if (isset($availroles) && is_array($availroles) && in_array($role, array_values($availroles))) $checked = TRUE;
           else $checked = FALSE;
           $form['groupsave']['group_public_roles']['roles'][$rid] = array(
             '#type' => 'checkbox',
@@ -117,7 +118,7 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
       '#value' => $account->uid,
     );
   }
-  if ($record->gid) {
+  if (isset($record->gid)) {
     $form['groupsave']['gid'] = array(
       '#type' => 'hidden',
       '#value' => $record->gid,
@@ -137,7 +138,7 @@ function imagepicker_groups_form_submit($form, &$form_state) {
   $record['public'] = $form_state['values']['group_public'];
 
   // Check role restrictions submitted
-  if ( $form_state['values']['roles']) {
+  if ( isset($form_state['values']['roles']) && $form_state['values']['roles']) {
     $found = 0;
     foreach ($form_state['values']['roles'] as $rid => $role) {
       if (!$role) {
@@ -155,13 +156,13 @@ function imagepicker_groups_form_submit($form, &$form_state) {
     }
   }
 
-  if ( $form_state['values']['account'] ) {
+  if ( isset($form_state['values']['account'])) {
     $record['uid'] = $form_state['values']['account'];
   }
   else {
     $record['uid'] = $user->uid;
   }
-  if ($form_state['values']['gid']) {
+  if (isset($form_state['values']['gid'])) {
     $record['gid'] = $form_state['values']['gid'];
     imagepicker_update_user_group($record);
   }

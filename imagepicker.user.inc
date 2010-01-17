@@ -8,7 +8,7 @@
  */
 function imagepicker_user_page($uid, $path="", $func="", $id=0) {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-
+  $content = '';
   // path/func/id
   if ($path == 'images') {
     if ( ($func == 'browse' || $func == 'browseadmin') && is_numeric($id) && $id > 0) {
@@ -96,12 +96,14 @@ function imagepicker_user_view($img_id) {
     }
     $view = theme('imagepicker_view', $img, $imgpath, $info, $exifinfo);
     $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
+    $form2 = '';
+    $form3 = '';
     // copy form
     if (variable_get('imagepicker_copy_enabled', 0)) {
       $form2 = drupal_get_form('imagepicker_copy_form', $img['img_id'], $img['img_name']);
     }
     // group form
-    if (_imagepicker_has_groups($user)) {
+    if (_imagepicker_has_groups()) {
       $form3 = drupal_get_form('imagepicker_group_images_form', $img['img_id']);
     }
     $content = theme('imagepicker_user_view', $view, $form1, $form2, $form3);
@@ -189,8 +191,8 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
     '#collapsed' => FALSE,
     '#weight' => -38,
   );
-  $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem(($user->imagepicker_default_thumbnail_size ? $user->imagepicker_default_thumbnail_size : NULL));
-  $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem(($user->imagepicker_default_scale ? $user->imagepicker_default_scale : NULL));
+  $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem((isset($user->imagepicker_default_thumbnail_size) ? $user->imagepicker_default_thumbnail_size : NULL));
+  $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem((isset($user->imagepicker_default_scale) ? $user->imagepicker_default_scale : NULL));
   $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem((isset($user->imagepicker_default_pagelink) ? $user->imagepicker_default_pagelink : NULL));
 
   // insert settings
@@ -202,10 +204,10 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
     '#weight' => -36,
   );
   if (variable_get('imagepicker_default_align_show', 1)) {
-    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts(($user->imagepicker_insert_defaults_align ? $user->imagepicker_insert_defaults_align : NULL));
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts((isset($user->imagepicker_insert_defaults_align) ? $user->imagepicker_insert_defaults_align : NULL));
   }
-  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(($user->imagepicker_insert_defaults_show ? $user->imagepicker_insert_defaults_show : NULL));
-  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(($user->imagepicker_insert_defaults_link ? $user->imagepicker_insert_defaults_link : NULL));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts((isset($user->imagepicker_insert_defaults_show) ? $user->imagepicker_insert_defaults_show : NULL));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts((isset($user->imagepicker_insert_defaults_link) ? $user->imagepicker_insert_defaults_link : NULL));
 
   if (variable_get('imagepicker_default_align_show', 1)) {
     // alignment settings
@@ -216,8 +218,8 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
       '#collapsed' => FALSE,
       '#weight' => -34,
     );
-    $form['imagepicker_align']['imagepicker_default_fleft'] = imagepicker_fleft_elem(($user->imagepicker_default_fleft ? $user->imagepicker_default_fleft : NULL));
-    $form['imagepicker_align']['imagepicker_default_fright'] = imagepicker_fright_elem(($user->imagepicker_default_fright ? $user->imagepicker_default_fright : NULL));
+    $form['imagepicker_align']['imagepicker_default_fleft'] = imagepicker_fleft_elem((isset($user->imagepicker_default_fleft) ? $user->imagepicker_default_fleft : NULL));
+    $form['imagepicker_align']['imagepicker_default_fright'] = imagepicker_fright_elem((isset($user->imagepicker_default_fright) ? $user->imagepicker_default_fright : NULL));
   }
 
   // browser
@@ -229,13 +231,13 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
     '#collapsed' => FALSE,
     '#weight' => -20,
   );
-  $form['imagepicker_browser']['imagepicker_default_browser_thumbnail_size'] = imagepicker_browser_thumbnail_size_elem(($user->imagepicker_default_browser_thumbnail_size ? $user->imagepicker_default_browser_thumbnail_size : NULL));
-  $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = imagepicker_browser_columns_elem(($user->imagepicker_advanced_browser_columns ? $user->imagepicker_advanced_browser_columns : NULL));
-  $form['imagepicker_browser']['imagepicker_advanced_browser_page'] = imagepicker_browser_page_elem(($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : NULL));
+  $form['imagepicker_browser']['imagepicker_default_browser_thumbnail_size'] = imagepicker_browser_thumbnail_size_elem((isset($user->imagepicker_default_browser_thumbnail_size) ? $user->imagepicker_default_browser_thumbnail_size : NULL));
+  $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = imagepicker_browser_columns_elem((isset($user->imagepicker_advanced_browser_columns) ? $user->imagepicker_advanced_browser_columns : NULL));
+  $form['imagepicker_browser']['imagepicker_advanced_browser_page'] = imagepicker_browser_page_elem((isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : NULL));
   if (variable_get('imagepicker_show_browse_order_form', 1)) {
     $form['imagepicker_browser']['imagepicker_show_browse_order_form'] = imagepicker_show_browse_order_form_elem((isset($user->imagepicker_show_browse_order_form) ? $user->imagepicker_show_browse_order_form : NULL));
   }
-  $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(($user->imagepicker_default_browser_order ? $user->imagepicker_default_browser_order : NULL));
+  $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem((isset($user->imagepicker_default_browser_order) ? $user->imagepicker_default_browser_order : NULL));
   if (variable_get('imagepicker_show_browse_search_form', 1)) {
     $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem((isset($user->imagepicker_show_browse_search_form) ? $user->imagepicker_show_browse_search_form : NULL));
   }
@@ -265,14 +267,14 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
       '#type' => 'checkbox',
       '#title' => t('Enable watermark'),
       '#description' => $desc,
-      '#default_value' => ($user->imagepicker_watermark_enable ? $user->imagepicker_watermark_enable : FALSE),
+      '#default_value' => (isset($user->imagepicker_watermark_enable) ? $user->imagepicker_watermark_enable : FALSE),
       '#return_value' => 1,
     );
 
     if ($wf) {
       $form['imagepicker_watermark']['imagepicker_watermark_image'] = array(
       '#type' => 'select',
-      '#default_value' => ($user->imagepicker_watermark_image ? $user->imagepicker_watermark_image : ''),
+      '#default_value' => (isset($user->imagepicker_watermark_image) ? $user->imagepicker_watermark_image : ''),
       '#options' => $wf,
       '#title' => t('Select Watermark image'),
       '#prefix' => '<div class="container-inline">',
@@ -314,8 +316,8 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
       '#collapsed' => ($user->imagepicker_watermark_scaling ? TRUE : FALSE),
     );
     $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling'] = imagepicker_watermark_scaling_elem((isset($user->imagepicker_watermark_scaling) ? $user->imagepicker_watermark_scaling : NULL));
-    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem(($user->imagepicker_watermark_scaling_percentage ? $user->imagepicker_watermark_scaling_percentage : NULL));
-    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(($user->imagepicker_watermark_min_width ? $user->imagepicker_watermark_min_width : NULL));
+    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem((isset($user->imagepicker_watermark_scaling_percentage) ? $user->imagepicker_watermark_scaling_percentage : NULL));
+    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem((isset($user->imagepicker_watermark_min_width) ? $user->imagepicker_watermark_min_width : NULL));
   }
 
   if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
@@ -327,7 +329,7 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
       '#collapsed' => FALSE,
       '#weight' => -23,
     );
-    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem(($user->imagepicker_lightbox2_insert ? $user->imagepicker_lightbox2_insert : NULL));
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem((isset($user->imagepicker_lightbox2_insert) ? $user->imagepicker_lightbox2_insert : NULL));
   }
 
   // Iframe
@@ -343,10 +345,10 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
     $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = imagepicker_thickbox_elem((isset($user->imagepicker_advanced_thickbox) ? $user->imagepicker_advanced_thickbox : NULL));
   }
 
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem(($user->imagepicker_advanced_iframe_width ? $user->imagepicker_advanced_iframe_width : NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(($user->imagepicker_advanced_iframe_height ? $user->imagepicker_advanced_iframe_height : NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(($user->imagepicker_advanced_iframe_border ? $user->imagepicker_advanced_iframe_border : NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem(($user->imagepicker_advanced_collapsed ? $user->imagepicker_advanced_collapsed : NULL));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem((isset($user->imagepicker_advanced_iframe_width) ? $user->imagepicker_advanced_iframe_width : NULL));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem((isset($user->imagepicker_advanced_iframe_height) ? $user->imagepicker_advanced_iframe_height : NULL));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem((isset($user->imagepicker_advanced_iframe_border) ? $user->imagepicker_advanced_iframe_border : NULL));
+  $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem((isset($user->imagepicker_advanced_collapsed) ? $user->imagepicker_advanced_collapsed : NULL));
 
   if ($account) {
     $form['uid'] = array(
@@ -369,7 +371,7 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
 }
 
 function imagepicker_user_config_admin_form_validate($form, &$form_state) {
-  if ($form_state['values']['uid']) {
+  if (isset($form_state['values']['uid']) && is_numeric($form_state['values']['uid']) ) {
     $user = user_load(array('uid' => $form_state['values']['uid']));
   }
   else {
@@ -406,9 +408,6 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) && $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
     form_set_error('imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) && $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
-    form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
-  }
   if (! is_numeric($form_state['values']['imagepicker_advanced_iframe_height'])) {
     form_set_error('imagepicker_advanced_iframe_height', t('The Iframe height must be a number'));
   }
@@ -424,7 +423,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
     }
   }
   // also used by the imagepicker admin form
-  if ( $form_state['values']['imagepicker_watermark_image'] ) {
+  if (isset($form_state['values']['imagepicker_watermark_image'])) {
     $wdir = imagepicker_get_watermarks_dir($user);
     $file = $wdir . DIRECTORY_SEPARATOR . $form_state['values']['imagepicker_watermark_image'];
     if (! file_exists($file)) {
@@ -460,7 +459,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
 }
 
 function imagepicker_user_config_admin_form_submit($form, &$form_state) {
-  if ( $form_state['values']['uid'] ) {
+  if (isset($form_state['values']['uid'])) {
     $user = user_load(array('uid' => $form_state['values']['uid']));
   }
   else {
@@ -486,11 +485,11 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
     }
   }
   // got one
-  if ($file) {
+  if (isset($file)) {
     $form_state['values']['imagepicker_watermark_image'] = $file;
   }
   // save all
-  if ($form_state['values']['imagepicker_watermark_image']) {
+  if (isset($form_state['values']['imagepicker_watermark_image'])) {
     user_save($user, array('imagepicker_watermark_enable' => $form_state['values']['imagepicker_watermark_enable']));
     user_save($user, array('imagepicker_watermark_image' => $form_state['values']['imagepicker_watermark_image']));
     user_save($user, array('imagepicker_watermark_position' => $form_state['values']['imagepicker_watermark_position']));
@@ -538,7 +537,7 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
 #    user_save($user, array('imagepicker_exifinfo_enable' => $form_state['values']['imagepicker_exifinfo_enable']));
 #    user_save($user, array('imagepicker_exifinfo_external' => $form_state['values']['imagepicker_exifinfo_external']));
 #  }
-  if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
+  if (isset($form_state['values']['imagepicker_advanced_thickbox']) && module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
     user_save($user, array('imagepicker_advanced_thickbox' => $form_state['values']['imagepicker_advanced_thickbox']));
   }
   user_save($user, array('imagepicker_advanced_iframe_width' => $form_state['values']['imagepicker_advanced_iframe_width']));

@@ -449,19 +449,22 @@ function imagepicker_func_load($arg) {
  */
 function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   global $user;
-  $node = $form['#node'];
-  $node_types = node_get_types('names');
-  $node_type = in_array($node->type, variable_get('imagepicker_node_types_enabled', array_keys($node_types)), TRUE);
-  // comment
+
+  $node_type = FALSE;
   $comment = FALSE;
+  $block = FALSE;
   $weight = 1;
-  if (module_exists('comment') && variable_get('imagepicker_comment_enabled', 0) && preg_match('/comment_form$/i', $form_id) ) {
+  if (isset($form['#node'])) {
+    $node = $form['#node'];
+    $node_types = node_get_types('names');
+    $node_type = in_array($node->type, variable_get('imagepicker_node_types_enabled', array_keys($node_types)), TRUE);
+  }
+  elseif (module_exists('comment') && variable_get('imagepicker_comment_enabled', 0) && preg_match('/comment_form$/i', $form_id) ) {
     $comment = TRUE;
     $weight = 1;
   }
   // blocks
-  $block = FALSE;
-  if ( ( $form_id == 'block_add_block_form' || $form_id == 'block_admin_configure' ) && variable_get('imagepicker_blocks_enabled', 0)) {
+  elseif (( $form_id == 'block_add_block_form' || $form_id == 'block_admin_configure' ) && variable_get('imagepicker_blocks_enabled', 0)) {
     $block = TRUE;
     $weight = 1;
   }
@@ -834,19 +837,20 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
       $gid = variable_get('imagepicker_currentgroup', 0);
     }
   }
-  $default_order = ($user->imagepicker_default_browser_order ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
+  $default_order = (isset($user->imagepicker_default_browser_order) ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   if ($account && $src == 'admin') {
-    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : variable_get('imagepicker_browser_order', $default_order));
+    $order = (isset($user->imagepicker_browser_order) ? $user->imagepicker_browser_order : variable_get('imagepicker_browser_order', $default_order));
     $searchs = variable_get('imagepicker_browser_search', '');
-    $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
   }
   else {
-    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order);
-    $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
-    $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $order = (isset($user->imagepicker_browser_order) ? $user->imagepicker_browser_order : $default_order);
+    $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
+    $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
   }
   $searchs = trim($searchs);
   $sarr = '';
+  $searchsql = '';
 
   if ($searchs) {
     $xarr = _imagepicker_search_opts($searchs);
@@ -954,13 +958,14 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
 function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   global $user;
 
-  $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
-  $default_order = ($user->imagepicker_default_browser_order ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
-  $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order );
+  $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+  $default_order = (isset($user->imagepicker_default_browser_order) ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
+  $order = (isset($user->imagepicker_browser_order) ? $user->imagepicker_browser_order : $default_order );
 
-  $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
+  $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
   $searchs = trim($searchs);
   $sarr = '';
+  $searchsql = '';
   if ($searchs) {
     $xarr = _imagepicker_search_opts($searchs);
     $searchsql = $xarr[0];
@@ -988,7 +993,7 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
         $x++;
       }
     }
-    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name AS name
       FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
       {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
       WHERE g.img_id=i.img_id
@@ -1009,7 +1014,7 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
     }
   }
   elseif ($range == 2) {
-    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name AS name
       FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
       {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
       WHERE g.img_id=i.img_id
@@ -1024,8 +1029,8 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
     }
   }
   else {
-    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-      FROM {imagepicker} AS i JOIN {users} AS n USING (uid)";
+    $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name AS name
+      FROM {imagepicker} AS i JOIN {users} AS n USING (uid) WHERE i.img_id > 0";
     if ($searchsql) {
       $sql .= $searchsql;
     }
@@ -1109,6 +1114,10 @@ function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account')
 
     while ($img = db_fetch_array($result)) {
       if ($public || $src == 'admin') {
+        if (! isset($img['name'])) {
+          $tuser = user_load(array('uid' => $img['uid']));
+          $img['name'] = $tuser->name;
+        }
         $rows[$imgct]['userdir'] = array('name' => $img['name'], 'uid' => $img['uid']);
       }
       else {
@@ -1155,7 +1164,7 @@ function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account')
   }
 
   if ($src == 'account') {
-    $page = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $page = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
     $cols = (isset($user->imagepicker_advanced_browser_columns) ? $user->imagepicker_advanced_browser_columns : variable_get('imagepicker_advanced_browser_columns', 0));
   }
   else {
@@ -1217,12 +1226,13 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
     $how_many = variable_get('imagepicker_advanced_browser_page', 25);
   }
   else {
-    $how_many = ($user->imagepicker_advanced_browser_page ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
   }
 
-  $searchs = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
+  $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
   $searchs = trim($searchs);
   $sarr = '';
+  $searchsql = '';
   if ($searchs) {
     $xarr = _imagepicker_search_opts($searchs);
     $searchsql = $xarr[0];
@@ -1362,6 +1372,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
 
   $pref = '<div class="imgp_imgs_list">';
   $suff = '</div>';
+  $message = '';
   if (count($rows)) {
     if ($public && $src == 'admin') {
       $content .= drupal_get_form('imagepicker_browse_public_form');
@@ -1659,7 +1670,7 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
 function imagepicker_browse_groups_form_submit($form, &$form_state) {
   // need to get the users gids
   $account = FALSE;
-  if ( $form_state['values']['uid'] ) {
+  if ( isset($form_state['values']['uid'])) {
     $account = user_load(array('uid' => $form_state['values']['uid']));
     if ($form_state['values']['gid']) {
     variable_set('imagepicker_currentgroup', $form_state['values']['gid']);
@@ -1812,7 +1823,7 @@ function imagepicker_browse_order_form(&$form_state, $account = FALSE, $admin = 
     );
   }
   else {
-    $order = ($user->imagepicker_browser_order ? $user->imagepicker_browser_order : $default_order );
+    $order = (isset($user->imagepicker_browser_order) ? $user->imagepicker_browser_order : $default_order );
   }
   $orderlist = array(
     'img_id DESC' => t('Newest first'),
@@ -1842,7 +1853,7 @@ function imagepicker_browse_order_form(&$form_state, $account = FALSE, $admin = 
  * Submit form
  */
 function imagepicker_browse_order_form_submit($form, &$form_state) {
-  if ($form_state['values']['admin']) {
+  if (isset($form_state['values']['admin'])) {
     variable_set('imagepicker_browser_order', $form_state['values']['imagepicker_browser_order']);
   }
   else {
@@ -1886,7 +1897,7 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
   $usercount = FALSE;
   $bytecount = 0;
   if ($account) {
-    if ($account == -1) {
+    if (is_numeric($account) && $account == -1) {
       $allcount = _imagepicker_user_has_img();
       $totcount = _imagepicker_user_has_grouped_img('all');
       $publiccount = _imagepicker_user_has_grouped_img('yes');
@@ -2288,8 +2299,8 @@ function imagepicker_browse_search_form(&$form_state, $account = FALSE, $admin =
     );
   }
   else {
-    $search = ($user->imagepicker_browser_search ? $user->imagepicker_browser_search : '');
-    $sarr = ($user->imagepicker_browser_search_opts ? $user->imagepicker_browser_search_opts : '');
+    $search = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
+    $sarr = (isset($user->imagepicker_browser_search_opts) ? $user->imagepicker_browser_search_opts : '');
   }
 
   $form['imagepicker_browser_search'] = array(
@@ -2339,7 +2350,7 @@ function imagepicker_browse_search_form_submit($form, &$form_state) {
         'desc' => $form_state['values']['imagepicker_browser_search_by_desc'],
         'title' => $form_state['values']['imagepicker_browser_search_by_title']);
     $search = $form_state['values']['imagepicker_browser_search'];
-    if ($form_state['values']['admin']) {
+    if (isset($form_state['values']['admin'])) {
       variable_set('imagepicker_browser_search', $search);
       variable_set('imagepicker_browser_search_opts', $arr);
     }
@@ -2349,7 +2360,7 @@ function imagepicker_browse_search_form_submit($form, &$form_state) {
     }
   }
   else {
-    if ($form_state['values']['admin']) {
+    if (isset($form_state['values']['admin'])) {
       variable_del('imagepicker_browser_search');
       variable_del('imagepicker_browser_search_opts');
     }
@@ -2364,7 +2375,7 @@ function imagepicker_browse_search_form_submit($form, &$form_state) {
  * Submit Reset button.
  */
 function imagepicker_browse_search_form_reset($form, &$form_state) {
-  imagepicker_browse_search_form_reset_func($form_state['values']['admin']);
+  imagepicker_browse_search_form_reset_func( (isset($form_state['values']['admin']) ? TRUE : FALSE));
 }
 
 function imagepicker_browse_search_form_reset_func($admin = FALSE) {
@@ -2381,6 +2392,16 @@ function imagepicker_browse_search_form_reset_func($admin = FALSE) {
 
 function _imagepicker_search_opts($searchs) {
   $search_opts = variable_get('imagepicker_browser_search_opts', array());
+  if (! isset($search_opts['name'])) {
+    $search_opts['name'] = FALSE;
+  }
+  if (! isset($search_opts['desc'])) {
+    $search_opts['desc'] = FALSE;
+  }
+  if (! isset($search_opts['title'])) {
+    $search_opts['title'] = FALSE;
+  }
+
   if (   $search_opts['name']
     && ! $search_opts['desc']
     && ! $search_opts['title']) {
