@@ -281,10 +281,10 @@ function imagepicker_upload_form_submit($form, &$form_state) {
       drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
     }
   }
-  if ($form_state['values']['admin']) {
+  if (isset($form_state['values']['admin'])) {
     $outpath = 'admin/settings/imagepicker/images';
   }
-  elseif ($form_state['values']['account']) {
+  elseif (isset($form_state['values']['account'])) {
     $outpath = 'user/'. $user->uid .'/imagepicker';
   }
   else {

@@ -92,6 +92,13 @@ function imagepicker_settings_form($form_state) {
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_use_cssbox', 0),
   );
+  $form['imagepicker_settings']['imagepicker_use_icons'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Icons in tables'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_icons', 1),
+    '#description' => t('Setting this option enables icons in tables.'),
+  );
 
   // default options
   $form['imagepicker_defaults'] = array(

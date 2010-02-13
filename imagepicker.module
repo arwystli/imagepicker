@@ -1221,6 +1221,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
   elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
     $content .= drupal_get_form('imagepicker_browse_search_form');
   }
+  $use_icons = variable_get('imagepicker_use_icons', 1);
 
   if ($src == 'admin') {
     $how_many = variable_get('imagepicker_advanced_browser_page', 25);
@@ -1351,8 +1352,8 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         $description,
         l($row['name'], $listpath),
         check_plain($row['img_date']),
-        l(t('Edit'), $editpath . $row['img_id']),
-        l(t('Delete'), $deletepath . $row['img_id']),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
       );
     }
     else {
@@ -1361,8 +1362,8 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         check_plain($row['img_title']),
         $description,
         check_plain($row['img_date']),
-        l(t('Edit'), $editpath . $row['img_id']),
-        l(t('Delete'), $deletepath . $row['img_id']),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
       );
     }
 
@@ -2815,4 +2816,36 @@ function imagepicker_user_has_role($role, $user=NULL) {
     }
   }
   return FALSE;
+}
+
+/**
+ * Function to get an icon
+ * Derived from invoice module
+ *
+ * @param $name
+ *   Name of icon without extension.
+ * @param $url
+ *   URL to link the icon to.
+ * @param $attributes
+ *   Any optional HTML attributes.
+ * @param $extension
+ *   The file extension.
+ * @return
+ *   The icon string.
+ */
+function _imagepicker_get_icon($name, $url = NULL, $attributes = array(), $extension = 'png') {
+  if (empty($attributes['alt'])) {
+    $attributes['alt'] = $attributes['title'];
+  }
+
+  $img_addition = '';
+  foreach ($attributes as $key => $value) {
+    $img_addition .= ' '. $key .'="'. $value .'"';
+  }
+
+  $icon = '<img src="'. base_path() . drupal_get_path('module', 'imagepicker') .'/images/'. $name .'.'. $extension .'"'. $img_addition .' />';
+  if (!empty($url)) {
+    $icon = l($icon, $url, array('html' => TRUE));
+  }
+  return $icon;
 }

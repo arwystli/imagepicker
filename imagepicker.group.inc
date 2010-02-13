@@ -290,6 +290,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
 
   $content = "";
   $how_many = variable_get('imagepicker_rows_per_page', 25);
+  $use_icons = variable_get('imagepicker_use_icons', 1);
 
   if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
     $header = array(
@@ -329,8 +330,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
         ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
         (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
         ($row['public'] ? t('Yes') : t('No')),
-        l(t('Edit'), $editpath . $row['gid']),
-        l(t('Delete'), $deletepath . $row['gid']),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['gid'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['gid'])),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['gid'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['gid'])),
       );
     }
     else {
@@ -339,8 +340,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
         check_plain($row['group_description']),
         ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
         (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
-        l(t('Edit'), $editpath . $row['gid']),
-        l(t('Delete'), $deletepath . $row['gid']),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['gid'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['gid'])),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['gid'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['gid'])),
       );
     }
     $rows[] = $row_data;
