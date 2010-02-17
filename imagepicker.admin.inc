@@ -470,10 +470,10 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
-  if ( imagepicker_image_check_functions(TRUE) && $form_state['values']['imagepicker_watermark_enable'] ) {
-    include_once('imagepicker.user.inc');
-    imagepicker_user_config_admin_form_validate($form, $form_state);
-  }
+#  if (imagepicker_image_check_functions(TRUE) && $form_state['values']['imagepicker_watermark_enable'] && empty($form_state['values']['imagepicker_watermark_image'])) {
+#    include_once('imagepicker.user.inc');
+#    imagepicker_user_config_admin_form_validate($form, $form_state);
+#  }
   if ($form_state['values']['imagepicker_exifinfo_external'] != "" && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
     form_set_error('imagepicker_exifinfo_external', t('file does not exist or is not executable'));
   }

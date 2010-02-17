@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-02-17
+------------------------------------
+by hutch, fixed bug in admin watermarks validation
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-02-13
 ------------------------------------
 by hutch, added icons
