@@ -33,7 +33,7 @@ Drupal.imagepicker_upload_progress_show = function() {
 
 // Global killswitch
 if (Drupal.jsEnabled) {
-  $(document).ready( function() {
+  Drupal.behaviors.imagepicker = function() {
     // Attaches the upload behaviour to the imagepicker upload form.
     $('#imagepicker-upload-form').submit(Drupal.imagepicker_upload_progress_hide_timeout);
 
@@ -102,7 +102,5 @@ if (Drupal.jsEnabled) {
         $("#wrap-imagepicker-upload-progress").hide();
       }
     });
-
-
-  });
+  };
 }
