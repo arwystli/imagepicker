@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-04-24
+------------------------------------
+by hutch, added support for Colorbox module
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-02-25
 ------------------------------------
 by hutch, Drupal.behaviors applied to js

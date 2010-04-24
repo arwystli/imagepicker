@@ -135,6 +135,9 @@ if (Drupal.jsEnabled) {
         case 'thickbox':
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='thickbox' >" + imgpImageElement + "</a>";
           break;
+        case 'colorbox':
+          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='colorbox' >" + imgpImageElement + "</a>";
+          break;
         case 'file':
         default:
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' target='_blank' >" + imgpImageElement + "</a>";

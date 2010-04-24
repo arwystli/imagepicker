@@ -230,6 +230,9 @@ function imagepicker_get_link_opts($default = NULL) {
   if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1) ) {
     $linkoptions['thickbox'] = t('Thickbox');
   }
+  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 1) ) {
+    $linkoptions['colorbox'] = t('Colorbox');
+  }
   return array(
     '#type' => 'radios',
     '#title' => t('Link'),
