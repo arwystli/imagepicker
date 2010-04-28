@@ -344,7 +344,9 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
   if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js') && variable_get('imagepicker_advanced_thickbox', 0) ) {
     $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = imagepicker_thickbox_elem((isset($user->imagepicker_advanced_thickbox) ? $user->imagepicker_advanced_thickbox : NULL));
   }
-
+  if (module_exists('colorbox') && variable_get('colorbox_load', 0)) {
+    $form['imagepicker_iframe']['imagepicker_advanced_colorbox'] = imagepicker_colorbox_elem((isset($user->imagepicker_advanced_colorbox) ? $user->imagepicker_advanced_colorbox : NULL));
+  }
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem((isset($user->imagepicker_advanced_iframe_width) ? $user->imagepicker_advanced_iframe_width : NULL));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem((isset($user->imagepicker_advanced_iframe_height) ? $user->imagepicker_advanced_iframe_height : NULL));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem((isset($user->imagepicker_advanced_iframe_border) ? $user->imagepicker_advanced_iframe_border : NULL));
@@ -540,11 +542,14 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   if (isset($form_state['values']['imagepicker_advanced_thickbox']) && module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
     user_save($user, array('imagepicker_advanced_thickbox' => $form_state['values']['imagepicker_advanced_thickbox']));
   }
+  if (isset($form_state['values']['imagepicker_advanced_colorbox']) && module_exists('colorbox')) {
+    user_save($user, array('imagepicker_advanced_colorbox' => $form_state['values']['imagepicker_advanced_colorbox']));
+  }
   user_save($user, array('imagepicker_advanced_iframe_width' => $form_state['values']['imagepicker_advanced_iframe_width']));
   user_save($user, array('imagepicker_advanced_iframe_height' => $form_state['values']['imagepicker_advanced_iframe_height']));
   user_save($user, array('imagepicker_advanced_iframe_border' => $form_state['values']['imagepicker_advanced_iframe_border']));
   user_save($user, array('imagepicker_advanced_collapsed' => $form_state['values']['imagepicker_advanced_collapsed']));
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 0)) {
     user_save($user, array('imagepicker_lightbox2_insert' => $form_state['values']['imagepicker_lightbox2_insert']));
   }
 
@@ -575,6 +580,7 @@ function imagepicker_user_config_form_reset($form, &$form_state) {
   user_save($user, array('imagepicker_show_browse_search_form' => NULL));
   user_save($user, array('imagepicker_default_pagelink' => NULL));
   user_save($user, array('imagepicker_advanced_thickbox' => NULL));
+  user_save($user, array('imagepicker_advanced_colorbox' => NULL));
   user_save($user, array('imagepicker_advanced_iframe_width' => NULL));
   user_save($user, array('imagepicker_advanced_iframe_height' => NULL));
   user_save($user, array('imagepicker_advanced_iframe_border' => NULL));

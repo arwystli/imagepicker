@@ -159,13 +159,19 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
     drupal_add_js($path .'/imagepicker_iframe.js');
   }
 
-  $vars['content'] = $content;
-  $vars['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
-  $vars['styles'] = drupal_get_css();
-  $vars['scripts'] = drupal_get_js();
-  $vars['tabs'] = theme('menu_local_tasks');
-  $vars['messages'] = imagepicker_strip_messages(theme('status_messages'));
-  $vars['language'] = $language;
+  $variables['content'] = $content;
+  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
+  $variables['styles'] = drupal_get_css();
+  $variables['scripts'] = drupal_get_js();
+  $variables['tabs'] = theme('menu_local_tasks');
+  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
+  $variables['language'] = $language;
+
+  // fix jquery version thing in the iframe
+  if (module_exists('jquery_update')) {
+    jquery_update_preprocess_page($variables);
+  }
+
   $template = 'imagepicker-page.tpl.php';
   $defaulttemplate = variable_get('theme_default', '');
   if ($defaulttemplate) {
@@ -177,7 +183,7 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
       $template = $path .'/'. $template;
     }
   }
-  echo theme_render_template($template, $vars);
+  echo theme_render_template($template, $variables);
   exit;
 }
 

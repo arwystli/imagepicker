@@ -105,6 +105,15 @@ function imagepicker_thickbox_elem($default = NULL) {
       '#default_value' => (is_numeric($default) ? $default : variable_get('imagepicker_advanced_thickbox', 0)),
     );
 }
+function imagepicker_colorbox_elem($default = NULL) {
+  return array(
+      '#type' => 'checkbox',
+      '#title' => t('Colorbox Iframe'),
+      '#description' => t('Use colorbox iframe instead of the builtin one.'),
+      '#return_value' => 1,
+      '#default_value' => (is_numeric($default) ? $default : variable_get('imagepicker_advanced_colorbox', 0)),
+    );
+}
 function imagepicker_iframe_width_elem($default = NULL) {
   return array(
     '#type' => 'textfield',
@@ -224,13 +233,13 @@ function imagepicker_get_show_opts($default = NULL) {
 }
 function imagepicker_get_link_opts($default = NULL) {
   $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
+  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 0) ) {
     $linkoptions['lightbox'] = t('Lightbox');
   }
-  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1) ) {
+  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 0) ) {
     $linkoptions['thickbox'] = t('Thickbox');
   }
-  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 1) ) {
+  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0) ) {
     $linkoptions['colorbox'] = t('Colorbox');
   }
   return array(

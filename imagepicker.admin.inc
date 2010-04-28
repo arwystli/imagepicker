@@ -316,6 +316,9 @@ function imagepicker_settings_form($form_state) {
   if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js')) {
     $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = imagepicker_thickbox_elem(variable_get('imagepicker_advanced_thickbox', 0));
   }
+  if (module_exists('colorbox') && variable_get('colorbox_load', 0)) {
+    $form['imagepicker_iframe']['imagepicker_advanced_colorbox'] = imagepicker_colorbox_elem(variable_get('imagepicker_advanced_colorbox', 0));
+  }
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem(variable_get('imagepicker_advanced_iframe_width', "100%"));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(variable_get('imagepicker_advanced_iframe_height', "500"));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(variable_get('imagepicker_advanced_iframe_border', "0"));

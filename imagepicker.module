@@ -488,6 +488,12 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     if (imagepicker_get_thickbox_perms()) {
       $iurl = l('Run imagepicker', 'imagepicker' );
     }
+    elseif (imagepicker_get_colorbox_perms()) {
+      $iurl = l('Run imagepicker', 'imagepicker', array(
+        'query' => array('width' => $width, 'height' => $height, 'iframe' => 'true'),
+        'attributes' => array('class' => 'colorbox-load')
+      ));
+    }
     else {
       $iurl = '<iframe id="imagepicker" style="width: '. $width .'; height: '. $height .'px; border: '. $border .';" src="'. url('imagepicker') .'">Imagepicker requires iframe support.</iframe>';
     }
@@ -2273,6 +2279,23 @@ function imagepicker_get_thickbox_perms() {
   return FALSE;
 }
 
+function imagepicker_get_colorbox_perms() {
+  global $user;
+  if ((module_exists('colorbox')
+    && isset($user->imagepicker_advanced_colorbox)
+    && $user->imagepicker_advanced_colorbox
+    && variable_get('imagepicker_advanced_colorbox', 0 )
+    && variable_get('colorbox_load', 0))
+      || (module_exists('colorbox')
+    && ! isset($user->imagepicker_advanced_colorbox)
+    && variable_get('imagepicker_advanced_colorbox', 0)
+    && variable_get('colorbox_load', 0))
+    ) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
 /**
  * Function to display the image search form
  *
@@ -2849,3 +2872,4 @@ function _imagepicker_get_icon($name, $url = NULL, $attributes = array(), $exten
   }
   return $icon;
 }
+

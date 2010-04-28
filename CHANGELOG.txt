@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-04-28
+------------------------------------
+by hutch, added support for Colorbox iframe
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-04-24
 ------------------------------------
 by hutch, added support for Colorbox module
