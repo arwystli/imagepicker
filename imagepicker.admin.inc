@@ -173,7 +173,7 @@ function imagepicker_settings_form($form_state) {
         '#title' => t('Enable Lightbox2 in Imagepicker'),
         '#description' => t('Setting this option will enable Lightbox2 in Imagepicker.'),
         '#return_value' => 1,
-        '#default_value' => variable_get('imagepicker_lightbox2_enable', 1),
+        '#default_value' => variable_get('imagepicker_lightbox2_enable', 0),
       );
       $form['imagepicker_module']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem(variable_get('imagepicker_lightbox2_insert', 'lightbox'));
     }
@@ -183,7 +183,7 @@ function imagepicker_settings_form($form_state) {
         '#title' => t('Enable Thickbox in Imagepicker'),
         '#description' => t('Setting this option will enable Thickbox in Imagepicker.'),
         '#return_value' => 1,
-        '#default_value' => variable_get('imagepicker_thickbox_enable', 1),
+        '#default_value' => variable_get('imagepicker_thickbox_enable', 0),
       );
     }
     if (module_exists('colorbox')) {
@@ -192,7 +192,7 @@ function imagepicker_settings_form($form_state) {
         '#title' => t('Enable Colorbox in Imagepicker'),
         '#description' => t('Setting this option will enable Colorbox in Imagepicker.'),
         '#return_value' => 1,
-        '#default_value' => variable_get('imagepicker_colorbox_enable', 1),
+        '#default_value' => variable_get('imagepicker_colorbox_enable', 0),
       );
     }
   }

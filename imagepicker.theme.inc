@@ -148,10 +148,10 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
         'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->imagepicker_default_align_show) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->imagepicker_default_align_show) && $user->imagepicker_default_align_show) ? 1 : 0),
         'default_fleft' => (isset($user->imagepicker_default_fleft) ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
         'default_fright' => (isset($user->imagepicker_default_fright) ? $user->imagepicker_default_fright : variable_get('imagepicker_default_fright', 'style="float: right"')),
-        'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
+        'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 0)),
         'lightbox2_insert' => (isset($user->imagepicker_lightbox2_insert) ? $user->imagepicker_lightbox2_insert : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
-        'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1)),
-        'colorbox_enable' => (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 1)),
+        'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 0)),
+        'colorbox_enable' => (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)),
       ),
     );
 
