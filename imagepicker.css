@@ -131,3 +131,7 @@
 #imgp_targ {
   display: none;
 }
+/* add this to your style.css to control the body of the imagepicker iframe */
+#imagepicker {
+
+}
