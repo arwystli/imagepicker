@@ -72,6 +72,7 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
  * Submit form functions
  */
 function imagepicker_edit_form_cancel($form, &$form_state) {
+  $img_id = $form_state['values']['img_id'];
   if ($form_state['values']['account'] && $form_state['values']['src'] == 'admin') {
     $user = user_load(array('uid' => $form_state['values']['account'] ));
   }

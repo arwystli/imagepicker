@@ -557,6 +557,7 @@ function imagepicker_admin_users_list($dir, $label='') {
 
 function imagepicker_admin_groups_list($label="") {
   $how_many = variable_get('imagepicker_rows_per_page', 25);
+  $use_icons = variable_get('imagepicker_use_icons', 1);
     $header = array(
       array('data' => t('Group Name'), 'field' => 'g.group_name'),
       array('data' => t('User Name'), 'field' => 'u.name'),
@@ -571,13 +572,15 @@ function imagepicker_admin_groups_list($label="") {
   $result = db_query($sql);
   $rowcount = 0;
   while ($row = db_fetch_array($result)) {
+    $editpath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/edit/'. $row['gid'];
+    $deletepath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/delete/'. $row['gid'];
     $row_data = array(
       $row['group_name'],
       l($row['name'], 'admin/settings/imagepicker/groups/user/'. $row['uid']),
       ($row['public'] ? t('Public') : t('Private')),
       ($row['ct'] ? l(format_plural($row['ct'], '1 image', '@count images'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
-      l(t('Edit'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/edit/'. $row['gid']) ,
-      l(t('Delete'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/delete/'. $row['gid']) ,
+      ($use_icons ? _imagepicker_get_icon('edit', $editpath, array('title' => t('Edit'))) : l(t('Edit'), $editpath)),
+      ($use_icons ?  _imagepicker_get_icon('delete', $deletepath, array('title' => t('Delete'))) : l(t('Delete'), $deletepath)),
     );
     $rows[] = $row_data;
     $rowcount++;
