@@ -253,6 +253,8 @@ function imagepicker_upload_form_submit($form, &$form_state) {
             else {
               $outpath = 'imagepicker/browse/'. $nextimgid;
             }
+            // external functions
+            module_invoke_all('imagepicker_upload_extra', $nextimgid);
             drupal_goto($outpath);
           }
           else {

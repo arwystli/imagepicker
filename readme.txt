@@ -93,3 +93,9 @@ In the 2 series there is the ability for an administrator to
 view/add/edit/delete anything.
 The directories under files/imagepicker are now stored under uid. Older systems
 should still run. See the configuration tab 'Validate Files'
+
+	Imagepicker external hook
+There is now an external hook in the upload submit function,
+called 'imagepicker_upload_extra'. So other modules can do things to images.
+It passes the new image id using the Drupal function module_invoke_all().
+

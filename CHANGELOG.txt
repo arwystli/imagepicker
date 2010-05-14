@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-05-14
+------------------------------------
+by hutch, added external hook 'imagepicker_upload_extra'
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-05-13
 ------------------------------------
 by hutch, fixed issues in #796524, #797612, added icons to admin/groups
