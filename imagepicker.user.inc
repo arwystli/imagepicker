@@ -147,7 +147,7 @@ function imagepicker_user_image_form(&$form_state, $img_id) {
     '#submit' => array('imagepicker_user_image_form_delete'),
   );
   $form['img_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $img_id,
   );
   return $form;
@@ -354,7 +354,7 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
 
   if ($account) {
     $form['uid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $user->uid,
     );
   }

@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-05-15
+------------------------------------
+by hutch, added public select box, 
+changed hidden formfields to 'value'
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-05-14
 ------------------------------------
 by hutch, added external hook 'imagepicker_upload_extra'

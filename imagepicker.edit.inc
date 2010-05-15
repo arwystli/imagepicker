@@ -41,16 +41,16 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
   );
   if ($account) {
     $form['account'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $account->uid,
     );
   }
   $form['img_id'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $img['img_id'],
     );
   $form['src'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $src,
   );
   $form['submit'] = array(

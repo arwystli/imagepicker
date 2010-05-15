@@ -88,7 +88,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
     }
     elseif (variable_get('imagepicker_watermark_image', '')) {
       $form['watermark'] = array(
-        '#type' => 'hidden',
+        '#type' => 'value',
         '#value' => 1,
       );
     }
@@ -108,13 +108,13 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
 
   if ($account) {
     $form['account'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $user->uid,
     );
   }
   if ($admin) {
     $form['admin'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => 1,
     );
   }

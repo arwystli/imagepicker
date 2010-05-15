@@ -640,7 +640,7 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
     );
   }
   $form['img_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $img_id,
   );
 
@@ -964,6 +964,18 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
 function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   global $user;
 
+  // if there are groups
+  $gid = 0;
+  if (_imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
+    if ($src == 'admin') {
+      $gid = variable_get('imagepicker_public_currentgroup', 0);
+    }
+    else {
+      // get the current users setting
+      $gid = (isset($user->imagepicker_public_currentgroup) ? $user->imagepicker_public_currentgroup : 0);
+    }
+  }
+
   $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
   $default_order = (isset($user->imagepicker_default_browser_order) ? $user->imagepicker_default_browser_order : variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   $order = (isset($user->imagepicker_browser_order) ? $user->imagepicker_browser_order : $default_order );
@@ -1005,19 +1017,23 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
       WHERE g.img_id=i.img_id
       AND u.public=1 ";
 
+    if ($gid) {
+      $sql .= " AND u.gid = %d";
+      $garr = array($gid);
+      $rarr = array_merge($rarr, $garr);
+    }
+
     if ($rolesql) {
       $sql .= $rolesql;
+      $rarr = array_merge($rarr, $rolesarr);
     }
     if ($searchsql) {
       $sql .= $searchsql;
+      if ( is_array($sarr) ) {
+        $rarr = array_merge($rarr, $sarr);
+      }
     }
     $sql .= " ORDER BY %s";
-    if ( count($rolesarr) > 0 ) {
-      $rarr = $rolesarr;
-    }
-    if ( is_array($sarr) ) {
-      $rarr = array_merge($rarr, $sarr);
-    }
   }
   elseif ($range == 2) {
     $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name AS name
@@ -1092,6 +1108,11 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
     $forms[] = drupal_get_form('imagepicker_browse_public_form');
   }
 
+  if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
+    // add groups select here
+    $forms[] = drupal_get_form('imagepicker_browse_public_groups_form', $user, ($src=='admin' ? TRUE : FALSE));
+  }
+
   if (isset($user->imagepicker_show_browse_search_form)) {
     if ($user->imagepicker_show_browse_search_form) {
       $forms[] = drupal_get_form('imagepicker_browse_search_form');
@@ -1100,6 +1121,8 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
     $forms[] = drupal_get_form('imagepicker_browse_search_form');
   }
+
+
 
   if ($src == "account" || $src == 'admin') {
     $help = '<div class="imgp_help">'. t('Hold the mouse over an image to view Name, Title and Description, Click on it to view.') .'</div>';
@@ -1220,6 +1243,9 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         }
       }
     }
+    elseif($src == 'admin' && _imagepicker_has_public_groups($user, TRUE)) {
+      $gid = variable_get('imagepicker_public_currentgroup', 0);
+    }
   }
   if ($src != 'admin' && isset($user->imagepicker_show_browse_search_form) && $user->imagepicker_show_browse_search_form ) {
     $content .= drupal_get_form('imagepicker_browse_search_form');
@@ -1275,7 +1301,12 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
       if ($searchsql) {
         $sql .= $searchsql;
       }
+      if ($gid) {
+        $sql .= " AND u.gid = %d";
+        $garr = array($gid);
+      }
       $sql .= tablesort_sql($header);
+      $label = t('List All Public Images');
     }
     elseif ($range == 2) {
       $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
@@ -1285,6 +1316,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         $sql .= $searchsql;
       }
       $sql .= tablesort_sql($header);
+      $label = t('List All Private Images');
     }
     else {
       $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
@@ -1295,8 +1327,15 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
       }
       $sql .= tablesort_sql($header);
     }
-    if (is_array($sarr) ) {
-      $result = pager_query($sql, $how_many, 0, NULL, $sarr);
+    if (is_array($sarr) || is_array($garr)) {
+      $rarr = array();
+      if (is_array($sarr)) {
+        $rarr = $sarr;
+      }
+      if (is_array($garr)) {
+        $rarr = array_merge($rarr, $garr);
+      }
+      $result = pager_query($sql, $how_many, 0, NULL, $rarr);
     }
     else {
       $result = pager_query($sql, $how_many, 0, NULL);
@@ -1376,13 +1415,16 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
     $rows[] = $row_data;
   }
 
-
   $pref = '<div class="imgp_imgs_list">';
   $suff = '</div>';
   $message = '';
   if (count($rows)) {
     if ($public && $src == 'admin') {
       $content .= drupal_get_form('imagepicker_browse_public_form');
+      if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
+        // add groups select here
+        $content .= drupal_get_form('imagepicker_browse_public_groups_form', $user, TRUE);
+      }
     }
   }
   else {
@@ -1590,6 +1632,64 @@ function imagepicker_has_grouplist($account = FALSE) {
   return $ct;
 }
 
+// for public dropdown
+function imagepicker_get_public_grouplist($account = FALSE, $admin = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  $grouplist = array('0' => 'All');
+  $tmp = '';
+  $result = db_query("
+    SELECT g.gid, g.group_name, g.avail_roles
+    FROM {imagepicker_user_groups} AS g
+    WHERE g.public = 1");
+  $rowct = 0;
+  while ($row = db_fetch_array($result)) {
+    $tmp[$rowct]['gid'] = $row['gid'];
+    $tmp[$rowct]['group_name'] = $row['group_name'];
+    $tmp[$rowct]['avail_roles'] = $row['avail_roles'];
+    $rowct++;
+  }
+  // filter for role
+  if (is_array($tmp)) {
+    for ($ct = 0; $ct < $rowct; $ct++) {
+      if (! $admin) {
+        if ($tmp[$ct]['avail_roles'] != 'all') {
+          $role = $tmp[$ct]['avail_roles'];
+          if (imagepicker_user_has_role($role, $user)) {
+            $grouplist[$tmp[$ct]['gid']] = $tmp[$ct]['group_name'];
+          }
+        }
+        else {
+          $grouplist[$tmp[$ct]['gid']] = $tmp[$ct]['group_name'];
+        }
+      }
+      else {
+        $grouplist[$tmp[$ct]['gid']] = $tmp[$ct]['group_name'];
+      }
+    }
+    return $grouplist;
+  }
+  return FALSE;
+}
+
+function _imagepicker_has_public_groups($account=FALSE, $admin = FALSE) {
+  if (! variable_get('imagepicker_groups_enabled', 0)) {
+    return 0;
+  }
+  if ($admin && variable_get('imagepicker_browse_public', 0) != 1) {
+    return 0;
+  }
+  $list = imagepicker_get_public_grouplist($account, $admin);
+  if (is_array($list)){
+    return count($list);
+  }
+  return 0;
+}
+
 function _imagepicker_has_groups($account=FALSE) {
   if (! variable_get('imagepicker_groups_enabled', 0)) {
     return 0;
@@ -1658,7 +1758,7 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
   );
   if ($account) {
     $form['uid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $user->uid,
     );
   }
@@ -1700,6 +1800,80 @@ function imagepicker_browse_groups_form_submit($form, &$form_state) {
 }
 
 /**
+ * Submit public browse groups form
+ *
+ * @param $account
+ *   Optional,
+ * @param $admin
+ *   Optional, sets where the form is coming from
+ * @return
+ *   Returns the form.
+ */
+function imagepicker_browse_public_groups_form(&$form_state, $account = FALSE, $admin = FALSE) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+
+  // all the groups for the current user which have images attached
+  $grouplist = imagepicker_get_public_grouplist($user, $admin);
+  if ($admin) {
+    $enabledlist = variable_get('imagepicker_public_currentgroup', 0);
+  }
+  else {
+    $enabledlist = (isset($user->imagepicker_public_currentgroup) ? $user->imagepicker_public_currentgroup : 0);
+  }
+
+
+  $form['gid'] = array(
+    '#type' => 'select',
+    '#default_value' => $enabledlist,
+    '#options' => $grouplist,
+    '#title' => t('Public Group'),
+    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
+  );
+  if ($admin) {
+    $form['admin'] = array(
+      '#type' => 'value',
+      '#value' => TRUE,
+    );
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Go'),
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit public browse groups form
+ */
+function imagepicker_browse_public_groups_form_submit($form, &$form_state) {
+
+  if ( isset($form_state['values']['admin'])) {
+    if ($form_state['values']['gid'] > 0) {
+    variable_set('imagepicker_public_currentgroup', $form_state['values']['gid']);
+    }
+    else {
+    variable_del('imagepicker_public_currentgroup');
+    }
+  }
+  else {
+    global $user;
+    if ($form_state['values']['gid'] > 0) {
+      user_save($user, array('imagepicker_public_currentgroup' => $form_state['values']['gid']));
+    }
+    else {
+      user_save($user, array('imagepicker_public_currentgroup' => NULL));
+    }
+  }
+}
+
+/**
  * Insert a form into the edit image page to allow the image to be associated with a group.
  *
  * @param $img_id
@@ -1731,7 +1905,7 @@ function imagepicker_group_images_form(&$form_state, $img_id, $account = FALSE) 
     '#value' => t('Save group settings'),
     );
   $form['img_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $img_id,
   );
   return $form;
@@ -1825,7 +1999,7 @@ function imagepicker_browse_order_form(&$form_state, $account = FALSE, $admin = 
   if ($admin) {
     $order = variable_get('imagepicker_browser_order', $default_order);
     $form['admin'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => TRUE,
     );
   }
@@ -2097,7 +2271,6 @@ function _imagepicker_bkmg($number) {
   return (round(($number/$count)*$inc, 2) .' '. $sym);
 }
 
-
 function imagepicker_get_quota_list($key = 'x') {
   $list = array(
     0 => t('Unlimited'),
@@ -2318,7 +2491,7 @@ function imagepicker_browse_search_form(&$form_state, $account = FALSE, $admin =
     $search = variable_get('imagepicker_browser_search', '');
     $sarr = variable_get('imagepicker_browser_search_opts', '');
     $form['admin'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => TRUE,
     );
   }
@@ -2569,19 +2742,19 @@ function imagepicker_copy_form(&$form_state, $img_id, $img_name, $account = FALS
   }
   if ($admin) {
     $form['admin'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => TRUE,
     );
   }
   if ($account) {
     $form['uid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $user->uid,
     );
   }
 
   $form['img_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $img_id,
   );
 
@@ -2619,7 +2792,7 @@ function imagepicker_copy_form(&$form_state, $img_id, $img_name, $account = FALS
     }
     elseif (variable_get('imagepicker_watermark_image', '')) {
       $form['watermark'] = array(
-        '#type' => 'hidden',
+        '#type' => 'value',
         '#value' => 1,
       );
     }

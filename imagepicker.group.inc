@@ -114,13 +114,13 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
 
   if ($account) {
     $form['groupsave']['account'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $account->uid,
     );
   }
   if (isset($record->gid)) {
     $form['groupsave']['gid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $record->gid,
     );
   }
@@ -230,11 +230,11 @@ function imagepicker_group_delete_form(&$form_state, $gid) {
       '#value' => '<p>'. $record->group_name .'</p>',
     );
     $form['mode'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => 'reallydelete',
     );
     $form['gid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $gid,
     );
     $form['delete'] = array(

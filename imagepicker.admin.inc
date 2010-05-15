@@ -637,12 +637,12 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
 function imagepicker_admin_image_form($form_state, $img_id, $account = FALSE) {
   if ($account) {
     $form['account'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $account->uid,
     );
   }
   $form['img_id'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $img_id,
   );
   $form['edit'] = array(
@@ -683,7 +683,7 @@ function imagepicker_user_search_form($form_state, $dir) {
     '#prefix' => '<div id="imgp_users_form" class="container-inline">',
   );
   $form['dir'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $dir,
   );
   $form['imagepicker_stats_submit'] = array(
@@ -759,7 +759,7 @@ function imagepicker_convert_form($form_state) {
     '#weight' => ($fstype == 'numeric' ? 10 : -10),
   );
   $form['imagepicker_files']['step'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $step,
   );
   switch ($step) {
@@ -775,7 +775,7 @@ function imagepicker_convert_form($form_state) {
         '#suffix' => '</div>',
       );
       $form['imagepicker_files']['imagepicker_files_validate'] = array(
-        '#type' => 'hidden',
+        '#type' => 'value',
         '#value' => 1,
       );
       break;
@@ -786,7 +786,7 @@ function imagepicker_convert_form($form_state) {
         '#suffix' => '</p>',
       );
       $form['imagepicker_files']['imagepicker_files_validate'] = array(
-        '#type' => 'hidden',
+        '#type' => 'value',
         '#value' => 1,
       );
       if ($fstype == 'alpha') {
@@ -796,7 +796,7 @@ function imagepicker_convert_form($form_state) {
           '#suffix' => '</p>',
         );
         $form['imagepicker_files']['imagepicker_files_convert_to_numeric'] = array(
-          '#type' => 'hidden',
+          '#type' => 'value',
           '#value' => 1,
         );
       }
@@ -1483,7 +1483,7 @@ function imagepicker_group_search_form($form_state, $dir = 'groups') {
     '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   $form['dir'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => $dir,
   );
   $form['imagepicker_group_search_submit'] = array(
@@ -1533,7 +1533,7 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
     '#prefix' => '<div id="imgp_quota_form" class="container-inline">',
   );
   $form['account'] = array(
-    '#type' => 'hidden',
+    '#type' => 'value',
     '#value' => ($account ? $account->uid : 0),
   );
   $form['submit'] = array(
