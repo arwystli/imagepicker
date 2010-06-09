@@ -293,7 +293,7 @@ function theme_imagepicker_view($img, $imgpath, $info, $exifinfo='') {
         $rows = array();
         foreach ($section as $name => $val) {
           if ($key == 'COMMENT') {
-            $a = split(':', $val);
+            $a = explode(':', $val);
             $rows[] = array($a[0] . ':', $a[1]);
           }
           else {

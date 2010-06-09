@@ -207,7 +207,7 @@ function imagepicker_show_browse_search_form_elem($default = NULL) {
 
 // align options
 function imagepicker_get_align_opts($default = NULL) {
-  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float right'));
+  $alignoptions = array('none' => t('None'), 'fleft' => t('Float Left'), 'fright' => t('Float Right'));
   return array(
     '#type' => 'radios',
     '#title' => t('Align'),

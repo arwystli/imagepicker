@@ -38,7 +38,7 @@ if (Drupal.jsEnabled) {
       var imgpImagePath;
       var imgpImageElement;
       var imgpImageStyle;
-      var imgpImageCss = '';
+      var imgpImageCss = 'class="imgp_img"';
       var imgpInsertion;
       var imgpImageAlt = Drupal.settings['imagepicker_iframe']['imgpImageAlt'];
       var imgpImageTitle = Drupal.settings['imagepicker_iframe']['imgpImageTitle'];

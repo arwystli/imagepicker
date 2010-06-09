@@ -1,9 +1,14 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-06-09
+------------------------------------
+by hutch, added class imgp_img to inserted image
+replaced split() with explode()
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-05-15
 ------------------------------------
-by hutch, added public select box, 
+by hutch, added public select box,
 changed hidden formfields to 'value'
 
 Image Picker  for D6 in DRUPAL-6--2, 20010-05-14
