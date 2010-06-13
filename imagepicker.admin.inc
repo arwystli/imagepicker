@@ -802,7 +802,7 @@ function imagepicker_admin_groups() {
     $searchform = drupal_get_form('imagepicker_group_search_form', 'groups');
     $content .= theme('imagepicker_groupt_search_form', array('form' => $searchform));
 
-    $content .= '<p>' . t('Managing groups for @n', array('@n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
+    $content .= '<p>' . t('Managing groups for !n', array('!n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
     if ($uid) {
       // show groups for $uid
       if ($gid) {
@@ -886,7 +886,7 @@ function imagepicker_admin_images() {
   }
   $searchform = drupal_get_form('imagepicker_user_search_form', 'images');
   $content .= theme('imagepicker_usert_search_form', array('form' => $searchform));
-  $content .= '<p>' . t('Managing images for @n', array('@n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
+  $content .= '<p>' . t('Managing images for !n', array('!n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
   if ($uid) {
     if ($img_id) {
       if ($imgaction == 'edit' ) {
