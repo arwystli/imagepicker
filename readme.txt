@@ -1,4 +1,6 @@
-Imagepicker module for Drupal 6.x
+Imagepicker module for Drupal 7.x
+
+This document has not yet been updated for Drupal 7
 
 If you have any questions or suggestions please contact me at
 http://drupal.org/user/52366
@@ -15,8 +17,10 @@ save configuration. Imagepicker module will create it's directory structure in
 your files directory (configurable via Administer > Site configuration > File
 system) and all images will be saved in these directories depending on the name
 of user who is uploading images.
-You can change the default settings for imagepicker under
-Administer > Site configuration > Imagepicker
+After installation go to Administer > Site configuration > Imagepicker and
+select your preferences and Save Configuration.
+Also remember to go to Administer > User management > Permissions and
+set up permissions according to your needs.
 
 NOTE: Once you install Imagepicker module, it is not recomended to change
 Drupal's files directory path. But if you do so, please make sure, that you will
@@ -85,3 +89,9 @@ some problems, so be aware of it.
 Imagepicker can now be accessed in My Account, this is the best place to build
 up a collection of images. Here you can create Groups and add images to one or
 more groups. There is also an Admin mode where your images are listed.
+
+	Imagepicker Administrator
+In the 2 series there is the ability for an administrator to
+view/add/edit/delete anything.
+The directories under files/imagepicker are now stored under uid. Older systems
+should still run. See the configuration tab 'Validate Files'

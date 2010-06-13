@@ -1,33 +1,62 @@
 <?php
 // $Id$
 // $Name$
-
+// for D7
 /**
  * @file
  * contains the functions for group management
  */
+
+function imagepicker_groups() {
+
+  // from iframe
+  if (! arg(2)) {
+    $content = imagepicker_groups_list();
+    $content .= drupal_get_form('imagepicker_groups_form');
+  }
+  elseif ( arg(2) == 'edit') {
+    $record = imagepicker_get_user_group(arg(3));
+    $content .= drupal_get_form('imagepicker_groups_form', $record);
+  }
+  elseif (arg(2) == 'delete') {
+    $content .= drupal_get_form('imagepicker_group_delete_form', arg(3));
+  }
+  elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
+    imagepicker_set_user_group_state(1, arg(2));
+    drupal_goto('imagepicker/browse');
+  }
+
+  theme('imagepicker', array('content' => $content));
+}
 
 /**
  * groups
  * from imagepicker groups in my account
  */
 function imagepicker_user_groups($mode="", $gid=0) {
+
   // $mode is edit, delete or empty
+  $content = '';
   if (empty($mode)) {
-    $content = imagepicker_groups_list(TRUE);
-    $content .= drupal_get_form('imagepicker_groups_form');
+    $content = imagepicker_groups_list('account');
+    $form = drupal_get_form('imagepicker_groups_form');
+    $content .= theme('imagepicker_general_form', array('form' => $form));
   }
   elseif ($mode == 'edit') {
     $record = imagepicker_get_user_group($gid);
-    $content .= drupal_get_form('imagepicker_groups_form', $record);
+    $form = drupal_get_form('imagepicker_groups_form', $record);
+    $content .= theme('imagepicker_general_form', array('form' => $form));
   }
   elseif ($mode == 'delete') {
-    $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
+    $form = drupal_get_form('imagepicker_group_delete_form', $gid);
+    $content .= theme('imagepicker_general_form', array('form' => $form));
   }
+
   return $content;
 }
 
-function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
+function imagepicker_groups_form($form, &$form_state, $record=FALSE, $account=FALSE) {
+
   $form['groupsave'] = array(
     '#type' => 'fieldset',
     '#title' => ( $record ?  t('Edit group') : t('Add group')),
@@ -52,15 +81,52 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
     '#description' => t('Maximum 50 characters'),
     '#required' => FALSE
   );
-  if ($account == TRUE) {
+  if (user_access('use public imagepicker') && user_access('create public groups') && variable_get('imagepicker_public_enabled', 1)) {
+    $form['groupsave']['group_public'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Public'),
+      '#return_value' => 1,
+      '#default_value' => (isset($record->public) ? $record->public : ''),
+      '#description' => t('Make this group publicly available'),
+    );
+    // Create role restrictions
+    if (variable_get('imagepicker_publicroles_enabled', 1)) {
+      $form['groupsave']['group_public_roles'] = array(
+        '#type' => 'fieldset',
+        '#title' => ( isset($record->gid) ?  t('Edit group roles') : t('Add public group roles')),
+        '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all roles.)'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+      );
+      // Output a list of available roles as checkboxes
+      $form['groupsave']['group_public_roles']['roles']['#tree'] = TRUE;
+      if (isset($record->avail_roles)) {
+        if ($record->avail_roles != 'all') $availroles = explode(':', $record->avail_roles);
+      }
+      foreach (user_roles(TRUE) as $rid => $role) {
+        if (imagepicker_role_has_permission($rid)) {
+          if (isset($availroles) && is_array($availroles) && in_array($role, array_values($availroles))) $checked = TRUE;
+          else $checked = FALSE;
+          $form['groupsave']['group_public_roles']['roles'][$rid] = array(
+            '#type' => 'checkbox',
+            '#title' => $role,
+            '#return_value' => $role,
+            '#default_value' => ($checked ? 1 : ''),
+          );
+        }
+      }
+    }
+  }
+
+  if ($account) {
     $form['groupsave']['account'] = array(
-      '#type' => 'hidden',
-      '#value' => 1,
+      '#type' => 'value',
+      '#value' => $account->uid,
     );
   }
-  if ($record) {
+  if (isset($record->gid)) {
     $form['groupsave']['gid'] = array(
-      '#type' => 'hidden',
+      '#type' => 'value',
       '#value' => $record->gid,
     );
   }
@@ -68,15 +134,47 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
     '#type' => 'submit',
     '#value' => t('Save group'),
   );
+
   return $form;
 }
 
 function imagepicker_groups_form_submit($form, &$form_state) {
+
   global $user;
   $record['group_name'] = $form_state['values']['group_name'];
   $record['group_description'] = $form_state['values']['group_description'];
-  $record['uid'] = $user->uid;
-  if ($form_state['values']['gid']) {
+  $record['public'] = $form_state['values']['group_public'];
+
+  // Check role restrictions submitted
+  if (isset($form_state['values']['roles'])) {
+    $found = 0;
+    foreach ($form_state['values']['roles'] as $rid => $role) {
+      if (!$role) {
+        unset($form_state['values']['roles'][$rid]);
+      }
+      else {
+        $found++;
+      }
+    }
+    if ($found) {
+      $record['avail_roles'] = implode(':', $form_state['values']['roles']);
+    }
+    else {
+      $record['avail_roles'] = 'all';
+    }
+  }
+  else {
+    $record['avail_roles'] = 'all';
+  }
+
+  if ( isset($form_state['values']['account'] )) {
+    $record['uid'] = $form_state['values']['account'];
+  }
+  else {
+    $record['uid'] = $user->uid;
+  }
+
+  if (isset($form_state['values']['gid'])) {
     $record['gid'] = $form_state['values']['gid'];
     imagepicker_update_user_group($record);
   }
@@ -85,11 +183,21 @@ function imagepicker_groups_form_submit($form, &$form_state) {
   }
 }
 
-// imagepicker_user_groups functions
+/**
+ * imagepicker_user_groups functions
+ */
 function imagepicker_insert_user_group($record) {
-  if (db_query(
-    "INSERT INTO {imagepicker_user_groups} (uid, group_name, group_description) VALUES (%d, '%s', '%s')",
-    array($record['uid'], $record['group_name'], $record['group_description']))) {
+
+  if (db_insert('imagepicker_user_groups')
+    ->fields(array(
+      'uid' => $record['uid'],
+      'group_name' => $record['group_name'],
+      'group_description' => $record['group_description'],
+      'public' => $record['public'],
+       'avail_roles' => (isset($record['avail_roles']) ? $record['avail_roles'] : 'all'),
+    ))
+    ->execute()
+  ) {
     drupal_set_message(t('Group was successfully inserted'));
   }
   else {
@@ -98,9 +206,17 @@ function imagepicker_insert_user_group($record) {
 }
 
 function imagepicker_update_user_group($record) {
-  if (db_query(
-    "UPDATE {imagepicker_user_groups} SET group_name='%s', group_description='%s' WHERE gid = %d",
-    array($record['group_name'], $record['group_description'], $record['gid']))) {
+
+  if (db_update('imagepicker_user_groups')
+    ->fields(array(
+      'group_name' => $record['group_name'],
+      'group_description' => $record['group_description'],
+      'public' => $record['public'],
+       'avail_roles' => (isset($record['avail_roles']) ? $record['avail_roles'] : 'all'),
+    ))
+    ->condition('gid', $record['gid'])
+    ->execute()
+  ) {
     drupal_set_message(t('Group was successfully updated'));
   }
   else {
@@ -109,8 +225,9 @@ function imagepicker_update_user_group($record) {
 }
 
 function imagepicker_delete_user_group($gid) {
-  if (db_query("DELETE FROM {imagepicker_user_groups} WHERE gid = %d", array($gid))
-    && db_query("DELETE FROM {imagepicker_group_images} WHERE gid=%d", array($gid)) ) {
+
+  if ( db_delete('imagepicker_user_groups')->condition('gid', $gid)->execute()
+    && db_delete('imagepicker_group_images')->condition('gid', $gid)->execute() ) {
     drupal_set_message(t('Group was successfully deleted'));
   }
   else {
@@ -118,143 +235,167 @@ function imagepicker_delete_user_group($gid) {
   }
 }
 
-function imagepicker_get_user_group($gid, $obj=TRUE) {
-  $result = db_query("SELECT * FROM {imagepicker_user_groups} WHERE gid = %d", array($gid));
-  if ($obj) {
-    return db_fetch_object($result);
-  }
-  return db_fetch_array($result);
+function imagepicker_group_edit($gid) {
+
+  $record = imagepicker_get_user_group($gid);
+  $content .= drupal_get_form('imagepicker_groups_form', $record);
+  return $content;
 }
 
-function imagepicker_get_user_groups_by_user($uid, $obj=TRUE) {
-  $result = db_query("SELECT * FROM {imagepicker_user_groups} WHERE uid = %d", array($uid));
-  if ($obj) {
-    return db_fetch_object($result);
+/**
+ * group delete form
+ */
+function imagepicker_group_delete_form($form, &$form_state, $gid) {
+
+  if ($gid) {
+    $record = imagepicker_get_user_group($gid);
+    if ($record) {
+      $form['groupname'] = array(
+        '#value' => '<p>' . $record->group_name . '</p>',
+      );
+      $form['mode'] = array(
+        '#type' => 'value',
+        '#value' => 'reallydelete',
+      );
+      $form['gid'] = array(
+        '#type' => 'value',
+        '#value' => $gid,
+      );
+      $form['delete'] = array(
+        '#type' => 'submit',
+        '#value' => t('Really Delete record'),
+      );
+      return $form;
+    }
   }
-  return db_fetch_array($result);
 }
 
-// imagepicker_group_images
-// gid img_id
+/**
+ * Submit group delete form
+ */
+function imagepicker_group_delete_form_submit($form, &$form_state) {
+
+  if ($form_state['values']['gid']) {
+    imagepicker_delete_user_group($form_state['values']['gid']);
+  }
+}
+
+function imagepicker_role_has_permission($rid) {
+
+  $query = db_select('role_permission', 'p');
+  $query->addExpression('COUNT(rid)', 'ct');
+  $query->condition('rid', $rid)->condition('permission', '%use public imagepicker%', 'LIKE');
+  $row = $query->execute()->fetchObject();
+  return $row->ct;
+}
 
 // build a table
-function imagepicker_groups_list($myaccount=FALSE, $account=FALSE) {
-  // show a table of the lists belonging to the current user
+function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
+
   if ($account) {
     $user = $account;
   }
   else {
     global $user;
   }
-  if ($myaccount) {
-    $editpath = 'user/'. $user->uid .'/imagepicker/groups/edit/';
-    $deletepath = 'user/'. $user->uid .'/imagepicker/groups/delete/';
+
+  if ($src) {
+    if ($src == 'admin') {
+      $editpath = IMAGEPICKER_ADMIN_PATH . '/groups/user/' . $user->uid . '/edit/';
+      $deletepath = IMAGEPICKER_ADMIN_PATH . '/groups/user/' . $user->uid . '/delete/';
+      $browsepath = IMAGEPICKER_ADMIN_PATH . '/groups/user/' . $user->uid . '/browse/';
+    }
+    else {
+      $editpath = 'user/' . $user->uid . '/imagepicker/groups/edit/';
+      $deletepath = 'user/' . $user->uid . '/imagepicker/groups/delete/';
+      $browsepath = 'user/' . $user->uid . '/imagepicker/groups/browse/';
+    }
   }
   else {
     $editpath = "imagepicker/groups/edit/";
     $deletepath = "imagepicker/groups/delete/";
-  }
-  $output = "";
-  $how_many = variable_get('imagepicker_rows_per_page', 25);
-  $sql = "SELECT * FROM {imagepicker_user_groups} WHERE uid=". $user->uid ." ORDER BY group_name";
-  $result = pager_query($sql, $how_many);
-  $rows = array();
-  $totcount = 0;
-  $enabledlist = imagepicker_get_enabled_group();
-  while ($row = db_fetch_array($result)) {
-    $count = imagepicker_get_group_images_count($row['gid']);
-    $totcount += $count;
-    $row_data = array(
-      check_plain($row['group_name']),
-      check_plain($row['group_description']),
-      $count,
-      (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
-      l(t('Edit'), $editpath . $row['gid']),
-      l(t('Delete'), $deletepath . $row['gid']),
-    );
-    $rows[] = $row_data;
+    $browsepath = 'imagepicker/groups/';
   }
 
-  if (count($rows)) {
+  $content = "";
+  $max = variable_get('imagepicker_advanced_browser_page', 25);
+  $use_icons = variable_get('imagepicker_use_icons', 1);
+
+  if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
     $header = array(
-      t('Group name'),
-      t('Description'),
-      t('No. images'),
+      array('data' => t('Group name'), 'field' => 'g.group_name'),
+      array('data' => t('Description'), 'field' => 'g.group_description'),
+      array('data' => t('Images'), 'field' => 'ct'),
+      t('State'),
+      array('data' => t('Public'), 'field' => 'g.public'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+  else {
+    $header = array(
+      array('data' => t('Group name'), 'field' => 'g.group_name'),
+      array('data' => t('Description'), 'field' => 'g.group_description'),
+      array('data' => t('Images'), 'field' => 'ct'),
       t('State'),
       array('data' => t('Actions'), 'colspan' => 2),
     );
-    $output .= '<div class="imgp_groups_list">'. theme('table', $header, $rows) . theme('pager', NULL, $how_many) ."</div>";
-
-    $allcount = _imagepicker_user_has_img();
-    $output .= '<div class="imgp_groups_info">';
-    $output .= t('Total number of images: %allcount', array('%allcount' => $allcount)) .'<br/>';
-    $output .= t('Total number of grouped images: %totcount', array('%totcount' => $totcount)) .'<br/>';
-    $output .= t('Total number of ungrouped images: %lcount', array('%lcount' => $allcount-$totcount)) .'<br/>';
-    $output .= '</div>';
-
-    return $output;
   }
-  else {
-    return '<div class="messages">'. t('No groups found.') .'</div>';
+
+  $countquery = db_select('imagepicker_user_groups', 'g');
+  $countquery->addExpression('COUNT(g.gid)', 'ct');
+  $countquery->join('users', 'u', 'u.uid = g.uid');
+  $countquery->condition('g.uid', $user->uid)
+    ->condition('u.status', 1);
+
+  $query = db_select('imagepicker_user_groups', 'g')
+    ->extend('PagerDefault')->limit($max)
+    ->extend('TableSort')->orderByHeader($header);
+  $query->setCountQuery($countquery);
+  $query->fields('g', array('gid', 'group_name', 'group_description', 'public'))
+    ->addExpression('COUNT(i.img_id)', 'ct');
+  $query->leftjoin('imagepicker_group_images', 'i', 'g.gid = i.gid');
+  $query->leftjoin('users', 'u', 'g.uid = u.uid');
+  $query->condition('g.uid', $user->uid)
+    ->condition('u.status', 1)
+    ->groupBy('g.gid');
+  $result = $query->execute();
+
+  $rows = array();
+  $enabledlist = imagepicker_get_enabled_group($account);
+  foreach ($result AS $row) {
+    $rowct = $row->ct;
+    if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+      $row_data = array(
+        check_plain($row->group_name),
+        check_plain($row->group_description),
+        ($rowct && $browsepath ?  l(format_plural($rowct, '1 image', '@count images'), $browsepath . $row->gid) : t('No images')),
+        (($enabledlist && in_array($row->gid, $enabledlist)) ? t('selected') : ''),
+        ($row->public ? t('Yes') : t('No')),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row->gid, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row->gid)),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row->gid, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row->gid)),
+      );
+    }
+    else {
+      $row_data = array(
+        check_plain($row->group_name),
+        check_plain($row->group_description),
+        ($rowct && $browsepath ?  l(format_plural($rowct, '1 image', '@count images'), $browsepath . $row->gid) : t('No images')),
+        (($enabledlist && in_array($row->gid, $enabledlist)) ? t('selected') : ''),
+        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row->gid, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row->gid)),
+        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row->gid, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row->gid)),
+      );
+    }
+    $rows[] = $row_data;
   }
+  return theme('imagepicker_list', array('header' => $header, 'rows' => $rows, 'max' => $max, 'message' => t('No groups found.'), 'pref' => '<div class="imgp_groups_list">', 'suff' => '</div>', 'label' => $label));
 }
+
 function imagepicker_get_group_images_count($gid) {
-  $result = db_query("SELECT count(gid) as gidct FROM {imagepicker_group_images} WHERE gid = %d", array($gid));
-  $row = db_fetch_array($result);
-  return $row['gidct'];
 
-}
-
-function imagepicker_group_edit($gid) {
-  $record = imagepicker_get_user_group($gid);
-  $content .= drupal_get_form('imagepicker_groups_form', $record);
-  return $content;
-}
-
-function imagepicker_group_delete_form(&$form_state, $gid) {
-  $record = imagepicker_get_user_group($gid);
-  if ($record) {
-    $form['groupname'] = array(
-      '#value' => '<p>'. $record->group_name .'</p>',
-    );
-    $form['mode'] = array(
-      '#type' => 'hidden',
-      '#value' => 'reallydelete',
-    );
-    $form['gid'] = array(
-      '#type' => 'hidden',
-      '#value' => $gid,
-    );
-    $form['delete'] = array(
-      '#type' => 'submit',
-      '#value' => t('Really Delete record'),
-    );
-    return $form;
-  }
-  else {
-
-  }
-}
-function imagepicker_group_delete_form_submit($form, &$form_state) {
-  imagepicker_delete_user_group($form_state['values']['gid']);
-}
-
-// not in use
-function imagepicker_get_grouped_images() {
-  global $user;
-  // now the enabled ones
-  $result = db_query("
-  SELECT i.img_id
-  FROM {imagepicker_user_groups} g, {imagepicker_group_images} i
-  WHERE g.uid=%d AND g.gid = i.gid AND g.state=1", array($user->uid));
-  $ct = 0;
-  while ($row = db_fetch_array($result)) {
-    $data[] = $row['img_id'];
-    $ct++;
-  }
-  if ($ct) {
-    return $data;
-  }
-  return FALSE;
+  $query = db_select('imagepicker_group_images', 'g');
+  $query->addExpression('COUNT(gid)', 'ct');
+  $query->condition('gid', $gid);
+  $row = $query->execute()->fetchObject();
+  return $row->ct;
 }
 

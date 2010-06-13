@@ -2,4 +2,20 @@
 name = Imagepicker
 description = Upload, browse and add images to your nodes.
 package = Other
-core = 6.x
+core = 7.x
+
+files[] = imagepicker.install
+files[] = imagepicker.module
+files[] = imagepicker.admin.inc
+files[] = imagepicker.edit.inc
+files[] = imagepicker.form-elements.inc
+files[] = imagepicker.group.inc
+files[] = imagepicker.imagefuncs.inc
+files[] = imagepicker.import.inc
+files[] = imagepicker.theme.inc
+files[] = imagepicker.upload.inc
+files[] = imagepicker.user.inc
+
+configure = admin/config/media/imagepicker
+
+

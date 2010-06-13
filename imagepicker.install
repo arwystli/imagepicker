@@ -1,80 +1,67 @@
 <?php
 // $Id$
 // $Name$
+// for drupal 7.x
 
 /**
  * @file
- * imagepicker instal, update and uninstall functions
+ * imagepicker install, update and uninstall functions
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function imagepicker_install() {
-  // Create a directory structure so that usernames would be divided by letters.
+  // Create a directory structure.
   $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
-  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR .'imagepicker';
+  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR . 'imagepicker';
 
-  if (file_check_directory($dir, TRUE)) {
-    $dirlist = range('a', 'z');
-    array_push($dirlist, 'others');
-
-    foreach ($dirlist AS $v) {
-      $newdir = $dir . DIRECTORY_SEPARATOR . $v;
-      if (! file_check_directory($newdir, TRUE)) {
-        drupal_set_message(t('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
-      }
-    }
-    $errors = drupal_get_messages('error');
-    if (! count($errors)) {
-      // clear
-      drupal_get_messages();
-      drupal_set_message(t('Directory creation for the Imagepicker module was successful.'), '');
-    }
-    else {
-      foreach ($errors['error'] AS $error) {
-        drupal_set_message($error, 'error');
-      }
-    }
+  if (file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
+    drupal_get_messages('status', TRUE);
   }
-
-  // Create tables.
-  drupal_install_schema('imagepicker');
+  else {
+    drupal_set_message(st('Directory creation for the Imagepicker module was unsuccessful.'), 'error');
+  }
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function imagepicker_schema() {
   $schema['imagepicker'] = array(
+    'description' => 'The image table',
     'fields' => array(
       'img_id' => array(
-        'description' => t('The primary image identifier.'),
+        'description' => 'The primary image identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
       'uid' => array(
-        'description' => t('The user identifier.'),
+        'description' => 'The user identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
       'img_name' => array(
+        'description' => 'The image name',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_title' => array(
+        'description' => 'The image title',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_description' => array(
+        'description' => 'The image description',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'img_date' => array(
+        'description' => 'The image date',
         'type' => 'datetime',
         'not null' => TRUE),
     ),
@@ -85,34 +72,51 @@ function imagepicker_schema() {
   );
 
   $schema['imagepicker_user_groups'] = array(
+    'description' => 'The groups table',
     'fields' => array(
       'gid' => array(
-        'description' => t('The primary group identifier.'),
+        'description' => 'The primary group identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
       'uid' => array(
-        'description' => t('The user identifier.'),
+        'description' => 'The user identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
       'group_name' => array(
+        'description' => 'The group name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'group_description' => array(
+        'description' => 'The group description.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       'state' => array(
+        'description' => 'The currently selected group.',
         'type' => 'int',
         'size' => 'tiny',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
+      'public' => array(
+        'description' => 'The public flag.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+      'avail_roles' => array(
+        'description' => 'List of roles that may view this group.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'all'),
     ),
     'indexes' => array(
       'uid' => array('uid'),
@@ -123,17 +127,22 @@ function imagepicker_schema() {
   $schema['imagepicker_group_images'] = array(
     'fields' => array(
       'gid' => array(
-        'description' => t('The group identifier.'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE),
-      'img_id' => array(
-        'description' => t('The image identifier.'),
+        'description' => 'The group identifier.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
-    )
+      'img_id' => array(
+        'description' => 'The image identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+    ),
+    'indexes' => array(
+      'gid' => array('gid'),
+      'img_id' => array('img_id'),
+    ),
   );
 
   return $schema;
@@ -141,72 +150,12 @@ function imagepicker_schema() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function imagepicker_uninstall() {
-  // Remove tables.
-  drupal_uninstall_schema('imagepicker');
-
-  db_query("DELETE FROM {variable} WHERE name LIKE 'imagepicker_%';");
+  // DELETE FROM {variable} WHERE name LIKE 'imagepicker_%'
+  $query = db_delete('variable', 'v')
+    ->condition('name', 'imagepicker_%', 'LIKE')
+    ->execute();
 }
 
-function imagepicker_update_1() {
-
-  $schema['imagepicker_user_groups'] = array(
-    'fields' => array(
-      'gid' => array(
-        'description' => t('The primary identifier for a group.'),
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE),
-      'uid' => array(
-        'description' => t('The user identifier for a group.'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0),
-      'group_name' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => ''),
-      'group_description' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => ''),
-      'state' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0),
-    ),
-    'indexes' => array(
-      'uid' => array('uid'),
-    ),
-    'primary key' => array('gid'),
-  );
-
-  $schema['imagepicker_group_images'] = array(
-    'fields' => array(
-      'gid' => array(
-        'description' => t('The group identifier.'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE),
-      'img_id' => array(
-        'description' => t('The image identifier.'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0),
-    )
-  );
-
-  $ret = array();
-  foreach ($schema AS $tablename => $tableschema) {
-    db_create_table($ret, $tablename, $tableschema);
-  }
-  return $ret;
-}
