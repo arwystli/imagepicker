@@ -15,7 +15,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       $content .= imagepicker_user_view($id);
     }
     elseif ($func == 'edit' && is_numeric($id) && $id > 0) {
-      include_once('imagepicker.edit.inc');
+      module_load_include('inc', 'imagepicker', 'imagepicker.edit');
       $content .= imagepicker_user_image_edit($id);
     }
     elseif ($func == 'browse') {
@@ -37,7 +37,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
     }
   }
   elseif (variable_get('imagepicker_groups_enabled', 1) && $path == 'groups') {
-    include_once('imagepicker.group.inc');
+    module_load_include('inc', 'imagepicker', 'imagepicker.group');
     if ($func == 'edit' && is_numeric($id) && $id > 0) {
       $content .= imagepicker_user_groups($func, $id);
     }
@@ -59,7 +59,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
     $content .= imagepicker_user_config_admin();
   }
   else {
-    include_once('imagepicker.upload.inc');
+    module_load_include('inc', 'imagepicker', 'imagepicker.upload');
     $content .= imagepicker_user_upload();
   }
   return $content;
@@ -447,7 +447,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
   }
 
   if (! empty($_FILES['files']['name']['file_upload'])) {
-    include_once('imagepicker.upload.inc');
+    module_load_include('inc', 'imagepicker', 'imagepicker.upload');
     if (!isset($_FILES['files']['tmp_name']['file_upload']) || !file_exists($_FILES['files']['tmp_name']['file_upload'])) {
       form_set_error('file_upload', t('Error while uploading file.'));
     }
@@ -469,7 +469,7 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   }
 
   if (! empty($_FILES['files']['name']['file_upload'])) {
-    include_once('imagepicker.upload.inc');
+    module_load_include('inc', 'imagepicker', 'imagepicker.upload');
     $wdir = imagepicker_get_watermarks_dir();
     if (file_check_directory($wdir, TRUE)) {
       // clear out the noisy 'created' messages

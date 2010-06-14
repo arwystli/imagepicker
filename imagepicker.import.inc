@@ -7,7 +7,7 @@
  * manage batch imports.
  */
 
-include_once("imagepicker.imagefuncs.inc");
+module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
 
 /**
  * Function to check the import folder.

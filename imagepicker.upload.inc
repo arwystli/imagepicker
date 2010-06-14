@@ -7,7 +7,7 @@
  * upload functions
  */
 
-include_once("imagepicker.imagefuncs.inc");
+module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
 
 /**
  * Menu callback; presents the upload form for imagepicker

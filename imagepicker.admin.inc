@@ -1272,7 +1272,7 @@ function imagepicker_files_validate($dir) {
 
 function imagepicker_admin_groups() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-  include_once('imagepicker.group.inc');
+  module_load_include('inc', 'imagepicker', 'imagepicker.group');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
@@ -1372,7 +1372,7 @@ function imagepicker_admin_images() {
   }
   $content = '';
   if (arg(6) == 'upload' ) {
-    include_once('imagepicker.upload.inc');
+    module_load_include('inc', 'imagepicker', 'imagepicker.upload');
     if (variable_get('imagepicker_upload_progress_enabled', 1)) {
       $content .= imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
     }
@@ -1387,7 +1387,7 @@ function imagepicker_admin_images() {
   if ($uid) {
     if ($img_id) {
       if ($imgaction == 'edit' ) {
-        include_once('imagepicker.edit.inc');
+        module_load_include('inc', 'imagepicker', 'imagepicker.edit');
         $img =  _imagepicker_get_img($img_id, FALSE, $account);
         $imgsrc = imagepicker_get_image_path($img, 'browser', array('uid' => $account->uid , 'name' => $account->name) );
         $content .= theme('imagepicker_image_edit_header', $img, $imgsrc);
@@ -1556,7 +1556,7 @@ function imagepicker_quota_form_submit($form, &$form_state) {
 
 function imagepicker_admin_import() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-  include_once('imagepicker.import.inc');
+  module_load_include('inc', 'imagepicker', 'imagepicker.import');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
   }

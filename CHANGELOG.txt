@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-06-14
+------------------------------------
+by hutch, replaced include_once with module_load_include
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-06-09
 ------------------------------------
 by hutch, added class imgp_img to inserted image

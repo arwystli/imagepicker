@@ -2847,7 +2847,7 @@ function imagepicker_copy_form_validate($form, &$form_state) {
  *
  */
 function imagepicker_copy_form_submit($form, &$form_state) {
-  include_once("imagepicker.imagefuncs.inc");
+  module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
   if ($form_state['values']['uid']) {
     $user = user_load(array('uid' => $form_state['values']['uid']));
   }

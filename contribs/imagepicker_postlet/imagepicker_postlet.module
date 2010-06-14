@@ -108,7 +108,7 @@ function imagepicker_postlet_admin_page($account) {
   if ($account) {
     $user = user_load(array('uid' => $account));
   }
-  include_once(drupal_get_path('module', 'imagepicker') .'/imagepicker.admin.inc');
+  module_load_include('inc', 'imagepicker', 'imagepicker.admin');
   $content .= drupal_get_form('imagepicker_user_search_form', 'images');
   $content .= '<p>'. t('Managing images for ') . ($user->name ? l($user->name, "user/". $user->uid) : 'All') .'</p>';
   $content .= imagepicker_postlet_upload('admin', $user);
@@ -201,7 +201,7 @@ function imagepicker_postlet_process($path, $account = FALSE) {
     global $user;
     $userdir = TRUE;
   }
-  include_once(drupal_get_path('module', 'imagepicker') .'/imagepicker.upload.inc');
+  module_load_include('inc', 'imagepicker', 'imagepicker.upload');
 
   $destdir = imagepicker_get_path(FALSE, $userdir);
   $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
