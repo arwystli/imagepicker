@@ -197,8 +197,6 @@ function imagepicker_menu() {
     'weight'           => -8
   );
   $items[IMAGEPICKER_ADMIN_PATH . '/groups/autocomplete'] = array(
-    'title'            => '',
-    'description'      => '',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_group_search_autocomplete',
     'type'             => MENU_CALLBACK,
@@ -297,8 +295,6 @@ function imagepicker_menu() {
     'weight'           => -1
   );
   $items[IMAGEPICKER_ADMIN_PATH . '/images/autocomplete'] = array(
-    'title'            => '',
-    'description'      => '',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_user_autocomplete',
     'type'             => MENU_CALLBACK,
@@ -309,7 +305,7 @@ function imagepicker_menu() {
   $items[IMAGEPICKER_ADMIN_PATH . '/convert'] = array(
     'title'            => 'Validate Files',
     'description'      => 'Validate and convert Imagepicker Files.',
-    'access arguments' => array('administer imagepicker'),
+    'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'drupal_get_form',
     'page arguments'   => array('imagepicker_convert_form'),
     'type'             => MENU_LOCAL_TASK,
@@ -328,8 +324,6 @@ function imagepicker_menu() {
     'weight'           => -8
   );
   $items[IMAGEPICKER_ADMIN_PATH . '/import/autocomplete'] = array(
-    'title'            => '',
-    'description'      => '',
     'access callback'  => 'imagepicker_access_import',
     'page callback'    => 'imagepicker_user_autocomplete',
     'type'             => MENU_CALLBACK,
@@ -422,7 +416,6 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_user_page',
     'page arguments'   => array(1, 3),
     'access callback'  => 'imagepicker_access_user_config',
-    'access arguments' => array('access own imagepicker'),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.user.inc',
     'weight'           => -2
