@@ -301,6 +301,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
       array('data' => t('Public'), 'field' => 'g.public'),
       array('data' => t('Actions'), 'colspan' => 2),
     );
+    $cols = 7;
   }
   else {
     $header = array(
@@ -310,6 +311,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
       t('State'),
       array('data' => t('Actions'), 'colspan' => 2),
     );
+    $cols = 6;
   }
 
   $sql = "SELECT g.gid, g.group_name, g.group_description, g.public, COUNT(i.img_id) AS ct
@@ -347,7 +349,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
     $rows[] = $row_data;
     $rowcount++;
   }
-  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), '<div class="imgp_groups_list">', '</div>', $label);
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), '<div class="imgp_groups_list">', '</div>', $label, $cols);
 
 }
 

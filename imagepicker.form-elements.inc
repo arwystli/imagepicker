@@ -214,8 +214,6 @@ function imagepicker_get_align_opts($default = NULL) {
     '#options' => $alignoptions,
     '#description' => '',
     '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_insert_defaults_align', 'none')),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
   );
 }
 function imagepicker_get_show_opts($default = NULL) {
@@ -227,8 +225,6 @@ function imagepicker_get_show_opts($default = NULL) {
     '#options' => $showoptions,
     '#description' => '',
     '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_insert_defaults_show', 'full')),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
   );
 }
 function imagepicker_get_link_opts($default = NULL) {
@@ -248,8 +244,6 @@ function imagepicker_get_link_opts($default = NULL) {
     '#options' => $linkoptions,
     '#description' => '',
     '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_insert_defaults_link', 'none')),
-    '#prefix' => '<div class="imgp_img_options">',
-    '#suffix' => '</div>'
   );
 }
 
@@ -265,3 +259,12 @@ function imagepicker_lightbox2_insert_elem($default = NULL) {
   );
 }
 
+function imagepicker_rows_per_page_elem($default = NULL) {
+  return array(
+    '#type' => 'textfield',
+    '#title' => t('Rows per page in tables'),
+    '#size' => 5,
+    '#required' => TRUE,
+    '#default_value' =>($default != NULL ? $default : variable_get('imagepicker_rows_per_page', 25)),
+  );
+}

@@ -665,8 +665,6 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
     '#type' => 'checkbox',
     '#title' => t('Show Description'),
     '#description' => t('Insert title and description'),
-    '#prefix' => '<div id="imgp_desc_control">',
-    '#suffix' => '</div>'
   );
   // allow override but only if admin allows
   if ((variable_get('imagepicker_use_cssbox', 0)
@@ -683,7 +681,6 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
   $form['insert'] = array(
     '#type' => 'button',
     '#value' => t('Insert image'),
-    '#prefix' => '<div id="imgp_controls">',
     '#attributes' => array('onclick' => 'imagepickerInsert(this); return false;')
   );
   if (! $public) {
@@ -696,7 +693,6 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
       '#type' => 'submit',
       '#value' => t('Delete image'),
       '#submit' => array('imagepicker_image_form_delete'),
-      '#suffix' => '</div>'
     );
   }
   $form['img_id'] = array(
@@ -1316,10 +1312,10 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
   $use_icons = variable_get('imagepicker_use_icons', 1);
 
   if ($src == 'admin') {
-    $how_many = variable_get('imagepicker_advanced_browser_page', 25);
+    $how_many = variable_get('imagepicker_rows_per_page', 25);
   }
   else {
-    $how_many = (isset($user->imagepicker_advanced_browser_page) ? $user->imagepicker_advanced_browser_page : variable_get('imagepicker_advanced_browser_page', 25));
+    $how_many = (isset($user->imagepicker_rows_per_page) ? $user->imagepicker_rows_per_page : variable_get('imagepicker_rows_per_page', 25));
   }
 
   $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
@@ -1460,6 +1456,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
         ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
       );
+      $cols = 7;
     }
     else {
       $row_data = array(
@@ -1470,6 +1467,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
         ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
       );
+      $cols = 6;
     }
 
     $rows[] = $row_data;
@@ -1512,7 +1510,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
       $message = t('There are no !status images', array('!status' => $ibpout));
     }
   }
-  $content .= theme('imagepicker_list', $header, $rows, $how_many, $message, '<div class="imgp_imgs_list">', '</div>', $label);
+  $content .= theme('imagepicker_list', $header, $rows, $how_many, $message, '<div class="imgp_imgs_list">', '</div>', $label, $cols);
   return $content;
 }
 
@@ -1814,7 +1812,6 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
     '#default_value' => $enabledlist,
     '#options' => $grouplist,
     '#title' => t('Group'),
-    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   if ($account) {
     $form['uid'] = array(
@@ -1825,7 +1822,6 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
-    '#suffix' => '</div>',
   );
 
   return $form;
@@ -1886,13 +1882,11 @@ function imagepicker_browse_public_groups_form(&$form_state, $account = FALSE, $
     $enabledlist = (isset($user->imagepicker_public_currentgroup) ? $user->imagepicker_public_currentgroup : 0);
   }
 
-
   $form['gid'] = array(
     '#type' => 'select',
     '#default_value' => $enabledlist,
     '#options' => $grouplist,
     '#title' => t('Public Group'),
-    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   if ($admin) {
     $form['admin'] = array(
@@ -1903,7 +1897,6 @@ function imagepicker_browse_public_groups_form(&$form_state, $account = FALSE, $
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
-    '#suffix' => '</div>',
   );
 
   return $form;
@@ -2079,12 +2072,10 @@ function imagepicker_browse_order_form(&$form_state, $account = FALSE, $admin = 
     '#default_value' => $order,
     '#options' => $orderlist,
     '#title' => t('Order'),
-    '#prefix' => '<div id="imgp_order_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
-    '#suffix' => '</div>',
   );
 
   return $form;
@@ -2241,12 +2232,10 @@ function imagepicker_browse_public_form(&$form_state) {
     '#default_value' => variable_get('imagepicker_browse_public', 0),
     '#options' => $list,
     '#title' => t('Show'),
-    '#prefix' => '<div id="imgp_browse_form" class="container-inline">',
   );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
-    '#suffix' => '</div>',
   );
   return $form;
 }
@@ -2565,7 +2554,6 @@ function imagepicker_browse_search_form(&$form_state, $account = FALSE, $admin =
     '#title' => t('Search'),
     '#size' => 10,
     '#default_value' => $search,
-    '#prefix' => '<div id="imgp_search_form" class="container-inline">',
   );
   $form['imagepicker_browser_search_by_name'] = array(
     '#type' => 'checkbox',
@@ -2590,7 +2578,6 @@ function imagepicker_browse_search_form(&$form_state, $account = FALSE, $admin =
       '#type' => 'submit',
       '#value' => t('Reset'),
       '#submit' => array('imagepicker_browse_search_form_reset'),
-      '#suffix' => '</div>'
     );
 
   return $form;
@@ -3106,3 +3093,9 @@ function _imagepicker_get_icon($name, $url = NULL, $attributes = array(), $exten
   return $icon;
 }
 
+function imagepicker_group_images_count($gid) {
+  $sql = "SELECT COUNT(img_id) AS ct FROM {imagepicker_group_images} WHERE gid = %d";
+  $result = db_query($sql, array($gid));
+  $row = db_fetch_array($result);
+  return $row['ct'];
+}

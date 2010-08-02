@@ -28,7 +28,6 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
     '#title' => t('Title'),
     '#description' => t('Edit title of your image'),
     '#default_value' => htmlspecialchars_decode($img['img_title']),
-    '#prefix' => '<div id="imgp_edit_form">'
   );
   $form['description'] = array(
     '#type' => 'textarea',
@@ -37,7 +36,6 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
     '#cols' => 80,
     '#description' => t('Edit description of your image'),
     '#default_value' => htmlspecialchars_decode($img['img_description']),
-    '#suffix' => '</div>'
   );
   if ($account) {
     $form['account'] = array(
@@ -56,13 +54,11 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
-    '#prefix' => '<div id="imgp_controls">',
     '#submit' => array('imagepicker_edit_form_process'),
   );
   $form['cancel'] = array(
     '#type' => 'submit',
     '#value' => t('Cancel'),
-    '#suffix' => '</div>',
     '#submit' => array('imagepicker_edit_form_cancel'),
   );
   return $form;

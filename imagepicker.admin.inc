@@ -11,7 +11,6 @@
  * Menu callback; presents the settings form for imagepicker
  */
 function imagepicker_settings_page($op = NULL) {
-  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
   $content = drupal_get_form('imagepicker_settings_form');
   return $content;
 }
@@ -23,6 +22,7 @@ function imagepicker_settings_page($op = NULL) {
  */
 function imagepicker_settings_form($form_state) {
   drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
 
   // default settings
   $form['imagepicker_settings'] = array(
@@ -112,11 +112,13 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem(variable_get('imagepicker_default_thumbnail_size', 100));
   $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem(variable_get('imagepicker_default_scale', ''));
   $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem(variable_get('imagepicker_default_pagelink', 1));
+  $form['imagepicker_defaults']['imagepicker_rows_per_page'] = imagepicker_rows_per_page_elem(variable_get('imagepicker_rows_per_page', 25));
 
   // insert settings
   $form['imagepicker_insert_defaults'] = array(
     '#type' => 'fieldset',
     '#title' => t('Set imagepicker insert defaults'),
+    '#description' => t('These settings are also available to users if User Configuration is enabled.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#weight' => -36,
@@ -129,6 +131,7 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_align'] = array(
     '#type' => 'fieldset',
     '#title' => t('Image alignment settings'),
+    '#description' => t('These settings are also available to users if User Configuration is enabled.'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_default_align_show', 1) ? TRUE : FALSE),
     '#weight' => -34,
@@ -147,7 +150,7 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_browser'] = array(
     '#type' => 'fieldset',
     '#title' => t('Imagepicker browser settings'),
-    '#description' => t('Configure browser.'),
+    '#description' => t('These settings are also available to users if User Configuration is enabled.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#weight' => -32,
@@ -224,8 +227,6 @@ function imagepicker_settings_form($form_state) {
     '#description' => t("Select which Role for 'Quotas by Role'."),
     '#options' => user_roles(TRUE),
     '#default_value' => variable_get('imagepicker_quota_role', 2),
-    '#prefix' => '<div id="wrap_imagepicker_quota_role">',
-    '#suffix' => '</div>',
   );
   $form['imagepicker_quotas']['imagepicker_quota_default'] = array(
     '#type' => 'select',
@@ -300,8 +301,6 @@ function imagepicker_settings_form($form_state) {
       '#maxlength' => 100,
       '#required' => FALSE,
       '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
-      '#prefix' => '<div id="wrap-imagepicker-exifinfo-external">',
-      '#suffix' => '</div>',
     );
   }
   // Iframe
@@ -348,7 +347,6 @@ function imagepicker_settings_form($form_state) {
     '#required' => TRUE,
     '#default_value' => variable_get('imagepicker_upload_progress_delay', 3),
     '#field_suffix' => t('seconds'),
-    '#prefix' => '<div id="wrap-imagepicker-upload-progress">',
   );
 
   $form['imagepicker_progress']['imagepicker_upload_progress_message'] = array(
@@ -357,7 +355,6 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Message to display while uploading.'),
     '#size' => 60,
     '#default_value' => variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
-    '#suffix' => '</div>',
   );
 
   // Groups
@@ -382,7 +379,6 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Allow users to make image groups publicly available.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_public_enabled', 1),
-    '#prefix' => '<div id="wrap-imagepicker-groups">',
   );
   $form['imagepicker_groups']['imagepicker_publicroles_enabled'] = array(
     '#type' => 'checkbox',
@@ -397,7 +393,6 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Allow users to select a group in the upload form.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_groups_in_upload_enabled', 1),
-    '#suffix' => '</div>',
   );
 
   // Import
@@ -422,11 +417,10 @@ function imagepicker_settings_form($form_state) {
     '#description' => t('Delete uploaded source images after succesful import into imagepicker.'),
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_import_delete', 0),
-    '#prefix' => '<div id="wrap-imagepicker-import">',
-    '#suffix' => '</div>',
   );
-
-  return system_settings_form($form);
+  $form = system_settings_form($form);
+  unset($form['#theme']);
+  return $form;
 }
 
 /**
@@ -519,11 +513,15 @@ function imagepicker_admin_users_list($dir, $label='') {
     (variable_get('imagepicker_quota_enable', 1) ? t('Quotas') : ''),
     t('Used'),
   );
+  $cols = 5;
   $rowcount = 0;
-  $result = db_query("
-    SELECT DISTINCT u.uid, u.name
-    FROM {imagepicker} i, {users} u
-    WHERE i.uid=u.uid AND status=1".  tablesort_sql($header));
+  $rows = '';
+
+  $countsql = "SELECT COUNT(DISTINCT u.uid) FROM {imagepicker} i JOIN {users} u ON i.uid=u.uid WHERE u.status=1";
+  $sql = "SELECT DISTINCT u.uid, u.name FROM {imagepicker} i JOIN {users} u ON  i.uid=u.uid WHERE u.status=1";
+  $sql .= tablesort_sql($header);
+  $result = pager_query($sql, $how_many, 0, $countsql);
+
   while ($row = db_fetch_array($result)) {
     $account = user_load( array('uid' => $row['uid']));
     $allcount = _imagepicker_user_has_img($account);
@@ -552,42 +550,49 @@ function imagepicker_admin_users_list($dir, $label='') {
     $rows[] = $row_data;
     $rowcount++;
   }
-  return theme('imagepicker_list', $header, $rows, $how_many, t('No users found.'), '', '', $label);
+
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No users found.'), '', '', $label, $cols);
 }
 
 function imagepicker_admin_groups_list($label="") {
   $how_many = variable_get('imagepicker_rows_per_page', 25);
   $use_icons = variable_get('imagepicker_use_icons', 1);
-    $header = array(
-      array('data' => t('Group Name'), 'field' => 'g.group_name'),
-      array('data' => t('User Name'), 'field' => 'u.name'),
-      array('data' => t('Status'), 'field' => 'g.public'),
-      array('data' => t('Images'), 'field' => 'ct'),
-      array('data' => t('Actions'), 'colspan' => 2),
-    );
-  $sql = "SELECT g.gid, g.uid, g.group_name, g.group_description, g.state, g.public, COUNT(i.img_id) AS ct, u.name
-    FROM {imagepicker_user_groups} g LEFT JOIN {imagepicker_group_images} i USING(gid), {users} u
-    WHERE g.uid=u.uid
-    GROUP BY g.gid". tablesort_sql($header);
-  $result = db_query($sql);
+  $header = array(
+    array('data' => t('Group Name'), 'field' => 'g.group_name'),
+    array('data' => t('User Name'), 'field' => 'u.name'),
+    array('data' => t('Status'), 'field' => 'g.public'),
+    array('data' => t('Images'), 'field' => 'ct'),
+    array('data' => t('Actions'), 'colspan' => 2),
+  );
+  $cols = 6;
   $rowcount = 0;
+  $rows = '';
+
+  $countsql = "SELECT COUNT(g.gid) FROM {imagepicker_user_groups} g JOIN {users} u USING(uid)";
+  $sql = "SELECT g.gid, g.uid, g.group_name, g.group_description, g.state, g.public, u.name
+    FROM {imagepicker_user_groups} g JOIN  {users} u USING(uid)";
+  $sql .= tablesort_sql($header);
+  $result = pager_query($sql, $how_many, 0, $countsql);
+
   while ($row = db_fetch_array($result)) {
     $editpath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/edit/'. $row['gid'];
     $deletepath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/delete/'. $row['gid'];
+    $imgct = imagepicker_group_images_count($row['gid']);
     $row_data = array(
       $row['group_name'],
       l($row['name'], 'admin/settings/imagepicker/groups/user/'. $row['uid']),
       ($row['public'] ? t('Public') : t('Private')),
-      ($row['ct'] ? l(format_plural($row['ct'], '1 image', '@count images'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
+      ($imgct ? l(format_plural($imgct, '1 image', '@count images'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
       ($use_icons ? _imagepicker_get_icon('edit', $editpath, array('title' => t('Edit'))) : l(t('Edit'), $editpath)),
       ($use_icons ?  _imagepicker_get_icon('delete', $deletepath, array('title' => t('Delete'))) : l(t('Delete'), $deletepath)),
     );
     $rows[] = $row_data;
     $rowcount++;
   }
+
   $pref = '';
   $suff = '';
-  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), $pref, $suff, $label);
+  return theme('imagepicker_list', $header, $rows, $how_many, t('No groups found.'), $pref, $suff, $label, $cols);
 }
 
 function imagepicker_admin_view($img_id, $account = FALSE) {
@@ -680,16 +685,14 @@ function imagepicker_user_search_form($form_state, $dir) {
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
-    '#prefix' => '<div id="imgp_users_form" class="container-inline">',
   );
   $form['dir'] = array(
     '#type' => 'value',
     '#value' => $dir,
   );
-  $form['imagepicker_stats_submit'] = array(
+  $form['imagepicker_user_search_submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Go',
-    '#suffix' => '</div>',
+    '#value' => t('Go'),
   );
   return $form;
 }
@@ -1480,7 +1483,6 @@ function imagepicker_group_search_form($form_state, $dir = 'groups') {
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
-    '#prefix' => '<div id="imgp_groups_form" class="container-inline">',
   );
   $form['dir'] = array(
     '#type' => 'value',
@@ -1488,8 +1490,7 @@ function imagepicker_group_search_form($form_state, $dir = 'groups') {
   );
   $form['imagepicker_group_search_submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Go',
-    '#suffix' => '</div>',
+    '#value' => t('Go'),
   );
   return $form;
 }
@@ -1530,7 +1531,6 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
     '#default_value' => $quota,
     '#options' => $list,
     '#title' => $title,
-    '#prefix' => '<div id="imgp_quota_form" class="container-inline">',
   );
   $form['account'] = array(
     '#type' => 'value',
@@ -1539,7 +1539,6 @@ function imagepicker_quota_form(&$form_state, $account=FALSE) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go'),
-    '#suffix' => '</div>'
   );
   return $form;
 }
