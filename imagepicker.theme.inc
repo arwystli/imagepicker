@@ -315,13 +315,13 @@ function theme_imagepicker_browser($content, $forms='', $message='', $help='', $
   $suff1 = $content[4][0];
   $suff2 = $content[4][1];
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
-  if ($rows) {
-    // forms
-    if ($forms) {
-      foreach ($forms AS $form) {
-        $output .= $form;
-      }
+  // forms
+  if ($forms) {
+    foreach ($forms AS $form) {
+      $output .= $form;
     }
+  }
+  if ($rows) {
     // help message
     if ($help) {
       $output .= '<div class="imgp_help">'. $help . '</div>';
