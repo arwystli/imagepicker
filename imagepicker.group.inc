@@ -8,6 +8,7 @@
  */
 
 function imagepicker_groups() {
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
 
   // from iframe
   if (! arg(2)) {
@@ -27,7 +28,6 @@ function imagepicker_groups() {
   }
   theme('imagepicker', $content);
 }
-
 
 /**
  * groups
@@ -91,6 +91,8 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
         '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all roles.)'),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
+        '#prefix' => '<div id="wrap-group-public-roles">',
+        '#suffix' => '</div>',
       );
       // Output a list of available roles as checkboxes
       $form['groupsave']['group_public_roles']['roles']['#tree'] = TRUE;

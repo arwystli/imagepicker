@@ -8,6 +8,7 @@
  */
 function imagepicker_user_page($uid, $path="", $func="", $id=0) {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
   $content = '';
   // path/func/id
   if ($path == 'images') {

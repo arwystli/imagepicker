@@ -102,5 +102,20 @@ if (Drupal.jsEnabled) {
         $("#wrap-imagepicker-upload-progress").hide();
       }
     });
+
+    if ($("#edit-group-public").attr('checked')) {
+      $("#wrap-group-public-roles").show();
+    }
+    else {
+      $("#wrap-group-public-roles").hide();
+    }
+    $("#edit-group-public").change(function() {
+      if ($("#edit-group-public").attr('checked')) {
+        $("#wrap-group-public-roles").show();
+      }
+      else {
+        $("#wrap-group-public-roles").hide();
+      }
+    });
   };
 }

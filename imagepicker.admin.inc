@@ -1275,6 +1275,7 @@ function imagepicker_files_validate($dir) {
 
 function imagepicker_admin_groups() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
   module_load_include('inc', 'imagepicker', 'imagepicker.group');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
@@ -1342,6 +1343,7 @@ function imagepicker_admin_groups() {
 
 function imagepicker_admin_images() {
   drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
