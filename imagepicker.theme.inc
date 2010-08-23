@@ -247,6 +247,7 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
         'lightbox2_insert' => (isset($user->imagepicker_lightbox2_insert) ? $user->imagepicker_lightbox2_insert : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
         'thickbox_enable' => (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 0)),
         'colorbox_enable' => (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)),
+        'colorbox_iframe' => (imagepicker_get_colorbox_perms()),
       ),
     );
 

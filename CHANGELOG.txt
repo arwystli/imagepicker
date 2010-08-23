@@ -1,7 +1,13 @@
 // $Id$
 // $Name$
 
+
+Image Picker  for D6 in DRUPAL-6--2, 20010-08-23
+------------------------------------
+by hutch, improved wysiwyg support
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-08-09
+------------------------------------
 by hutch, fixed public groups bug #873094
 added js to public groups form
 

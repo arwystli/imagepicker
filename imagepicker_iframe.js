@@ -40,19 +40,20 @@ if (Drupal.jsEnabled) {
       var imgpImageStyle;
       var imgpImageCss = 'class="imgp_img"';
       var imgpInsertion;
-      var imgpImageAlt = Drupal.settings['imagepicker_iframe']['imgpImageAlt'];
-      var imgpImageTitle = Drupal.settings['imagepicker_iframe']['imgpImageTitle'];
-      var imgpImageDesc = Drupal.settings['imagepicker_iframe']['imgpImageDesc'];
-      var imgpFileLink = Drupal.settings['imagepicker_iframe']['imgpFileLink'];
-      var imgpThumbLink = Drupal.settings['imagepicker_iframe']['imgpThumbLink'];
-      var imgpPageLink = Drupal.settings['imagepicker_iframe']['imgpPageLink'];
-      var isFCKeditor = Drupal.settings['imagepicker_iframe']['isFCKeditor'];
-      var isWysiwyg = Drupal.settings['imagepicker_iframe']['isWysiwyg'];
-      var use_cssbox = Drupal.settings['imagepicker_iframe']['use_cssbox'];
-      var default_align_show = Drupal.settings['imagepicker_iframe']['default_align_show'];
-      var lightbox2_insert = Drupal.settings['imagepicker_iframe']['lightbox2_insert'];
-      var fleft = Drupal.settings['imagepicker_iframe']['default_fleft'];
-      var fright = Drupal.settings['imagepicker_iframe']['default_fright'];
+      var imgpImageAlt = Drupal.settings.imagepicker_iframe.imgpImageAlt;
+      var imgpImageTitle = Drupal.settings.imagepicker_iframe.imgpImageTitle;
+      var imgpImageDesc = Drupal.settings.imagepicker_iframe.imgpImageDesc;
+      var imgpFileLink = Drupal.settings.imagepicker_iframe.imgpFileLink;
+      var imgpThumbLink = Drupal.settings.imagepicker_iframe.imgpThumbLink;
+      var imgpPageLink = Drupal.settings.imagepicker_iframe.imgpPageLink;
+      var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
+      var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
+      var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
+      var default_align_show = Drupal.settings.imagepicker_iframe.default_align_show;
+      var lightbox2_insert = Drupal.settings.imagepicker_iframe.lightbox2_insert;
+      var fleft = Drupal.settings.imagepicker_iframe.default_fleft;
+      var fright = Drupal.settings.imagepicker_iframe.default_fright;
+      var colorbox_iframe = Drupal.settings.imagepicker_iframe.colorbox_iframe;
       var i;
 
       // Get show value
@@ -169,30 +170,44 @@ if (Drupal.jsEnabled) {
         inst = win.oFCKeditor.InstanceName;
       }
       else if (isWysiwyg == 'yes') {
-        inst = 'edit-body';
+        //inst = 'edit-body';
+        inst = win.Drupal.wysiwyg.activeId;
       }
 
       if (inst) {
         if (win.FCKeditorAPI) {
-          myFCKeditor = win.FCKeditorAPI.GetInstance(inst);
-          if (myFCKeditor) {
-            myFCKeditor.InsertHtml(imgpInsertion);
+          if (win.FCKeditorAPI.GetInstance(inst)) {
+            win.FCKeditorAPI.GetInstance(inst).InsertHtml(imgpInsertion);
+            jobdone = true;
+          }
+        }
+        // ckeditor 3.?
+        if (win.CKEDITOR) {
+          if (win.CKEDITOR.instances[inst]) {
+            win.CKEDITOR.instances[inst].insertHtml(imgpInsertion);
+            jobdone = true;
+          }
+        }
+        // tinyMCE v3
+        if (win.tinyMCE) {
+          if (win.tinyMCE.execInstanceCommand(inst, 'mceInsertContent', false, imgpInsertion)){
             jobdone = true;
           }
         }
       }
-
-      if (win.Drupal.ckeditorInstance && win.Drupal.ckeditorInsertHtml) {
+      // older ckeditor
+      if (! jobdone && win.Drupal.ckeditorInstance && win.Drupal.ckeditorInsertHtml) {
         if (win.Drupal.ckeditorInsertHtml(imgpInsertion)) {
           jobdone = true;
         }
-        else
-          return;
+        //else
+        //  return;
       }
 
       //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
-      var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
-      if (isTinyMCE) {
+      //var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
+      // tinyMCE v2
+      if (! jobdone && win.tinyMCE) {
         win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
         jobdone = true;
       }
@@ -207,7 +222,9 @@ if (Drupal.jsEnabled) {
           insertAtCursor(commentBody, imgpInsertion);
         }
       }
-      win.location.hash = 'body_hash';
+      if (! colorbox_iframe) {
+        win.location.hash = 'body_hash';
+      }
     }
   }
 
