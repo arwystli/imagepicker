@@ -14,7 +14,7 @@
 function imagepicker_install() {
   // Create a directory structure.
   $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
-  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR . 'imagepicker';
+  $dir = $drupaldir . file_stream_wrapper_get_instance_by_scheme('public')->getDirectoryPath() . DIRECTORY_SEPARATOR . 'imagepicker';
 
   if (file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
     drupal_get_messages('status', TRUE);
