@@ -116,6 +116,7 @@ function imagepicker_settings_form($form, &$form_state) {
   $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem(variable_get('imagepicker_default_thumbnail_size', 100));
   $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem(variable_get('imagepicker_default_scale', ''));
   $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem(variable_get('imagepicker_default_pagelink', 1));
+  $form['imagepicker_defaults']['imagepicker_rows_per_page'] = imagepicker_rows_per_page_elem(variable_get('imagepicker_rows_per_page', 25));
 
   // insert settings
   $form['imagepicker_insert_defaults'] = array(
@@ -163,7 +164,7 @@ function imagepicker_settings_form($form, &$form_state) {
   $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem(variable_get('imagepicker_show_browse_search_form', 1));
 
-  if (module_exists('lightbox2') || module_exists('thickbox')) {
+  if (module_exists('lightbox2') || module_exists('colorbox')) {
     $form['imagepicker_module'] = array(
       '#type' => 'fieldset',
       '#title' => t('Module integration'),
@@ -181,13 +182,13 @@ function imagepicker_settings_form($form, &$form_state) {
       );
       $form['imagepicker_module']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem(variable_get('imagepicker_lightbox2_insert', 'lightbox'));
     }
-    if (module_exists('thickbox')) {
-      $form['imagepicker_module']['imagepicker_thickbox_enable'] = array(
+    if (module_exists('colorbox')) {
+      $form['imagepicker_module']['imagepicker_colorbox_enable'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Enable Thickbox in Imagepicker'),
-        '#description' => t('Setting this option will enable Thickbox in Imagepicker.'),
+        '#title' => t('Enable Colorbox in Imagepicker'),
+        '#description' => t('Setting this option will enable Colorbox in Imagepicker.'),
         '#return_value' => 1,
-        '#default_value' => variable_get('imagepicker_thickbox_enable', 1),
+        '#default_value' => variable_get('imagepicker_colorbox_enable', 1),
       );
     }
   }
@@ -309,9 +310,8 @@ function imagepicker_settings_form($form, &$form_state) {
     '#collapsed' => FALSE,
     '#weight' => -22,
   );
-
-  if (module_exists('thickbox') && file_exists(drupal_get_path('module', 'imagepicker') . '/imagepicker_thickbox.js')) {
-    $form['imagepicker_iframe']['imagepicker_advanced_thickbox'] = imagepicker_thickbox_elem(variable_get('imagepicker_advanced_thickbox', 0));
+  if (module_exists('colorbox') && variable_get('colorbox_load', 0)) {
+    $form['imagepicker_iframe']['imagepicker_advanced_colorbox'] = imagepicker_colorbox_elem(variable_get('imagepicker_advanced_colorbox', 0));
   }
 
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem(variable_get('imagepicker_advanced_iframe_width', "100%"));
@@ -472,6 +472,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) || $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
     form_set_error('imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
+  }
+  if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1) {
+    form_set_error('imagepicker_rows_per_page', t('Rows per page must be a positive number'));
   }
   if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) || $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
     form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));

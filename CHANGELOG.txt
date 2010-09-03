@@ -4,6 +4,7 @@
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-03
 ------------------------------------
 by hutch, fixed issue #895308, replace file_directory_path()
+removed thickbox, added rows_per_page
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-07-10
 ------------------------------------

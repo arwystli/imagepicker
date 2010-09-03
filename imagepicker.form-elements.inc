@@ -95,16 +95,16 @@ function imagepicker_watermark_min_width_elem($default = NULL) {
     '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_watermark_min_width', 0)),
   );
 }
-
-function imagepicker_thickbox_elem($default = NULL) {
+function imagepicker_colorbox_elem($default = NULL) {
   return array(
       '#type' => 'checkbox',
-      '#title' => t('Thickbox Iframe'),
-      '#description' => t('Use thickbox iframe instead of the builtin one. See the contribs folder in Imagepicker'),
+      '#title' => t('Colorbox Iframe'),
+      '#description' => t('Use colorbox iframe instead of the builtin one.'),
       '#return_value' => 1,
-      '#default_value' => (is_numeric($default) ? $default : variable_get('imagepicker_advanced_thickbox', 0)),
+      '#default_value' => (is_numeric($default) ? $default : variable_get('imagepicker_advanced_colorbox', 0)),
     );
 }
+
 function imagepicker_iframe_width_elem($default = NULL) {
   return array(
     '#type' => 'textfield',
@@ -227,9 +227,6 @@ function imagepicker_get_link_opts($default = NULL) {
   if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
     $linkoptions['lightbox'] = t('Lightbox');
   }
-  if (module_exists('thickbox') && variable_get('imagepicker_thickbox_enable', 1) ) {
-    $linkoptions['thickbox'] = t('Thickbox');
-  }
   return array(
     '#type' => 'radios',
     '#title' => t('Link'),
@@ -253,3 +250,13 @@ function imagepicker_lightbox2_insert_elem($default = NULL) {
   );
 }
 
+
+function imagepicker_rows_per_page_elem($default = NULL) {
+  return array(
+    '#type' => 'textfield',
+    '#title' => t('Rows per page in tables'),
+    '#size' => 5,
+    '#required' => TRUE,
+    '#default_value' =>($default != NULL ? $default : variable_get('imagepicker_rows_per_page', 25)),
+  );
+}

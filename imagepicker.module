@@ -591,12 +591,7 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     $height = imagepicker_get_user_settings('imagepicker_advanced_iframe_height', variable_get('imagepicker_advanced_iframe_height', 500));
     $border = imagepicker_get_user_settings('imagepicker_advanced_iframe_border', variable_get('imagepicker_advanced_iframe_border', "0"));
 
-    if (imagepicker_get_thickbox_perms()) {
-      $iurl = l('Run imagepicker', 'imagepicker');
-    }
-    else {
-      $iurl = '<iframe id="imagepicker" style="width: ' . $width . '; height: ' . $height . 'px; border: ' . $border . ';" src="' . url('imagepicker') . '">Imagepicker requires iframe support.</iframe>';
-    }
+    $iurl = '<iframe id="imagepicker" style="width: ' . $width . '; height: ' . $height . 'px; border: ' . $border . ';" src="' . url('imagepicker') . '">Imagepicker requires iframe support.</iframe>';
 
     $fselement = array(
       '#type' => 'fieldset',
@@ -1393,10 +1388,10 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
 
   $use_icons = variable_get('imagepicker_use_icons', 1);
   if ($src == 'admin') {
-    $max = variable_get('imagepicker_advanced_browser_page', 25);
+    $max = variable_get('imagepicker_rows_per_page', 25);
   }
   else {
-    $max = imagepicker_get_user_settings('imagepicker_advanced_browser_page', variable_get('imagepicker_advanced_browser_page', 25)) ;
+    $max = imagepicker_get_user_settings('imagepicker_rows_per_page', variable_get('imagepicker_rows_per_page', 25)) ;
   }
 
   if ($src == 'admin') {
@@ -2651,45 +2646,6 @@ function _imagepicker_quota_check($src, $account = FALSE) {
     }
   }
   return array($quota_ok, $message1, $message2);
-}
-
-/**
- * hook into (patched) thickbox module.
- *
- */
-function imagepicker_thickbox_js() {
-
-  global $user;
-  if (imagepicker_get_thickbox_perms()) {
-    $width = variable_get('imagepicker_advanced_iframe_width', "100%");
-    if ( isset($user->data['imagepicker_advanced_iframe_width']) && $user->data['imagepicker_advanced_iframe_width']) {
-      $width = $user->data['imagepicker_advanced_iframe_width'];
-    }
-    if (preg_match("/%$/", $width)) {
-      $width = '630';
-    }
-    $height = variable_get('imagepicker_advanced_iframe_height', 500);
-    if (isset($user->data['imagepicker_advanced_iframe_height']) && $user->data['imagepicker_advanced_iframe_height'] ) {
-      $height = $user->data['imagepicker_advanced_iframe_height'];
-    }
-    drupal_add_js(array('imagepicker_thickbox' => array('width' => $width, 'height' => $height)), 'setting');
-    drupal_add_js(drupal_get_path('module', 'imagepicker') . '/imagepicker_thickbox.js');
-  }
-}
-
-function imagepicker_get_thickbox_perms() {
-
-  global $user;
-  if ((module_exists('thickbox')
-    && isset($user->data['imagepicker_advanced_thickbox'] )
-    && $user->data['imagepicker_advanced_thickbox']
-    && variable_get('imagepicker_advanced_thickbox', 0 ))
-      || (module_exists('thickbox')
-    && ! isset($user->data['imagepicker_advanced_thickbox'] )
-    && variable_get('imagepicker_advanced_thickbox', 0))) {
-    return TRUE;
-  }
-  return FALSE;
 }
 
 /**
