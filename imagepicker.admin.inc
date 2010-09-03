@@ -198,7 +198,7 @@ function imagepicker_settings_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => t('User quotas'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_quota_enable', 1) ? TRUE : FALSE),
     '#weight' => -28,
   );
   $form['imagepicker_quotas']['imagepicker_quota_enable'] = array(
@@ -325,7 +325,7 @@ function imagepicker_settings_form($form, &$form_state) {
     '#title' => t('Progress bar'),
     '#description' => t('Enable and configure progress bar.'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_upload_progress_enabled', 1) ? TRUE : FALSE),
     '#weight' => -18,
   );
   $form['imagepicker_progress']['imagepicker_upload_progress_enabled'] = array(
@@ -360,7 +360,7 @@ function imagepicker_settings_form($form, &$form_state) {
     '#title' => t('Imagepicker group settings'),
     '#description' => t('Enable and configure groups.'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => (variable_get('imagepicker_groups_enabled', 1) ? TRUE : FALSE),
     '#weight' => -16,
   );
   $form['imagepicker_groups']['imagepicker_groups_enabled'] = array(
