@@ -134,9 +134,6 @@
         case 'lightbox':
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' rel= '" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
           break;
-        case 'thickbox':
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='thickbox' >" + imgpImageElement + "</a>";
-          break;
         case 'file':
         default:
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' target='_blank' >" + imgpImageElement + "</a>";
