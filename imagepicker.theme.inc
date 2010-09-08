@@ -13,6 +13,11 @@
 function imagepicker_theme() {
   return array(
     'imagepicker' => array(
+      'arguments' => array('content' => NULL),
+      'template' => 'imagepicker',
+    ),
+
+    'imagepicker_iframe' => array(
       'arguments' => array(
         'content' => NULL,
         'img'  => NULL,
@@ -221,14 +226,12 @@ function imagepicker_theme() {
   );
 }
 
-function theme_imagepicker($content, $img='', $public=FALSE) {
-  if (module_exists('admin_menu')) {
-    admin_menu_suppress();
-  }
-  global $language, $user;
+// set up the iframe
+function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
   $path = drupal_get_path('module', 'imagepicker');
   drupal_add_css($path .'/imagepicker.css');
   if ($img) {
+    global $user;
     $settings = array(
       'imagepicker_iframe' => array(
         'imgpImageAlt' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ),
@@ -250,37 +253,10 @@ function theme_imagepicker($content, $img='', $public=FALSE) {
         'colorbox_iframe' => (imagepicker_get_colorbox_perms()),
       ),
     );
-
     drupal_add_js($settings, 'setting');
     drupal_add_js($path .'/imagepicker_iframe.js');
   }
-
-  $variables['content'] = $content;
-  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
-  $variables['styles'] = drupal_get_css();
-  $variables['scripts'] = drupal_get_js();
-  $variables['tabs'] = theme('menu_local_tasks');
-  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
-  $variables['language'] = $language;
-
-  // fix jquery version thing in the iframe
-  if (module_exists('jquery_update')) {
-    jquery_update_preprocess_page($variables);
-  }
-
-  $template = 'imagepicker-page.tpl.php';
-  $defaulttemplate = variable_get('theme_default', '');
-  if ($defaulttemplate) {
-    $templatepath = drupal_get_path('theme', $defaulttemplate);
-    if (file_exists($templatepath .'/'. $template)) {
-      $template = $templatepath .'/'. $template;
-    }
-    else {
-      $template = $path .'/'. $template;
-    }
-  }
-  echo theme_render_template($template, $variables);
-  exit;
+  return $content;
 }
 
 function theme_imagepicker_list($header, $rows, $max, $message="", $pref="", $suff="", $label="", $cols = 1) {
@@ -661,3 +637,25 @@ function theme_imagepicker_settings_form($form) {
   $output .= drupal_render($form);
   return $output;
 }
+
+// preprocess for imagepicker.tpl.php
+function template_preprocess_imagepicker(&$variables) {
+  global $language;
+  if (module_exists('admin_menu')) {
+    admin_menu_suppress();
+  }
+
+  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
+  $variables['styles'] = drupal_get_css();
+  $variables['scripts'] = drupal_get_js();
+  // fix jquery version thing in the iframe
+  if (module_exists('jquery_update')) {
+    jquery_update_preprocess_page($variables);
+  }
+  $variables['tabs'] = theme('menu_local_tasks');
+  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
+  $variables['language'] = $language;
+
+}
+
+

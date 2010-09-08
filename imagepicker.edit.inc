@@ -13,7 +13,7 @@
 // iframe
 function imagepicker_image_edit($img_id) {
   $content = _imagepicker_edit_img($img_id, 'iframe');
-  theme('imagepicker', $content);
+  return theme('imagepicker_iframe', $content);
 }
 
 // account

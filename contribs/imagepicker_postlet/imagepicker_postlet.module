@@ -68,7 +68,8 @@ function imagepicker_postlet_menu() {
     // iframe
     $items['imagepicker/upload_postlet'] = array(
       'title'            => 'Multi Upload',
-      'page callback'    => 'imagepicker_postlet_page',
+      #'page callback'    => 'imagepicker_postlet_page',
+      'page callback'    => 'imagepicker_box',
       'access arguments' => array('use imagepicker'),
       'type'             => MENU_LOCAL_TASK,
       'weight'           => 1,
@@ -97,7 +98,7 @@ function imagepicker_postlet_user_page() {
  * callback from iframe
  */
 function imagepicker_postlet_page() {
-  $content = theme('imagepicker', imagepicker_postlet_upload('iframe'));
+  $content = theme('imagepicker_iframe', imagepicker_postlet_upload('iframe'));
   return $content;
 }
 

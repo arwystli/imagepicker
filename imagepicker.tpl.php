@@ -4,7 +4,7 @@
 
 /**
  * @file
- * template for imagepicker iframe
+ * template for imagepicker iframe, new version
  */
 
 ?>

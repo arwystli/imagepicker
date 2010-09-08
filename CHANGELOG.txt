@@ -1,6 +1,9 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-09-08
+------------------------------------
+by hutch, improved iframe integration
 
 Image Picker  for D6 in DRUPAL-6--2, 20010-08-23
 ------------------------------------
