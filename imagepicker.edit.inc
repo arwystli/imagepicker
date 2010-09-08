@@ -14,7 +14,7 @@
 function imagepicker_image_edit($img_id) {
 
   $content = _imagepicker_edit_img($img_id, 'iframe');
-  theme('imagepicker', array('content' => $content));
+  return theme('imagepicker_iframe', array('content' => $content));
 }
 
 // account

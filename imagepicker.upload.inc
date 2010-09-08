@@ -21,7 +21,7 @@ function imagepicker_upload() {
     $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= imagepicker_quota_ok('iframe', FALSE, '', t('Upload images. You can give them a title and description'));
-  theme('imagepicker', array('content' => $content));
+  return theme('imagepicker_iframe', array('content' => $content));
 }
 // account
 function imagepicker_user_upload() {

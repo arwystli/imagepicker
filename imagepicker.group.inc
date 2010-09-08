@@ -26,7 +26,7 @@ function imagepicker_groups() {
     drupal_goto('imagepicker/browse');
   }
 
-  theme('imagepicker', array('content' => $content));
+  return theme('imagepicker_iframe', array('content' => $content));
 }
 
 /**

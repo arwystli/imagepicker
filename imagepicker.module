@@ -74,7 +74,7 @@ function imagepicker_menu() {
   $items = array();
   $items['imagepicker'] = array(
     'title'            => 'Image picker',
-    'page callback'    => 'imagepicker_upload',
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.upload.inc'
@@ -87,21 +87,21 @@ function imagepicker_menu() {
   );
   $items['imagepicker/browse'] = array(
     'title'            => 'Browse',
-    'page callback'    => 'imagepicker_browse',
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2,
   );
   $items['imagepicker/browse_public'] = array(
     'title'            => 'Browse Public',
-    'page callback'    => 'imagepicker_browse_public',
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use_public',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 3
   );
   $items['imagepicker/groups'] = array(
     'title'            => 'Groups',
-    'page callback'    => 'imagepicker_groups',
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use_group',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.group.inc',
@@ -109,24 +109,21 @@ function imagepicker_menu() {
   );
   $items['imagepicker/browse/%imagepicker_id'] = array(
     'title'            => 'Browse',
-    'page callback'    => 'imagepicker_browse',
-    'page arguments'   => array(2),
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2
   );
   $items['imagepicker/edit/%imagepicker_id'] = array(
     'title'            => 'Edit image',
-    'page callback'    => 'imagepicker_image_edit',
-    'page arguments'   => array(2),
+    'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.edit.inc'
   );
   $items['imagepicker/image/%imagepicker_id'] = array(
     'title'            => 'Imagepicker',
-    'page callback'    => 'imagepicker_image_page',
-    'page arguments'   => array(2),
+    'page callback'    => 'imagepicker_box',
     'access arguments' => array('access content'),
     'type'             => MENU_CALLBACK
   );
@@ -629,19 +626,21 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
 function imagepicker_browse($img_id=0) {
 
   if ( $img_id ) {
-    imagepicker_image_select($img_id);
-    exit();
+    return imagepicker_image_select($img_id);
   }
-  return theme('imagepicker', array('content' => _imagepicker_browse()));
+  else {
+    return theme('imagepicker_iframe', array('content' => _imagepicker_browse()));
+  }
 }
 
 function imagepicker_browse_public($img_id=0) {
 
   if ( $img_id ) {
-    imagepicker_image_select($img_id, FALSE, TRUE);
-    exit();
+    return imagepicker_image_select($img_id, FALSE, TRUE);
   }
-  return theme('imagepicker', array('content' => _imagepicker_browse_public()));
+  else {
+    return theme('imagepicker_iframe', array('content' => _imagepicker_browse_public()));
+  }
 }
 
 function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $account = FALSE) {
@@ -674,7 +673,7 @@ function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $ac
     $content = '';
   }
 
-  return theme('imagepicker', array('content' => $content, 'img' => $img, 'public' => $public));
+  return theme('imagepicker_iframe', array('content' => $content, 'img' => $img, 'public' => $public));
 }
 
 /**
@@ -3293,5 +3292,47 @@ function imagepicker_get_user_settings($varname, $default, $uid = FALSE) {
     $out = $default;
   }
   return $out;
+}
+
+// all iframe links pass through here
+function imagepicker_box() {
+  $a1 = FALSE;
+  $a2 = 0;
+
+  if (arg(1)) {
+    $a1 = arg(1);
+  }
+  if (arg(2) && is_numeric(arg(2))) {
+    $a2 = arg(2);
+  }
+dd('a1='.$a1.' a2='.$a2);
+  if ($a1 == 'browse') {
+    $content = imagepicker_browse($a2);
+  }
+  elseif ($a1 == 'browse_public') {
+    $content = imagepicker_browse_public($a2);
+  }
+  elseif ($a1 == 'groups') {
+    $content = imagepicker_groups();
+  }
+  elseif ($a1 == 'edit') {
+    $content = imagepicker_image_edit($a2);
+  }
+  elseif ($a1 == 'image') {
+    $content = imagepicker_image_page($a2);
+  }
+  elseif ($a1 == 'upload_postlet') {
+    $content = imagepicker_postlet_page();
+  }
+  else {
+    $content = imagepicker_upload();
+  }
+  $path = drupal_get_path('module', 'imagepicker');
+  drupal_add_css($path .'/imagepicker.css');
+
+  $output = theme('imagepicker', array('content' => $content));
+  print $output;
+  exit;
+
 }
 
