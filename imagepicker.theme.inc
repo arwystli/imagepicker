@@ -228,8 +228,8 @@ function imagepicker_theme() {
 
 // set up the iframe
 function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
-  $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css($path .'/imagepicker.css');
+
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   if ($img) {
     global $user;
     $settings = array(
@@ -254,7 +254,7 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
       ),
     );
     drupal_add_js($settings, 'setting');
-    drupal_add_js($path .'/imagepicker_iframe.js');
+    drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_iframe.js');
   }
   return $content;
 }

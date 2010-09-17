@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-09-18
+------------------------------------
+by hutch, added IMAGEPICKER_PATH constant
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-09-08
 ------------------------------------
 by hutch, improved iframe integration

@@ -12,6 +12,7 @@ define('IMAGEPICKER_THUMBS_DIR', 'thumbs');
 define('IMAGEPICKER_BROWSER_DIR', 'browser');
 define('IMAGEPICKER_ORIG_DIR', 'orig');
 define('IMAGEPICKER_WATERMARK_DIR', 'watermarks');
+define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
 
 /**
  * Implementation of hook_help().
@@ -768,8 +769,8 @@ function imagepicker_image_page($img_id) {
   $result = db_query_range("SELECT i.*, u.name FROM {imagepicker} AS i JOIN {users} AS u USING (uid) WHERE img_id = '%d'", $img_id, 0, 1);
   $img = db_fetch_array($result);
   if ($img && is_array($img) && count($img)) {
-    $path = drupal_get_path('module', 'imagepicker');
-    drupal_add_css($path .'/imagepicker.css');
+
+    drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
     drupal_set_title($img['img_title']);
     // js link
     $account = user_load(array('uid' => $img['uid']));
@@ -2482,7 +2483,7 @@ function imagepicker_thickbox_js() {
       $height = $user->imagepicker_advanced_iframe_height;
     }
     drupal_add_js(array('imagepicker_thickbox' => array('width' => $width, 'height' => $height)), 'setting');
-    drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker_thickbox.js');
+    drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_thickbox.js');
   }
 }
 
@@ -3132,8 +3133,8 @@ function imagepicker_box() {
   else {
     $content = imagepicker_upload();
   }
-  $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css($path .'/imagepicker.css');
+
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
 
   $output = theme('imagepicker', $content);
   print $output;

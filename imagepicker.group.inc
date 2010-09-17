@@ -8,7 +8,7 @@
  */
 
 function imagepicker_groups() {
-  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
 
   // from iframe
   if (! arg(2)) {

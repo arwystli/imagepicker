@@ -21,8 +21,8 @@ function imagepicker_settings_page($op = NULL) {
  *   Returns the form.
  */
 function imagepicker_settings_form($form_state) {
-  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
-  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
 
   // default settings
   $form['imagepicker_settings'] = array(
@@ -604,7 +604,7 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
     global $user;
     $userdir = FALSE;
   }
-  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
   $img = _imagepicker_get_img($img_id, FALSE, $user);
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
@@ -1274,8 +1274,8 @@ function imagepicker_files_validate($dir) {
 }
 
 function imagepicker_admin_groups() {
-  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
+  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
   module_load_include('inc', 'imagepicker', 'imagepicker.group');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
@@ -1342,8 +1342,8 @@ function imagepicker_admin_groups() {
 }
 
 function imagepicker_admin_images() {
-  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
-  drupal_add_js(drupal_get_path('module', 'imagepicker') .'/imagepicker.js');
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
+  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
@@ -1556,7 +1556,7 @@ function imagepicker_quota_form_submit($form, &$form_state) {
 }
 
 function imagepicker_admin_import() {
-  drupal_add_css(drupal_get_path('module', 'imagepicker') .'/imagepicker.css');
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   module_load_include('inc', 'imagepicker', 'imagepicker.import');
   if (! arg(4) ) {
     variable_del('imagepicker_currentuser');
