@@ -130,7 +130,7 @@ function imagepicker_edit_form_process($form, &$form_state) {
     if ($img->uid == $user->uid) {
       $title = htmlspecialchars($form_state['values']['title']);
       $description = htmlspecialchars($form_state['values']['description']);
-      $date = date('Y-m-d H:i:s');
+      $date = time();
 
       $num_updated = db_update('imagepicker')
         ->fields(array(

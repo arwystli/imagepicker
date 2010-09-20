@@ -18,7 +18,7 @@
   <?php echo $scripts ?>
   <script type="text/javascript"><?php /* Needed to avoid Flash of Unstyle Content in IE */ ?> </script>
 </head>
-<body id="imagepicker">
+<body id="imagepicker" class="html not-front logged-in no-sidebars overlay" >
   <table border="0" cellpadding="0" cellspacing="0" id="content" width="680">
   <tr>
     <td valign="top">

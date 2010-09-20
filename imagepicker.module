@@ -15,6 +15,7 @@ define('IMAGEPICKER_WATERMARK_DIR', 'watermarks');
 define('IMAGEPICKER_DESC_LEN', 30);
 define('IMAGEPICKER_FILE_SCHEME', 'public://');
 define('IMAGEPICKER_ADMIN_PATH', 'admin/config/media/imagepicker');
+define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
 
 /**
  * Implement hook_help().
@@ -819,8 +820,8 @@ function imagepicker_image_page($img_id) {
   // $img is now object
 
   if ($img && is_array($img) && count($img)) {
-    $path = drupal_get_path('module', 'imagepicker');
-    drupal_add_css($path . '/imagepicker.css');
+
+    drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
     drupal_set_title($img->img_title);
     // js link
     $account = user_load($img->uid);
@@ -1513,7 +1514,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         check_plain($row->img_title),
         $description,
         l($row->name, $listpath),
-        check_plain($row->img_date),
+        date('Y-m-d H:i:s', $row->img_date),
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row->img_id, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row->img_id)),
         ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row->img_id, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row->img_id)),
       );
@@ -1523,7 +1524,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         l($img_name, $imgpath . $row->img_id),
         check_plain($row->img_title),
         $description,
-        check_plain($row->img_date),
+        date('Y-m-d H:i:s', $row->img_date),
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row->img_id, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row->img_id)),
         ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row->img_id, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row->img_id)),
       );
@@ -3177,7 +3178,7 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
         'img_name' => $img_name,
         'img_title' => $img_title,
         'img_description' => $img_description,
-        'img_date' => date('Y-m-d H:i:s'),
+        'img_date' => time(),
       )
     )->execute();
   return $nextimgid;
@@ -3327,8 +3328,8 @@ dd('a1='.$a1.' a2='.$a2);
   else {
     $content = imagepicker_upload();
   }
-  $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css($path .'/imagepicker.css');
+
+  drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
 
   $output = theme('imagepicker', array('content' => $content));
   print $output;

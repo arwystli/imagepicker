@@ -9,7 +9,7 @@
  */
 function imagepicker_user_page($uid, $path="", $func="", $id=0) {
 
-  drupal_add_css(drupal_get_path('module', 'imagepicker') . '/imagepicker.css');
+  drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
   $content = '';
   // path/func/id
   if ($path == 'images') {
@@ -90,7 +90,7 @@ function imagepicker_user_browse_admin() {
 
 function imagepicker_user_view($img_id) {
 
-  drupal_add_js(drupal_get_path('module', 'imagepicker') . '/imagepicker.js');
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
   $form1 = '';
   $form2 = '';
   $form3 = '';

@@ -172,8 +172,7 @@ function theme_imagepicker_iframe($variables) {
   $img = (isset($variables['img']) ? $variables['img'] : '');
   $public = (isset($variables['public']) ? $variables['public'] : FALSE);
 
-  $path = drupal_get_path('module', 'imagepicker');
-  drupal_add_css($path .'/imagepicker.css');
+  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   if ($img) {
     global $user;
     $img_title = check_plain($img->img_title);
@@ -198,7 +197,7 @@ function theme_imagepicker_iframe($variables) {
       ),
     );
     drupal_add_js($settings, 'setting');
-    drupal_add_js($path .'/imagepicker_iframe.js');
+    drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_iframe.js');
   }
   return $content;
 }

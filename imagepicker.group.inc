@@ -12,14 +12,17 @@ function imagepicker_groups() {
   // from iframe
   if (! arg(2)) {
     $content = imagepicker_groups_list();
-    $content .= drupal_get_form('imagepicker_groups_form');
+    $form = drupal_get_form('imagepicker_groups_form');
+    $content .= drupal_render($form);
   }
   elseif ( arg(2) == 'edit') {
     $record = imagepicker_get_user_group(arg(3));
-    $content .= drupal_get_form('imagepicker_groups_form', $record);
+    $form = drupal_get_form('imagepicker_groups_form', $record);
+    $content .= drupal_render($form);
   }
   elseif (arg(2) == 'delete') {
-    $content .= drupal_get_form('imagepicker_group_delete_form', arg(3));
+    $form = drupal_get_form('imagepicker_group_delete_form', arg(3));
+    $content .= drupal_render($form);
   }
   elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
     imagepicker_set_user_group_state(1, arg(2));

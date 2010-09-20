@@ -1,6 +1,9 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-09-21
+------------------------------------
+by hutch, fixed datetime bug
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-08
 ------------------------------------

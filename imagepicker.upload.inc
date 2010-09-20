@@ -362,7 +362,7 @@ function imagepicker_get_uploaded_file_name($destination, $name) {
 
 function imagepicker_upload_progress_get_script($delay) {
 
-  drupal_add_js(drupal_get_path('module', 'imagepicker') . '/imagepicker.js');
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
   drupal_add_js(array('imagepicker_upload_progress' => array('delay' => $delay[0])), 'setting');
 }
 

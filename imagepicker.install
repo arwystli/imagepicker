@@ -62,8 +62,10 @@ function imagepicker_schema() {
         'default' => ''),
       'img_date' => array(
         'description' => 'The image date',
-        'type' => 'datetime',
-        'not null' => TRUE),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
     ),
     'indexes' => array(
       'uid' => array('uid'),
