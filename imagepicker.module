@@ -192,7 +192,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -9
   );
-  $items['admin/settings/imagepicker/images/browse_public'] = array(
+  $items['admin/settings/imagepicker/images/browse_all'] = array(
     'title'            => 'Browse All',
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -201,7 +201,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -9
   );
-  $items['admin/settings/imagepicker/images/list_public'] = array(
+  $items['admin/settings/imagepicker/images/list_all'] = array(
     'title'            => 'List All',
     'description'      => 'List user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -307,6 +307,16 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -3
   );
+  // multitask
+  $items['admin/settings/imagepicker/multitask/%/%/%'] = array(
+    'title' => 'Bulk Operations',
+    'page callback' => 'imagepicker_multitask',
+    'page arguments' => array(1, 4, 5, 6),
+    'access callback'  => 'imagepicker_access_admin',
+    'type' => MENU_CALLBACK,
+#    'file' => 'imagepicker.admin.inc',
+  );
+
   // My imagepicker
   $items['user/%imagepicker_uid/imagepicker'] = array(
     'title'            => 'My imagepicker',
@@ -389,6 +399,15 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.user.inc',
     'weight'           => -2
   );
+  // multitask
+  $items['user/%imagepicker_uid/imagepicker/multitask/%/%/%'] = array(
+    'title' => 'Bulk Operations',
+    'page callback' => 'imagepicker_multitask',
+    'page arguments' => array(1, 4, 5, 6),
+    'access callback'  => 'imagepicker_access_user_pages',
+    'type' => MENU_CALLBACK,
+    'file' => 'imagepicker.user.inc',
+  );
   return $items;
 }
 
@@ -402,18 +421,6 @@ function imagepicker_id_load($arg) {
 function imagepicker_uid_load($arg) {
   global $user;
   return ((is_numeric($arg) && $user->uid == $arg) ? $arg : FALSE);
-}
-
-function imagepicker_path_load($arg) {
-  $allowed = array('upload', 'images', 'groups', 'stats');
-  return ( in_array($arg, $allowed) ? $arg : FALSE);
-  return $arg;
-}
-
-function imagepicker_func_load($arg) {
-  $allowed = array('browse', 'browseadmin', 'edit', 'delete', 'browse_public');
-  return ( in_array($arg, $allowed) ? $arg : FALSE);
-  return $arg;
 }
 
 /**
@@ -733,7 +740,19 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
   else {
     $outpath ='imagepicker/browse';
   }
+  _imagepicker_image_delete($img_id, $account, $src);
+  drupal_goto($outpath);
+}
 
+function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
+  if ($account) {
+    $user = $account;
+    $userdir = array('name' => $user->name, 'uid' => $user->uid);
+  }
+  else {
+    global $user;
+    $userdir = TRUE;
+  }
   $img = _imagepicker_get_img($img_id, ($src=='admin' ? FALSE : TRUE), ($account ? $user : FALSE));
   if ($img) {
     $destination = imagepicker_get_path(FALSE, $userdir);
@@ -756,7 +775,7 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
   else {
     drupal_set_message(t('Image not found.'), 'error');
   }
-  drupal_goto($outpath);
+  return;
 }
 
 /**
@@ -878,6 +897,419 @@ function imagepicker_strip_messages($msg) {
     $msg = preg_replace($pattern, '', $msg);
   }
   return $msg;
+}
+
+function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FALSE, $public=FALSE, $range=1) {
+  if ($account) {
+    $user = $account;
+  }
+  else {
+    global $user;
+  }
+  // paths
+  if ($src == 'iframe') {
+    $path = '';
+    $editpath   = "imagepicker/edit/";
+    $deletepath = "imagepicker/delete/";
+    $imgpath    = 'imagepicker/browse/';
+  }
+  elseif ($src == 'admin') {
+    $path = 'admin/settings/';
+    $editpath   = $path .'imagepicker/images/user/'. $user->uid .'/edit/';
+    $deletepath = $path .'imagepicker/images/user/'. $user->uid .'/delete/';
+    $imgpath    = $path .'imagepicker/images/user/'. $user->uid .'/browse/';
+    $returnpath = 'a-'. $user->uid;
+  }
+  else {
+    $path = 'user/'. $user->uid .'/';
+    $editpath   = $path .'imagepicker/images/edit/';
+    $deletepath = $path .'imagepicker/images/delete/';
+    $imgpath    = $path .'imagepicker/images/browse/';
+    $returnpath = 'u-'. $user->uid;
+  }
+
+  // if there are groups
+  if (variable_get('imagepicker_groups_enabled', 1)) {
+    $gid = 0;
+    if (! $public) {
+      if (_imagepicker_has_groups( ($src == 'admin' ? $user : FALSE) ) && imagepicker_has_grouplist(($src == 'admin' ? $user : FALSE))) {
+        // add groups select here
+        $gids = imagepicker_get_user_group_state(1, ($src == 'admin' ? $user : FALSE));
+        $gid = $gids[0];
+        if ($account) {
+          $gid = variable_get('imagepicker_currentgroup', 0);
+        }
+      }
+    }
+    elseif ($src == 'admin' && _imagepicker_has_public_groups($user, TRUE)) {
+      $gid = variable_get('imagepicker_public_currentgroup', 0);
+    }
+  }
+
+  // tablesort
+  if ($public && $src == 'admin') {
+    $header = array(
+      array(),
+      array('data' => t('Name'), 'field' => 'i.img_name'),
+      array('data' => t('Title'), 'field' => 'i.img_title'),
+      t('Description'),
+      array('data' => t('User'), 'field' => 'n.name'),
+      array('data' => t('Date'), 'field' => 'i.img_date'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+  else {
+    $header = array(
+      array(),
+      array('data' => t('Name'), 'field' => 'i.img_name'),
+      array('data' => t('Title'), 'field' => 'i.img_title'),
+      t('Description'),
+      array('data' => t('Date'), 'field' => 'i.img_date'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+
+  $use_icons = variable_get('imagepicker_use_icons', 1);
+
+  if ($src == 'admin') {
+    $how_many = variable_get('imagepicker_rows_per_page', 25);
+  }
+  else {
+    $how_many = (isset($user->imagepicker_rows_per_page) ? $user->imagepicker_rows_per_page : variable_get('imagepicker_rows_per_page', 25));
+  }
+  $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
+  $searchs = trim($searchs);
+  $sarr = '';
+  $searchsql = '';
+  if ($searchs) {
+    $xarr = _imagepicker_search_opts($searchs);
+    $searchsql = $xarr[0];
+    $sarr = $xarr[1];
+  }
+  if ($public && $src == 'admin') {
+    if ($range == 1) {
+      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+        FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
+        WHERE i.uid=n.uid AND u.public=1 AND g.img_id=i.img_id AND u.gid=g.gid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      if ($gid) {
+        $sql .= " AND u.gid = %d";
+        $garr = array($gid);
+      }
+      $sql .= tablesort_sql($header);
+      $label = t('List All Public Images');
+    }
+    elseif ($range == 2) {
+      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+        FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
+        WHERE i.uid=n.uid AND u.public=0 AND g.img_id=i.img_id AND u.gid=g.gid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
+      $label = t('List All Private Images');
+    }
+    else {
+      $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
+        FROM {imagepicker} i, {users} n
+        WHERE i.uid = n.uid";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
+    }
+    if (is_array($sarr) || is_array($garr)) {
+      $rarr = array();
+      if (is_array($sarr)) {
+        $rarr = $sarr;
+      }
+      if (is_array($garr)) {
+        $rarr = array_merge($rarr, $garr);
+      }
+      $result = pager_query($sql, $how_many, 0, NULL, $rarr);
+    }
+    else {
+      $result = pager_query($sql, $how_many, 0, NULL);
+    }
+  }
+  else {
+    // filter by selected group
+    if ($gid) {
+      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
+        FROM {imagepicker} i, {imagepicker_group_images} g
+        WHERE i.uid=%d AND i.img_id=g.img_id AND g.gid=%d";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+      $sql .= tablesort_sql($header);
+      if ($searchsql) {
+        $rarr = array_merge(array($user->uid, $gid), $sarr);
+      }
+      else {
+        $rarr = array($user->uid, $gid);
+      }
+    }
+    else {
+      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
+        FROM {imagepicker} i
+        WHERE i.uid=%d";
+      if ($searchsql) {
+        $sql .= $searchsql;
+      }
+
+      $sql .= tablesort_sql($header);
+      if ($searchsql) {
+        $rarr = array_merge(array($user->uid), $sarr);
+      }
+      else {
+        $rarr = array($user->uid);
+      }
+    }
+    $result = pager_query($sql, $how_many, 0, NULL, $rarr);
+  }
+
+  $form['options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Bulk operations'),
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+  );
+  $form['options']['operation'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      'delete' => t('Delete'),
+    ),
+    '#default_value' => 'delete',
+  );
+  $form['options']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+  );
+  $form['options']['src'] = array(
+    '#type' => 'value',
+    '#value' => $src,
+  );
+  $form['options']['public'] = array(
+    '#type' => 'value',
+    '#value' => $public,
+  );
+  $form['options']['path'] = array(
+    '#type' => 'value',
+    '#value' => $path,
+  );
+  $rowct = 0;
+  while ($row = db_fetch_array($result)) {
+    // img_id img_name  img_title       img_description
+    $img_name = check_plain($row['img_name']);
+    $img_id = $row['img_id'];
+    $description = check_plain($row['img_description']);
+    if ( drupal_strlen($description) > 30 ) {
+      $description = drupal_substr($description, 0, 30) .'...';
+    }
+
+    if ($public && $src == 'admin') {
+      $editpath   = $path .'imagepicker/images/user/'. $row['uid'] .'/edit/';
+      $deletepath = $path .'imagepicker/images/user/'. $row['uid'] .'/delete/';
+      $imgpath    = $path .'imagepicker/images/user/'. $row['uid'] .'/browse/';
+      $listpath   = $path .'imagepicker/images/user/'. $row['uid'] .'/browseadmin';
+      $returnpath = 'a';
+      $editlink = ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id']));
+      $deletelink = ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id']));
+      $imglink = l($img_name, $imgpath . $img_id);
+      $listlink = l($row['name'], $listpath);
+      $form['img_name'][$img_id] = array('#value' => $imglink);
+      $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
+      $form['img_desc'][$img_id] = array('#value' => $description);
+      $form['img_list'][$img_id] = array('#value' => $listlink);
+      $form['img_date'][$img_id] = array('#value' => check_plain($row['img_date']));
+      $form['img_edit'][$img_id] = array('#value' => $editlink);
+      $form['img_delete'][$img_id] = array('#value' => $deletelink);
+      $cols = 7;
+    }
+    else {
+      $imglink = l($img_name, $imgpath . $img_id);
+      $editlink = ($use_icons ? _imagepicker_get_icon('edit', $editpath . $img_id, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $img_id));
+      $deletelink = ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $img_id, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $img_id));
+      $form['img_name'][$img_id] = array('#value' => $imglink);
+      $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
+      $form['img_desc'][$img_id] = array('#value' => $description);
+      $form['img_date'][$img_id] = array('#value' => check_plain($row['img_date']));
+      $form['img_edit'][$img_id] = array('#value' => $editlink);
+      $form['img_delete'][$img_id] = array('#value' => $deletelink);
+      $cols = 6;
+    }
+    $images[$img_id] = '';
+    $rowct++;
+  } // end of while loop
+
+  $form['images'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $images,
+  );
+  $form['options']['cols'] = array(
+    '#type' => 'value',
+    '#value' => $cols,
+  );
+  $form['options']['returnpath'] = array(
+    '#type' => 'value',
+    '#value' => $returnpath,
+  );
+  $pager = theme('pager', NULL, $max);
+  if ($pager) {
+    $form['pager'] = array('#value' => $pager);
+  }
+  $form['#submit'][] = 'imagepicker_browse_admin_form_submit';
+  if ($rowct) {
+    return $form;
+  }
+  return FALSE;
+}
+
+/**
+ * Submit form
+ */
+function imagepicker_browse_admin_form_submit($form, &$form_state) {
+  $operation = $form_state['values']['operation'];
+  $path = '';
+  if (isset($form_state['values']['path'])) {
+    $path = $form_state['values']['path'];
+  }
+  $returnpath = $form_state['values']['returnpath'];
+  $images = array_filter($form_state['values']['images']);
+  $img_ids = '';
+  if ($images) {
+    foreach ($images AS $img_id) {
+      $img_ids[] = $img_id;
+    }
+  }
+  if (is_array($img_ids)) {
+    $simg_ids = implode('-', $img_ids);
+    drupal_goto($path . "imagepicker/multitask/$operation/$simg_ids/$returnpath");
+  }
+  else {
+    $rpath = '';
+    if ($returnpath == 'a') {
+      $rpath = 'admin/settings/imagepicker/images/list_all';
+    }
+    else {
+      $a = explode('-', $returnpath);
+      if (is_numeric($a[1])) {
+        if ($a[0] == 'a') {
+          $rpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
+        }
+        elseif ($a[0] == 'u') {
+          $rpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
+        }
+      }
+    }
+    drupal_set_message(t('No images selected'));
+    drupal_goto($rpath);
+  }
+}
+
+/**
+ *
+ * Menu callback for imagepicker multitask.
+ * @param $path
+ * @param $mode
+ * @param $simg_ids
+ * @param $returnpath
+ */
+function imagepicker_multitask($path, $mode = '', $simg_ids = '', $returnpath = '') {
+
+  if ($path == 'settings') {
+    $path = 'admin/settings/';
+  }
+  else {
+    global $user;
+    $path = 'user/' . $user->uid .'/';
+  }
+  $output = '';
+  if ($mode && $simg_ids) {
+    switch ($mode) {
+      case 'delete':
+        // really delete?, auto themed
+        $output .= drupal_get_form('imagepicker_multitask_delete_form', $simg_ids, $returnpath);
+        $cancelpath = '';
+        if ($returnpath == 'a') {
+          $cancelpath = 'admin/settings/imagepicker/images/list_all';
+        }
+        else {
+          $a = explode('-', $returnpath);
+          if (is_numeric($a[1])) {
+            if ($a[0] == 'a') {
+              $cancelpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
+            }
+            elseif ($a[0] == 'u') {
+              $cancelpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
+            }
+          }
+        }
+        $output .= l(t('Cancel'), $cancelpath);
+        break;
+    }
+  }
+  return $output;
+}
+
+function imagepicker_multitask_delete_form(&$form_state, $simg_ids, $returnpath) {
+
+  $form['multitask_delete'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Bulk delete'),
+    '#description' => t('Delete all the selected images.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['multitask_delete']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete All'),
+  );
+  $form['simg_ids'] = array(
+    '#type' => 'value',
+    '#value' => $simg_ids
+  );
+  $form['returnpath'] = array(
+    '#type' => 'value',
+    '#value' => $returnpath
+  );
+  $img_ids = explode('-', $simg_ids);
+  $form['countnids'] = array(
+    '#type' => 'value',
+    '#value' => count($img_ids)
+  );
+  $form['#submit'][] = 'imagepicker_multitask_delete_form_submit';
+  return $form;
+}
+
+function imagepicker_multitask_delete_form_submit($form, &$form_state) {
+  $simg_ids = $form_state['values']['simg_ids'];
+  $returnpath = $form_state['values']['returnpath'];
+
+  $img_ids = explode('-', $simg_ids);
+  foreach ($img_ids AS $img_id) {
+    _imagepicker_image_delete($img_id, FALSE, 'admin');
+  }
+
+  drupal_set_message(t('%c deleted', array('%c' => format_plural( count($img_ids), t('1 image'), t('@count images'))) ));
+  $rpath = '';
+  if ($returnpath == 'a') {
+    $rpath = 'admin/settings/imagepicker/images/list_all';
+  }
+  else {
+    $a = explode('-', $returnpath);
+    if (is_numeric($a[1])) {
+      if ($a[0] == 'a') {
+        $rpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
+      }
+      elseif ($a[0] == 'u') {
+        $rpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
+      }
+    }
+  }
+  drupal_goto($rpath);
 }
 
 function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
@@ -1269,38 +1701,13 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
   }
 
   $content = "";
-  // paths
-  if ($src == 'iframe') {
-    $editpath   = "imagepicker/edit/";
-    $deletepath = "imagepicker/delete/";
-    $imgpath    = 'imagepicker/browse/';
-  }
-  elseif ($src == 'admin') {
-    $editpath   = 'admin/settings/imagepicker/images/user/'. $user->uid .'/edit/';
-    $deletepath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/delete/';
-    $imgpath    = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse/';
-  }
-  else {
-    $editpath   = 'user/'. $user->uid .'/imagepicker/images/edit/';
-    $deletepath = 'user/'. $user->uid .'/imagepicker/images/delete/';
-    $imgpath    = 'user/'. $user->uid .'/imagepicker/images/browse/';
-  }
   // if there are groups
   if (variable_get('imagepicker_groups_enabled', 1)) {
-    $gid = 0;
     if (! $public) {
       if (_imagepicker_has_groups( ($src == 'admin' ? $user : FALSE) ) && imagepicker_has_grouplist(($src == 'admin' ? $user : FALSE))) {
         // add groups select here
         $content .= drupal_get_form('imagepicker_browse_groups_form', ($src == 'admin' ? $user : FALSE));
-        $gids = imagepicker_get_user_group_state(1, ($src == 'admin' ? $user : FALSE));
-        $gid = $gids[0];
-        if ($account) {
-          $gid = variable_get('imagepicker_currentgroup', 0);
-        }
       }
-    }
-    elseif ($src == 'admin' && _imagepicker_has_public_groups($user, TRUE)) {
-      $gid = variable_get('imagepicker_public_currentgroup', 0);
     }
   }
   if ($src != 'admin' && isset($user->imagepicker_show_browse_search_form) && $user->imagepicker_show_browse_search_form ) {
@@ -1309,174 +1716,13 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
   elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
     $content .= drupal_get_form('imagepicker_browse_search_form');
   }
-  $use_icons = variable_get('imagepicker_use_icons', 1);
 
-  if ($src == 'admin') {
-    $how_many = variable_get('imagepicker_rows_per_page', 25);
-  }
-  else {
-    $how_many = (isset($user->imagepicker_rows_per_page) ? $user->imagepicker_rows_per_page : variable_get('imagepicker_rows_per_page', 25));
-  }
-
-  $searchs = (isset($user->imagepicker_browser_search) ? $user->imagepicker_browser_search : '');
-  $searchs = trim($searchs);
-  $sarr = '';
-  $searchsql = '';
-  if ($searchs) {
-    $xarr = _imagepicker_search_opts($searchs);
-    $searchsql = $xarr[0];
-    $sarr = $xarr[1];
-  }
-
-  // tablesort
-  if ($public && $src == 'admin') {
-    $header = array(
-      array('data' => t('Name'), 'field' => 'i.img_name'),
-      array('data' => t('Title'), 'field' => 'i.img_title'),
-      t('Description'),
-      array('data' => t('User'), 'field' => 'n.name'),
-      array('data' => t('Date'), 'field' => 'i.img_date'),
-      array('data' => t('Actions'), 'colspan' => 2),
-    );
-  }
-  else {
-    $header = array(
-      array('data' => t('Name'), 'field' => 'i.img_name'),
-      array('data' => t('Title'), 'field' => 'i.img_title'),
-      t('Description'),
-      array('data' => t('Date'), 'field' => 'i.img_date'),
-      array('data' => t('Actions'), 'colspan' => 2),
-    );
-  }
-
-  if ($public && $src == 'admin') {
-    if ($range == 1) {
-      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-        FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-        WHERE i.uid=n.uid AND u.public=1 AND g.img_id=i.img_id AND u.gid=g.gid";
-      if ($searchsql) {
-        $sql .= $searchsql;
-      }
-      if ($gid) {
-        $sql .= " AND u.gid = %d";
-        $garr = array($gid);
-      }
-      $sql .= tablesort_sql($header);
-      $label = t('List All Public Images');
-    }
-    elseif ($range == 2) {
-      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-        FROM {imagepicker} i, {users} n, {imagepicker_user_groups} u, {imagepicker_group_images} g
-        WHERE i.uid=n.uid AND u.public=0 AND g.img_id=i.img_id AND u.gid=g.gid";
-      if ($searchsql) {
-        $sql .= $searchsql;
-      }
-      $sql .= tablesort_sql($header);
-      $label = t('List All Private Images');
-    }
-    else {
-      $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date, n.name
-        FROM {imagepicker} i, {users} n
-        WHERE i.uid = n.uid";
-      if ($searchsql) {
-        $sql .= $searchsql;
-      }
-      $sql .= tablesort_sql($header);
-    }
-    if (is_array($sarr) || is_array($garr)) {
-      $rarr = array();
-      if (is_array($sarr)) {
-        $rarr = $sarr;
-      }
-      if (is_array($garr)) {
-        $rarr = array_merge($rarr, $garr);
-      }
-      $result = pager_query($sql, $how_many, 0, NULL, $rarr);
-    }
-    else {
-      $result = pager_query($sql, $how_many, 0, NULL);
-    }
-  }
-  else {
-    // filter by selected group
-    if ($gid) {
-      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
-        FROM {imagepicker} i, {imagepicker_group_images} g
-        WHERE i.uid=%d AND i.img_id=g.img_id AND g.gid=%d";
-      if ($searchsql) {
-        $sql .= $searchsql;
-      }
-      $sql .= tablesort_sql($header);
-      if ($searchsql) {
-        $rarr = array_merge(array($user->uid, $gid), $sarr);
-      }
-      else {
-        $rarr = array($user->uid, $gid);
-      }
-    }
-    else {
-      $sql = "SELECT i.img_id, i.uid, i.img_name, i.img_title, i.img_description, i.img_date
-        FROM {imagepicker} i
-        WHERE i.uid=%d";
-      if ($searchsql) {
-        $sql .= $searchsql;
-      }
-
-      $sql .= tablesort_sql($header);
-      if ($searchsql) {
-        $rarr = array_merge(array($user->uid), $sarr);
-      }
-      else {
-        $rarr = array($user->uid);
-      }
-    }
-    $result = pager_query($sql, $how_many, 0, NULL, $rarr);
-  }
-
-  $rows = array();
-  while ($row = db_fetch_array($result)) {
-    // img_id img_name 	img_title 	img_description
-    $img_name = check_plain($row['img_name']);
-    $description = check_plain($row['img_description']);
-    if ( drupal_strlen($description) > 30 ) {
-      $description = drupal_substr($description, 0, 30) .'...';
-    }
-
-    if ($public && $src == 'admin') {
-      $editpath   = 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/edit/';
-      $deletepath = 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/delete/';
-      $imgpath    = 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse/';
-      $listpath   = 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browseadmin';
-      $row_data = array(
-        l($img_name, $imgpath . $row['img_id']),
-        check_plain($row['img_title']),
-        $description,
-        l($row['name'], $listpath),
-        check_plain($row['img_date']),
-        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
-        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
-      );
-      $cols = 7;
-    }
-    else {
-      $row_data = array(
-        l($img_name, $imgpath . $row['img_id']),
-        check_plain($row['img_title']),
-        $description,
-        check_plain($row['img_date']),
-        ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id'])),
-        ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id'])),
-      );
-      $cols = 6;
-    }
-
-    $rows[] = $row_data;
-  }
+  $adminform = drupal_get_form('imagepicker_browse_admin_form', $src, $account, $public, $range);
 
   $pref = '<div class="imgp_imgs_list">';
   $suff = '</div>';
   $message = '';
-  if (count($rows)) {
+  if ($adminform) {
     if ($public && $src == 'admin') {
       $content .= drupal_get_form('imagepicker_browse_public_form');
       if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
@@ -1484,6 +1730,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
         $content .= drupal_get_form('imagepicker_browse_public_groups_form', $user, TRUE);
       }
     }
+    $content .= $adminform;
   }
   else {
     $ibp = variable_get('imagepicker_browse_public', 0);
@@ -1510,8 +1757,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
       $message = t('There are no !status images', array('!status' => $ibpout));
     }
   }
-  $content .= theme('imagepicker_list', $header, $rows, $how_many, $message, '<div class="imgp_imgs_list">', '</div>', $label, $cols);
-  return $content;
+  return theme('imagepicker_browse_admin', $content, $message, $pref, $suff, $label);
 }
 
 function _imagepicker_user_has_img($account = FALSE) {
@@ -3141,4 +3387,3 @@ function imagepicker_box() {
   exit;
 
 }
-

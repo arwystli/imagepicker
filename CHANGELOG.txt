@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-09-23
+------------------------------------
+by hutch, added Bulk Operations to image list
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-09-18
 ------------------------------------
 by hutch, added IMAGEPICKER_PATH constant

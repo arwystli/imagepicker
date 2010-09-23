@@ -1353,14 +1353,14 @@ function imagepicker_admin_images() {
   if ( arg(4) == 'user' && is_numeric(arg(5))) {
     $uid = arg(5);
   }
-  elseif (arg(4) == 'browse_public' || arg(4) == 'stats' || arg(4) == 'users' || arg(4) == 'list_public') {
+  elseif (arg(4) == 'browse_all' || arg(4) == 'stats' || arg(4) == 'users' || arg(4) == 'list_all') {
     $action = arg(4);
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
     $uid = variable_get('imagepicker_currentuser', '');
   }
   $imgaction = '';
-  if ( arg(6) == 'browse_public'
+  if ( arg(6) == 'browse_all'
     || arg(6) == 'browse'
     || arg(6) == 'edit'
     || arg(6) == 'delete'
@@ -1458,10 +1458,10 @@ function imagepicker_admin_images() {
     if ($action == 'stats') {
       $content .= imagepicker_group_stats(FALSE, t('Statistics'));
     }
-    elseif ($action == 'browse_public') {
+    elseif ($action == 'browse_all') {
       $content .= _imagepicker_browse_public('admin', variable_get('imagepicker_browse_public', 0), t('Browse All Images'));
     }
-    elseif ($action == 'list_public') {
+    elseif ($action == 'list_all') {
       $content .= _imagepicker_browse_admin('admin', FALSE, TRUE, variable_get('imagepicker_browse_public', 0), t('List All Images'));
     }
     else {

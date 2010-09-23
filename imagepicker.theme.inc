@@ -223,6 +223,25 @@ function imagepicker_theme() {
         'form' => array(),
       ),
     ),
+    'imagepicker_browse_admin_form' => array(
+      'arguments' => array(
+        'form' => array(),
+      ),
+    ),
+    'imagepicker_browse_admin' => array(
+      'arguments' => array(
+        'content' => '',
+        'message' => '',
+        'pref' => '',
+        'suff' => '',
+        'label' => '',
+      ),
+    ),
+    'imagepicker_multitask_delete_form' => array(
+      'arguments' => array(
+        'form' => array(),
+      ),
+    ),
   );
 }
 
@@ -658,4 +677,91 @@ function template_preprocess_imagepicker(&$variables) {
 
 }
 
+function theme_imagepicker_browse_admin_form($form) {
+  $src = $form['options']['src']['#value'];
+  $cols = $form['options']['cols']['#value'];
+  $public = $form['options']['public']['#value'];
+  // tablesort
+  if ($public && $src == 'admin') {
+    $header = array(
+      theme('table_select_header_cell'),
+      array('data' => t('Name'), 'field' => 'i.img_name'),
+      array('data' => t('Title'), 'field' => 'i.img_title'),
+      t('Description'),
+      array('data' => t('User'), 'field' => 'n.name'),
+      array('data' => t('Date'), 'field' => 'i.img_date'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+  else {
+    $header = array(
+      theme('table_select_header_cell'),
+      array('data' => t('Name'), 'field' => 'i.img_name'),
+      array('data' => t('Title'), 'field' => 'i.img_title'),
+      t('Description'),
+      array('data' => t('Date'), 'field' => 'i.img_date'),
+      array('data' => t('Actions'), 'colspan' => 2),
+    );
+  }
+
+  $output = drupal_render($form['options']);
+
+  if (isset($form['img_name']) && is_array($form['img_name'])) {
+    foreach (element_children($form['img_name']) as $key) {
+      if ($public && $src == 'admin') {
+        $rows[] = array(
+          drupal_render($form['images'][$key]),
+          drupal_render($form['img_name'][$key]),
+          drupal_render($form['img_title'][$key]),
+          drupal_render($form['img_desc'][$key]),
+          drupal_render($form['img_list'][$key]),
+          drupal_render($form['img_date'][$key]),
+          drupal_render($form['img_edit'][$key]),
+          drupal_render($form['img_delete'][$key]),
+        );
+      }
+      else {
+        $rows[] = array(
+          drupal_render($form['images'][$key]),
+          drupal_render($form['img_name'][$key]),
+          drupal_render($form['img_title'][$key]),
+          drupal_render($form['img_desc'][$key]),
+          drupal_render($form['img_date'][$key]),
+          drupal_render($form['img_edit'][$key]),
+          drupal_render($form['img_delete'][$key]),
+        );
+      }
+    }
+  }
+  else {
+    $rows[] = array(array('data' => t('No images available.'), 'colspan' => $cols));
+  }
+  if ($form['pager']['#value']) {
+    $pager = drupal_render($form['pager']);
+    $rows[] = array(array('data' => $pager, 'colspan' => $cols+1));
+  }
+  $output .= theme('table', $header, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}
+
+function theme_imagepicker_browse_admin($content='', $message="", $pref="", $suff="", $label="") {
+  $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
+  if ($content) {
+    $output .= $pref . $content . $suff;
+  }
+  else {
+    $output .= '<div class="messages">'. $message .'</div>';
+  }
+  $output .= ($label ? '</fieldset>' : '');
+  return $output;
+}
+
+function theme_imagepicker_multitask_delete_form($form) {
+  $output = '';
+  $count = $form['countnids']['#value'];
+  $output .= '<p>'. t('You have selected %c to be deleted', array('%c' => format_plural( $count, t('1 image'), t('@count images')))) . '</p>';
+  $output .= drupal_render($form);
+  return $output;
+}
 
