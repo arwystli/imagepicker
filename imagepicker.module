@@ -115,14 +115,14 @@ function imagepicker_menu() {
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2
   );
-  $items['imagepicker/edit/%imagepicker_id'] = array(
+  $items['imagepicker/edit'] = array(
     'title'            => 'Edit image',
     'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.edit.inc'
   );
-  $items['imagepicker/image/%imagepicker_id'] = array(
+  $items['imagepicker/image'] = array(
     'title'            => 'Imagepicker',
     'page callback'    => 'imagepicker_box',
     'access arguments' => array('access content'),

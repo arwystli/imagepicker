@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-09-30
+------------------------------------
+by hutch, fixed MENU_CALLBACK, no dynamic entries allowed
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-21
 ------------------------------------
 by hutch, fixed datetime bug
