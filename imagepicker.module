@@ -3306,7 +3306,7 @@ function imagepicker_box() {
   if (arg(2) && is_numeric(arg(2))) {
     $a2 = arg(2);
   }
-dd('a1='.$a1.' a2='.$a2);
+
   if ($a1 == 'browse') {
     $content = imagepicker_browse($a2);
   }
