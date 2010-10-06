@@ -1259,7 +1259,7 @@ function imagepicker_multitask_delete_form_submit($form, &$form_state) {
     _imagepicker_image_delete($img_id, FALSE, 'admin');
   }
 
-  drupal_set_message(t('%c deleted', array('%c' => format_plural( count($img_ids), t('1 image'), t('@count images'))) ));
+  drupal_set_message(t('%c deleted', array('%c' => format_plural( count($img_ids), '1 image', '@count images'))));
   $rpath = imagepicker_multitask_returnpath($returnpath);
   drupal_goto($rpath);
 }
@@ -1357,8 +1357,7 @@ function imagepicker_multitask_groups_form_submit($form, &$form_state) {
         }
       }
     }
-    drupal_set_message(
-    t('%c ', array('%c' => format_plural( count($img_ids), t('1 image'), t('@count images')))) .' '. ($action == 'add' ? t('added') : t('removed')));
+    drupal_set_message(t('%c ', array('%c' => format_plural( count($img_ids), '1 image', '@count images'))) .' '. ($action == 'add' ? t('added') : t('removed')));
   }
 
   $rpath = imagepicker_multitask_returnpath($returnpath);

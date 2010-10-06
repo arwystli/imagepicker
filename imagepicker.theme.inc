@@ -769,7 +769,7 @@ function theme_imagepicker_browse_admin($content='', $message="", $pref="", $suf
 function theme_imagepicker_multitask_delete_form($form) {
   $output = '';
   $count = $form['countnids']['#value'];
-  $output .= '<p>'. t('You have selected %c to be deleted', array('%c' => format_plural( $count, t('1 image'), t('@count images')))) . '</p>';
+  $output .= '<p>'. t('You have selected %c to be deleted', array('%c' => format_plural( $count, '1 image', '@count images'))) . '</p>';
   $output .= drupal_render($form);
   return $output;
 }
@@ -777,7 +777,7 @@ function theme_imagepicker_multitask_delete_form($form) {
 function theme_imagepicker_multitask_groups_form($form) {
   $output = '';
   $count = $form['countnids']['#value'];
-  $output .= '<p>'. t('You have selected %c to be grouped', array('%c' => format_plural( $count, t('1 image'), t('@count images')))) . '</p>';
+  $output .= '<p>'. t('You have selected %c to be grouped', array('%c' => format_plural( $count, '1 image', '@count images'))) . '</p>';
   $output .= drupal_render($form);
   return $output;
 }
