@@ -418,6 +418,15 @@ function imagepicker_settings_form($form_state) {
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_import_delete', 0),
   );
+  $form['imagepicker_import']['imagepicker_import_max'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Import Batch size'),
+    '#description' => t('How many files to process at a time. Must be greater than 1 and less than 100.'),
+    '#size' => 3,
+    '#required' => TRUE,
+    '#default_value' => variable_get('imagepicker_import_max', 5),
+  );
+
   $form = system_settings_form($form);
   unset($form['#theme']);
   return $form;
@@ -485,6 +494,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
       form_set_error('imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
     }
   }
+  if (! is_numeric($form_state['values']['imagepicker_import_max']) || ($form_state['values']['imagepicker_import_max'] < 1 || $form_state['values']['imagepicker_import_max'] > 100 )) {
+    form_set_error('imagepicker_import_max', t('The Import batch size must be must be a positive number.'));
+  }
 
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
     user_save($user, array('imagepicker_browser_order' => NULL));
@@ -542,9 +554,9 @@ function imagepicker_admin_users_list($dir, $label='') {
 
     $row_data = array(
       check_plain($row['name']),
-      ($allcount ? $allcount .' '. l(t('images'), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
-      (variable_get('imagepicker_groups_enabled', 1) ? ($groupcount ? ($groupcount .' '. l(t('groups'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse' )) : t('No groups')) : ''),
-      (variable_get('imagepicker_quota_enable', 1) ? l(imagepicker_get_quota_list($quota+1), 'admin/settings/imagepicker/images/user/'. $row['uid'] .'/quota') : ''),
+      ($allcount ? $allcount .' '. l(t('images'), IMAGEPICKER_ADMIN_PATH .'/images/user/'. $row['uid'] .'/browse' ) : t('No images')),
+      (variable_get('imagepicker_groups_enabled', 1) ? ($groupcount ? ($groupcount .' '. l(t('groups'), IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $row['uid'] .'/browse' )) : t('No groups')) : ''),
+      (variable_get('imagepicker_quota_enable', 1) ? l(imagepicker_get_quota_list($quota+1), IMAGEPICKER_ADMIN_PATH .'/images/user/'. $row['uid'] .'/quota') : ''),
       $usedbytesprint,
     );
     $rows[] = $row_data;
@@ -575,14 +587,14 @@ function imagepicker_admin_groups_list($label="") {
   $result = pager_query($sql, $how_many, 0, $countsql);
 
   while ($row = db_fetch_array($result)) {
-    $editpath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/edit/'. $row['gid'];
-    $deletepath = 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/delete/'. $row['gid'];
+    $editpath = IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $row['uid'] .'/edit/'. $row['gid'];
+    $deletepath = IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $row['uid'] .'/delete/'. $row['gid'];
     $imgct = imagepicker_group_images_count($row['gid']);
     $row_data = array(
       $row['group_name'],
-      l($row['name'], 'admin/settings/imagepicker/groups/user/'. $row['uid']),
+      l($row['name'], IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $row['uid']),
       ($row['public'] ? t('Public') : t('Private')),
-      ($imgct ? l(format_plural($imgct, '1 image', '@count images'), 'admin/settings/imagepicker/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
+      ($imgct ? l(format_plural($imgct, '1 image', '@count images'), IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $row['uid'] .'/browse/'. $row['gid'] ) : t('No images')),
       ($use_icons ? _imagepicker_get_icon('edit', $editpath, array('title' => t('Edit'))) : l(t('Edit'), $editpath)),
       ($use_icons ?  _imagepicker_get_icon('delete', $deletepath, array('title' => t('Delete'))) : l(t('Delete'), $deletepath)),
     );
@@ -667,7 +679,7 @@ function imagepicker_admin_image_form_submit($form, &$form_state) {
     imagepicker_image_delete($form_state['values']['img_id'], $account, 'admin');
   }
   elseif ($form_state['values']['op'] == t('Edit image')) {
-    drupal_goto('admin/settings/imagepicker/images/user/'. $form_state['values']['account'] .'/edit/'. $form_state['values']['img_id'] .'');
+    drupal_goto(IMAGEPICKER_ADMIN_PATH .'/images/user/'. $form_state['values']['account'] .'/edit/'. $form_state['values']['img_id'] .'');
   }
 }
 
@@ -680,8 +692,7 @@ function imagepicker_user_search_form($form_state, $dir) {
   $form['imagepicker_currentuser'] = array(
     '#type' => 'textfield',
     '#title' => t('Users'),
-    '#description' => '',
-    '#autocomplete_path' => 'admin/settings/imagepicker/'. $dir .'/autocomplete',
+    '#autocomplete_path' => IMAGEPICKER_ADMIN_PATH .'/'. $dir .'/autocomplete',
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
@@ -704,7 +715,7 @@ function imagepicker_user_search_form_submit($form, &$form_state) {
     $row = db_fetch_array($result);
     if ($row['uid'] ) {
       variable_set('imagepicker_currentuser', $row['uid']);
-      drupal_goto('admin/settings/imagepicker/'. $form_state['values']['dir'] .'/user/'. $row['uid']);
+      drupal_goto(IMAGEPICKER_ADMIN_PATH .'/'. $form_state['values']['dir'] .'/user/'. $row['uid']);
     }
     else {
       variable_del('imagepicker_currentuser');
@@ -1296,16 +1307,14 @@ function imagepicker_admin_groups() {
     $gid = arg(7);
     if (arg(6) == 'browse') {
       variable_set('imagepicker_currentgroup', $gid);
-      drupal_goto('admin/settings/imagepicker/images/user/'. $uid .'/browse');
+      drupal_goto(IMAGEPICKER_ADMIN_PATH .'/images/user/'. $uid .'/browse');
     }
   }
   $name = '';
   $content = '';
   if ($uid) {
     $account = user_load(array('uid' => $uid));
-    $result = db_query("SELECT u.name FROM {users} u, {imagepicker} i WHERE u.uid = %d AND u.uid=i.uid", $uid);
-    $row = db_fetch_array($result);
-    $name = $row['name'];
+    $name = $account->name;
   }
   if (variable_get('imagepicker_groups_enabled', 1)) {
     $content .= drupal_get_form('imagepicker_group_search_form');
@@ -1448,7 +1457,7 @@ function imagepicker_admin_images() {
       $content .= theme('imagepicker_quota', $form, $message, $label);
     }
     elseif ($imgaction == 'groups') {
-      drupal_goto('admin/settings/imagepicker/groups/user/'. $uid);
+      drupal_goto(IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $uid);
     }
     else {
       $content .= _imagepicker_browse('admin', $account, t('Browse images for %name', array('%name' => $name)));
@@ -1481,7 +1490,7 @@ function imagepicker_group_search_form($form_state, $dir = 'groups') {
     '#type' => 'textfield',
     '#title' => t('Groups'),
     '#description' => '',
-    '#autocomplete_path' => 'admin/settings/imagepicker/groups/autocomplete',
+    '#autocomplete_path' => IMAGEPICKER_ADMIN_PATH .'/groups/autocomplete',
     '#default_value' => '',
     '#maxlength' => 30,
     '#size' => 25,
@@ -1503,7 +1512,7 @@ function imagepicker_group_search_form_submit($form, &$form_state) {
     $row = db_fetch_array($result);
     if ($row['gid'] ) {
       variable_set('imagepicker_currentgroup', $row['gid']);
-      drupal_goto('admin/settings/imagepicker/'. $form_state['values']['dir'] .'/user/'. $row['uid'] .'/edit/'. $row['gid']);
+      drupal_goto(IMAGEPICKER_ADMIN_PATH .'/'. $form_state['values']['dir'] .'/user/'. $row['uid'] .'/edit/'. $row['gid']);
     }
     else {
       variable_set('imagepicker_currentgroup', 0);

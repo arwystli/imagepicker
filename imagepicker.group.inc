@@ -91,8 +91,6 @@ function imagepicker_groups_form(&$form_state, $record=0, $account=FALSE) {
         '#description' => t('Add roles for public access to your group. (Don\'t check anything to make it available to all roles.)'),
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
-        '#prefix' => '<div id="wrap-group-public-roles">',
-        '#suffix' => '</div>',
       );
       // Output a list of available roles as checkboxes
       $form['groupsave']['group_public_roles']['roles']['#tree'] = TRUE;
@@ -274,9 +272,9 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   }
   if ($src) {
     if ($src == 'admin') {
-      $editpath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/edit/';
-      $deletepath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/delete/';
-      $browsepath = 'admin/settings/imagepicker/groups/user/'. $user->uid .'/browse/';
+      $editpath = IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $user->uid .'/edit/';
+      $deletepath = IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $user->uid .'/delete/';
+      $browsepath = IMAGEPICKER_ADMIN_PATH .'/groups/user/'. $user->uid .'/browse/';
     }
     else {
       $editpath = 'user/'. $user->uid .'/imagepicker/groups/edit/';

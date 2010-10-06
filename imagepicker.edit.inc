@@ -77,7 +77,7 @@ function imagepicker_edit_form_cancel($form, &$form_state) {
   }
 
   if ($form_state['values']['src'] == 'admin') {
-    $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse/'. $img_id;
+    $outpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $user->uid .'/browse/'. $img_id;
 
   }
   elseif ($form_state['values']['src'] == 'account') {
@@ -102,7 +102,7 @@ function imagepicker_edit_form_process($form, &$form_state) {
   }
 
   if ($src == 'admin') {
-    $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse/'. $img_id;
+    $outpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $user->uid .'/browse/'. $img_id;
   }
   elseif ($src == 'account') {
     $outpath = 'user/'. $user->uid .'/imagepicker/images/browse/'. $img_id;

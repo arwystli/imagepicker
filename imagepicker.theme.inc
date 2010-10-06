@@ -242,6 +242,11 @@ function imagepicker_theme() {
         'form' => array(),
       ),
     ),
+    'imagepicker_multitask_groups_form' => array(
+      'arguments' => array(
+        'form' => array(),
+      ),
+    ),
   );
 }
 
@@ -556,6 +561,8 @@ function theme_imagepicker_edit_form($form) {
 
 function theme_imagepicker_groups_form($form) {
   $output = '';
+  $form['groupsave']['group_public_roles']['#prefix'] = '<div id="wrap-group-public-roles">';
+  $form['groupsave']['group_public_roles']['#suffix'] = '</div>';
   $output .= drupal_render($form);
   return $output;
 }
@@ -681,6 +688,8 @@ function theme_imagepicker_browse_admin_form($form) {
   $src = $form['options']['src']['#value'];
   $cols = $form['options']['cols']['#value'];
   $public = $form['options']['public']['#value'];
+  $form['options']['#prefix'] = '<div class="container-inline">';
+  $form['options']['#suffix'] = '</div>';
   // tablesort
   if ($public && $src == 'admin') {
     $header = array(
@@ -761,6 +770,14 @@ function theme_imagepicker_multitask_delete_form($form) {
   $output = '';
   $count = $form['countnids']['#value'];
   $output .= '<p>'. t('You have selected %c to be deleted', array('%c' => format_plural( $count, t('1 image'), t('@count images')))) . '</p>';
+  $output .= drupal_render($form);
+  return $output;
+}
+
+function theme_imagepicker_multitask_groups_form($form) {
+  $output = '';
+  $count = $form['countnids']['#value'];
+  $output .= '<p>'. t('You have selected %c to be grouped', array('%c' => format_plural( $count, t('1 image'), t('@count images')))) . '</p>';
   $output .= drupal_render($form);
   return $output;
 }

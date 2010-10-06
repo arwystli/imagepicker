@@ -245,7 +245,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
             }
             drupal_set_message(t('Image was successfully uploaded.'));
             if (isset($form_state['values']['admin'])) {
-              $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse';
+              $outpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $user->uid .'/browse';
             }
             elseif (isset($form_state['values']['account'])) {
               $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
@@ -284,7 +284,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
     }
   }
   if (isset($form_state['values']['admin'])) {
-    $outpath = 'admin/settings/imagepicker/images';
+    $outpath = IMAGEPICKER_ADMIN_PATH .'/images';
   }
   elseif (isset($form_state['values']['account'])) {
     $outpath = 'user/'. $user->uid .'/imagepicker';

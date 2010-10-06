@@ -12,6 +12,7 @@ define('IMAGEPICKER_THUMBS_DIR', 'thumbs');
 define('IMAGEPICKER_BROWSER_DIR', 'browser');
 define('IMAGEPICKER_ORIG_DIR', 'orig');
 define('IMAGEPICKER_WATERMARK_DIR', 'watermarks');
+define('IMAGEPICKER_ADMIN_PATH', 'admin/settings/imagepicker');
 define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
 
 /**
@@ -102,7 +103,7 @@ function imagepicker_menu() {
     'type'             => MENU_CALLBACK
   );
   // admin settings
-  $items['admin/settings/imagepicker'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH] = array(
     'title'            => 'Imagepicker',
     'description'      => 'Imagepicker settings and administration.',
     'page callback'    => 'imagepicker_settings_page',
@@ -111,7 +112,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => 0
   );
-  $items['admin/settings/imagepicker/general'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/general'] = array(
     'title'            => 'General',
     'description'      => 'Imagepicker settings.',
     'access callback'  => 'imagepicker_access_admin',
@@ -122,7 +123,7 @@ function imagepicker_menu() {
     'weight'           => -10
   );
   // admin groups and images
-  $items['admin/settings/imagepicker/groups'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups'] = array(
     'title'            => 'Groups',
     'description'      => 'Show user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -131,7 +132,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
   );
-  $items['admin/settings/imagepicker/groups/users'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/users'] = array(
     'title'            => 'Users',
     'description'      => 'Show user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -140,7 +141,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -10
   );
-  $items['admin/settings/imagepicker/groups/stats'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/stats'] = array(
     'title'            => 'Stats',
     'description'      => 'Show user group stats.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -149,7 +150,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
   );
-  $items['admin/settings/imagepicker/groups/user/%imagepicker_id'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/user/%imagepicker_id'] = array(
     'title'            => 'Groups',
     'description'      => 'Show user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -158,7 +159,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -7
   );
-  $items['admin/settings/imagepicker/groups/user/%imagepicker_id/stats'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/user/%imagepicker_id/stats'] = array(
     'title'            => 'Stats',
     'description'      => 'Show user stats.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -167,13 +168,13 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
   );
-  $items['admin/settings/imagepicker/groups/autocomplete'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/autocomplete'] = array(
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_group_search_autocomplete',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.admin.inc'
   );
-  $items['admin/settings/imagepicker/images/stats'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/stats'] = array(
     'title'            => 'Stats All',
     'description'      => 'Show user statistics.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -183,7 +184,7 @@ function imagepicker_menu() {
     'weight'           => -7
   );
   // admin images
-  $items['admin/settings/imagepicker/images'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images'] = array(
     'title'            => 'Images',
     'description'      => 'Show user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -192,7 +193,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -9
   );
-  $items['admin/settings/imagepicker/images/browse_all'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/browse_all'] = array(
     'title'            => 'Browse All',
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -201,7 +202,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -9
   );
-  $items['admin/settings/imagepicker/images/list_all'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/list_all'] = array(
     'title'            => 'List All',
     'description'      => 'List user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -210,7 +211,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
   );
-  $items['admin/settings/imagepicker/images/users'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/users'] = array(
     'title'            => 'Users',
     'description'      => 'List users.',
     'access callback'  => 'imagepicker_access_admin',
@@ -219,7 +220,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -10
   );
-  $items['admin/settings/imagepicker/images/user/%imagepicker_id/browse'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/browse'] = array(
     'title'            => 'Browse',
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -228,7 +229,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -4
   );
-  $items['admin/settings/imagepicker/images/user/%imagepicker_id/browseadmin'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/browseadmin'] = array(
     'title'            => 'List',
     'description'      => 'List user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -237,7 +238,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -3
   );
-  $items['admin/settings/imagepicker/images/user/%imagepicker_id/upload'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/upload'] = array(
     'title'            => 'Upload',
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
@@ -247,7 +248,7 @@ function imagepicker_menu() {
     'weight'           => -6
   );
 
-  $items['admin/settings/imagepicker/images/user/%imagepicker_id/stats'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/stats'] = array(
     'title'            => 'Stats',
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -256,7 +257,7 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -2
   );
-  $items['admin/settings/imagepicker/images/user/%imagepicker_id/groups'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/groups'] = array(
     'title'            => 'Groups',
     'description'      => 'List user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
@@ -265,14 +266,14 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -1
   );
-  $items['admin/settings/imagepicker/images/autocomplete'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/autocomplete'] = array(
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_user_autocomplete',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.admin.inc'
   );
   // admin validation
-  $items['admin/settings/imagepicker/convert'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/convert'] = array(
     'title'            => 'Validate Files',
     'description'      => 'Validate and convert Imagepicker Files.',
     'access callback'  => 'imagepicker_access_admin',
@@ -283,7 +284,7 @@ function imagepicker_menu() {
     'weight'           => -7
   );
   // Import
-  $items['admin/settings/imagepicker/import'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/import'] = array(
     'title'            => 'Import',
     'description'      => 'Manage bulk imports.',
     'page callback'    => 'imagepicker_admin_import',
@@ -292,13 +293,13 @@ function imagepicker_menu() {
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
   );
-  $items['admin/settings/imagepicker/import/autocomplete'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/import/autocomplete'] = array(
     'access callback'  => 'imagepicker_access_import',
     'page callback'    => 'imagepicker_user_autocomplete',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.admin.inc'
   );
-  $items['admin/settings/imagepicker/import/user/%imagepicker_id'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/import/user/%imagepicker_id'] = array(
     'title'            => 'Import',
     'description'      => 'Import files.',
     'access callback'  => 'imagepicker_access_import',
@@ -308,13 +309,12 @@ function imagepicker_menu() {
     'weight'           => -3
   );
   // multitask
-  $items['admin/settings/imagepicker/multitask/%/%/%'] = array(
+  $items[IMAGEPICKER_ADMIN_PATH .'/multitask/%/%/%'] = array(
     'title' => 'Bulk Operations',
     'page callback' => 'imagepicker_multitask',
-    'page arguments' => array(1, 4, 5, 6),
+    'page arguments' => array(4, 5, 6),
     'access callback'  => 'imagepicker_access_admin',
     'type' => MENU_CALLBACK,
-#    'file' => 'imagepicker.admin.inc',
   );
 
   // My imagepicker
@@ -403,10 +403,9 @@ function imagepicker_menu() {
   $items['user/%imagepicker_uid/imagepicker/multitask/%/%/%'] = array(
     'title' => 'Bulk Operations',
     'page callback' => 'imagepicker_multitask',
-    'page arguments' => array(1, 4, 5, 6),
+    'page arguments' => array(4, 5, 6),
     'access callback'  => 'imagepicker_access_user_pages',
     'type' => MENU_CALLBACK,
-    'file' => 'imagepicker.user.inc',
   );
   return $items;
 }
@@ -735,7 +734,7 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
     $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
   }
   elseif ($src == 'admin') {
-    $outpath = 'admin/settings/imagepicker/images/user/'. $user->uid .'/browse';
+    $outpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $user->uid .'/browse';
   }
   else {
     $outpath ='imagepicker/browse';
@@ -899,6 +898,9 @@ function imagepicker_strip_messages($msg) {
   return $msg;
 }
 
+/**
+ * list of images with bulk operations
+ */
 function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FALSE, $public=FALSE, $range=1) {
   if ($account) {
     $user = $account;
@@ -914,17 +916,17 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
     $imgpath    = 'imagepicker/browse/';
   }
   elseif ($src == 'admin') {
-    $path = 'admin/settings/';
-    $editpath   = $path .'imagepicker/images/user/'. $user->uid .'/edit/';
-    $deletepath = $path .'imagepicker/images/user/'. $user->uid .'/delete/';
-    $imgpath    = $path .'imagepicker/images/user/'. $user->uid .'/browse/';
+    $path = IMAGEPICKER_ADMIN_PATH;
+    $editpath   = $path .'/images/user/'. $user->uid .'/edit/';
+    $deletepath = $path .'/images/user/'. $user->uid .'/delete/';
+    $imgpath    = $path .'/images/user/'. $user->uid .'/browse/';
     $returnpath = 'a-'. $user->uid;
   }
   else {
-    $path = 'user/'. $user->uid .'/';
-    $editpath   = $path .'imagepicker/images/edit/';
-    $deletepath = $path .'imagepicker/images/delete/';
-    $imgpath    = $path .'imagepicker/images/browse/';
+    $path = 'user/'. $user->uid . '/imagepicker';
+    $editpath   = $path .'/images/edit/';
+    $deletepath = $path .'/images/delete/';
+    $imgpath    = $path .'/images/browse/';
     $returnpath = 'u-'. $user->uid;
   }
 
@@ -1073,14 +1075,16 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
   $form['options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Bulk operations'),
-    '#prefix' => '<div class="container-inline">',
-    '#suffix' => '</div>',
   );
+  if ($src == 'admin' && ! $account) {
+    $op_opts = array('delete' => t('Delete'));
+  }
+  else {
+    $op_opts = array('delete' => t('Delete'), 'groups' => t('Groups'));
+  }
   $form['options']['operation'] = array(
     '#type' => 'select',
-    '#options' => array(
-      'delete' => t('Delete'),
-    ),
+    '#options' => $op_opts,
     '#default_value' => 'delete',
   );
   $form['options']['submit'] = array(
@@ -1110,10 +1114,10 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
     }
 
     if ($public && $src == 'admin') {
-      $editpath   = $path .'imagepicker/images/user/'. $row['uid'] .'/edit/';
-      $deletepath = $path .'imagepicker/images/user/'. $row['uid'] .'/delete/';
-      $imgpath    = $path .'imagepicker/images/user/'. $row['uid'] .'/browse/';
-      $listpath   = $path .'imagepicker/images/user/'. $row['uid'] .'/browseadmin';
+      $editpath   = $path .'/images/user/'. $row['uid'] .'/edit/';
+      $deletepath = $path .'/images/user/'. $row['uid'] .'/delete/';
+      $imgpath    = $path .'/images/user/'. $row['uid'] .'/browse/';
+      $listpath   = $path .'/images/user/'. $row['uid'] .'/browseadmin';
       $returnpath = 'a';
       $editlink = ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['img_id'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['img_id']));
       $deletelink = ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $row['img_id'], array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $row['img_id']));
@@ -1186,24 +1190,10 @@ function imagepicker_browse_admin_form_submit($form, &$form_state) {
   }
   if (is_array($img_ids)) {
     $simg_ids = implode('-', $img_ids);
-    drupal_goto($path . "imagepicker/multitask/$operation/$simg_ids/$returnpath");
+    drupal_goto($path . "/multitask/$operation/$simg_ids/$returnpath");
   }
   else {
-    $rpath = '';
-    if ($returnpath == 'a') {
-      $rpath = 'admin/settings/imagepicker/images/list_all';
-    }
-    else {
-      $a = explode('-', $returnpath);
-      if (is_numeric($a[1])) {
-        if ($a[0] == 'a') {
-          $rpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
-        }
-        elseif ($a[0] == 'u') {
-          $rpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
-        }
-      }
-    }
+    $rpath = imagepicker_multitask_returnpath($returnpath);
     drupal_set_message(t('No images selected'));
     drupal_goto($rpath);
   }
@@ -1212,43 +1202,25 @@ function imagepicker_browse_admin_form_submit($form, &$form_state) {
 /**
  *
  * Menu callback for imagepicker multitask.
- * @param $path
  * @param $mode
  * @param $simg_ids
  * @param $returnpath
  */
-function imagepicker_multitask($path, $mode = '', $simg_ids = '', $returnpath = '') {
+function imagepicker_multitask($mode = '', $simg_ids = '', $returnpath = '') {
 
-  if ($path == 'settings') {
-    $path = 'admin/settings/';
-  }
-  else {
-    global $user;
-    $path = 'user/' . $user->uid .'/';
-  }
+  $cancelpath = imagepicker_multitask_returnpath($returnpath);
   $output = '';
   if ($mode && $simg_ids) {
     switch ($mode) {
       case 'delete':
         // really delete?, auto themed
         $output .= drupal_get_form('imagepicker_multitask_delete_form', $simg_ids, $returnpath);
-        $cancelpath = '';
-        if ($returnpath == 'a') {
-          $cancelpath = 'admin/settings/imagepicker/images/list_all';
-        }
-        else {
-          $a = explode('-', $returnpath);
-          if (is_numeric($a[1])) {
-            if ($a[0] == 'a') {
-              $cancelpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
-            }
-            elseif ($a[0] == 'u') {
-              $cancelpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
-            }
-          }
-        }
         $output .= l(t('Cancel'), $cancelpath);
         break;
+      case 'groups':
+        // select some groups
+        $output .= drupal_get_form('imagepicker_multitask_groups_form', $simg_ids, $returnpath);
+        $output .= l(t('Cancel'), $cancelpath);
     }
   }
   return $output;
@@ -1267,23 +1239,17 @@ function imagepicker_multitask_delete_form(&$form_state, $simg_ids, $returnpath)
     '#type' => 'submit',
     '#value' => t('Delete All'),
   );
-  $form['simg_ids'] = array(
-    '#type' => 'value',
-    '#value' => $simg_ids
-  );
-  $form['returnpath'] = array(
-    '#type' => 'value',
-    '#value' => $returnpath
-  );
+  $form['simg_ids'] = array('#type' => 'value', '#value' => $simg_ids);
+  $form['returnpath'] = array('#type' => 'value', '#value' => $returnpath);
   $img_ids = explode('-', $simg_ids);
-  $form['countnids'] = array(
-    '#type' => 'value',
-    '#value' => count($img_ids)
-  );
+  $form['countnids'] = array('#type' => 'value', '#value' => count($img_ids));
   $form['#submit'][] = 'imagepicker_multitask_delete_form_submit';
   return $form;
 }
 
+/**
+ * Submit form
+ */
 function imagepicker_multitask_delete_form_submit($form, &$form_state) {
   $simg_ids = $form_state['values']['simg_ids'];
   $returnpath = $form_state['values']['returnpath'];
@@ -1294,22 +1260,128 @@ function imagepicker_multitask_delete_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('%c deleted', array('%c' => format_plural( count($img_ids), t('1 image'), t('@count images'))) ));
+  $rpath = imagepicker_multitask_returnpath($returnpath);
+  drupal_goto($rpath);
+}
+
+function imagepicker_multitask_groups_form(&$form_state, $simg_ids, $returnpath) {
+
+  $img_ids = explode('-', $simg_ids);
+  $countnids = count($img_ids);
+
+  $sql = "SELECT uid FROM {imagepicker} WHERE img_id = %d";
+  $result = db_query($sql, array($img_ids[0]));
+  $row = db_fetch_array($result);
+  $account = user_load(array('uid' => $row['uid']));
+  $grouplist = imagepicker_get_groups($account);
+
+  $form['multitask_groups'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Bulk groups management'),
+    '#description' => t('Add/Remove all the selected images from groups.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['multitask_groups']['grouplist'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $grouplist,
+    '#title' => t('Your Groups'),
+  );
+  $form['multitask_groups']['action'] = array(
+    '#type' => 'select',
+    '#options' => array('add' => t('Add'), 'remove' => t('Remove')),
+    '#title' => t('Action'),
+    '#description' => t('Add or Remove selected images to one or more selected groups.'),
+  );
+  $form['multitask_groups']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add/Remove All'),
+  );
+
+  $form['simg_ids'] = array('#type' => 'value', '#value' => $simg_ids);
+  $form['returnpath'] = array('#type' => 'value', '#value' => $returnpath);
+  $form['countnids'] = array('#type' => 'value', '#value' => $countnids);
+  $form['#submit'][] = 'imagepicker_multitask_groups_form_submit';
+  return $form;
+}
+
+/**
+ * Validate form
+ */
+function imagepicker_multitask_groups_form_validate($form, &$form_state) {
+  $grouplist = array_filter($form_state['values']['grouplist']);
+  if (! count($grouplist)) {
+    form_set_error('grouplist', t('You did not select any groups.'));
+  }
+}
+
+/**
+ * Submit form
+ */
+function imagepicker_multitask_groups_form_submit($form, &$form_state) {
+
+  $simg_ids = $form_state['values']['simg_ids'];
+  $img_ids = explode('-', $simg_ids);
+  $returnpath = $form_state['values']['returnpath'];
+  $action = $form_state['values']['action'];
+  // list of selected groups
+  $grouplist = array_filter($form_state['values']['grouplist']);
+  $gids = '';
+  foreach ($grouplist AS $gid) {
+    $gids[] = $gid;
+  }
+
+  if (is_array($gids) && count($img_ids)) {
+    foreach ($img_ids AS $img_id) {
+      foreach ($gids AS $gid) {
+        $sql = "SELECT count(gid) AS ct FROM {imagepicker_group_images} WHERE gid = %d AND img_id = %d";
+        $result = db_query($sql, array($gid, $img_id));
+        $row = db_fetch_array($result);
+        $found = FALSE;
+        if ($row['ct'] > 0) {
+          $found = TRUE;
+        }
+        if ($action == 'add') {
+          if (! $found) {
+            // add $img_id to $gid
+            $rec['gid'] = $gid;
+            $rec['img_id'] = $img_id;
+            imagepicker_insert_group_image($rec);
+          }
+        }
+        else {
+          if ($found) {
+            // remove $img_id from $gid
+            imagepicker_delete_group_image($img_id);
+          }
+        }
+      }
+    }
+    drupal_set_message(
+    t('%c ', array('%c' => format_plural( count($img_ids), t('1 image'), t('@count images')))) .' '. ($action == 'add' ? t('added') : t('removed')));
+  }
+
+  $rpath = imagepicker_multitask_returnpath($returnpath);
+  drupal_goto($rpath);
+}
+
+function imagepicker_multitask_returnpath($returnpath) {
   $rpath = '';
   if ($returnpath == 'a') {
-    $rpath = 'admin/settings/imagepicker/images/list_all';
+    $rpath = IMAGEPICKER_ADMIN_PATH .'/images/list_all';
   }
   else {
     $a = explode('-', $returnpath);
     if (is_numeric($a[1])) {
       if ($a[0] == 'a') {
-        $rpath = 'admin/settings/imagepicker/images/user/'. $a[1] .'/browseadmin';
+        $rpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $a[1] .'/browseadmin';
       }
       elseif ($a[0] == 'u') {
         $rpath = 'user/'. $a[1] .'/imagepicker/images/browseadmin';
       }
     }
   }
-  drupal_goto($rpath);
+  return $rpath;
 }
 
 function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
@@ -1649,7 +1721,7 @@ function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account')
             $rows[$imgct]['imgurl'] = 'user/'. $user->uid .'/imagepicker/images/browse_public/';
           }
           elseif ($src == 'admin') {
-            $rows[$imgct]['imgurl'] = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
+            $rows[$imgct]['imgurl'] = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $img['uid'] .'/browse/';
           }
           else {
             $rows[$imgct]['imgurl'] = 'imagepicker/browse_public/';
@@ -1661,7 +1733,7 @@ function _imagepicker_thumbs_getrows($result, $public = FALSE, $src = 'account')
             $rows[$imgct]['imgurl'] = 'user/'. $user->uid .'/imagepicker/images/browse/';
           }
           elseif ($src == 'admin') {
-            $rows[$imgct]['imgurl'] = 'admin/settings/imagepicker/images/user/'. $img['uid'] .'/browse/';
+            $rows[$imgct]['imgurl'] = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $img['uid'] .'/browse/';
           }
           else {
             $rows[$imgct]['imgurl'] = 'imagepicker/browse/';
@@ -1801,6 +1873,9 @@ function _imagepicker_user_has_groups($public = 'all', $account = FALSE) {
 
 }
 
+/**
+ * How many groups a user has with images
+ */
 function _imagepicker_user_has_grouped_img($public = 'all', $account = FALSE) {
   if ($account) {
     $user = $account;
@@ -1825,6 +1900,9 @@ function _imagepicker_user_has_grouped_img($public = 'all', $account = FALSE) {
   return $row['ct'];
 }
 
+/**
+ * count of groups per user
+ */
 function imagepicker_has_groups($account=FALSE) {
   if ($account) {
     $user = $account;
@@ -1837,7 +1915,9 @@ function imagepicker_has_groups($account=FALSE) {
   return $row['gidct'];
 }
 
-// get all the groups for the current user;
+/**
+ * get all the groups for the current user
+ */
 function imagepicker_get_groups($account=FALSE) {
   if ($account) {
     $user = $account;
@@ -1857,6 +1937,9 @@ function imagepicker_get_groups($account=FALSE) {
   return FALSE;
 }
 
+/**
+ * get all for a group
+ */
 function imagepicker_get_user_group($gid, $obj=TRUE) {
   $result = db_query("SELECT * FROM {imagepicker_user_groups} WHERE gid = %d", array($gid));
   if ($obj) {
@@ -1865,7 +1948,9 @@ function imagepicker_get_user_group($gid, $obj=TRUE) {
   return db_fetch_array($result);
 }
 
-// get get the gid of the selected group
+/**
+ * get the gid of the selected group
+ */
 function imagepicker_get_user_group_state($state=1, $account = FALSE) {
   if ($account) {
     $user = $account;
@@ -1886,6 +1971,9 @@ function imagepicker_get_user_group_state($state=1, $account = FALSE) {
   return FALSE;
 }
 
+/**
+ * set group state
+ */
 function imagepicker_set_user_group_state($state, $gid, $account = FALSE) {
   if ($account) {
     $user = $account;
@@ -1897,7 +1985,9 @@ function imagepicker_set_user_group_state($state, $gid, $account = FALSE) {
   db_query("UPDATE {imagepicker_user_groups} SET state=%d WHERE gid=%d", array($state, $gid));
 }
 
-// for dropdown
+/**
+ * build groups select
+ */
 function imagepicker_get_grouplist($account = FALSE) {
   if ($account) {
     $user = $account;
@@ -1916,7 +2006,10 @@ function imagepicker_get_grouplist($account = FALSE) {
   }
   return $grouplist;
 }
-// for dropdown
+
+/**
+ * get how many groups
+ */
 function imagepicker_has_grouplist($account = FALSE) {
   if ($account) {
     $user = $account;
@@ -1936,7 +2029,9 @@ function imagepicker_has_grouplist($account = FALSE) {
   return $ct;
 }
 
-// for public dropdown
+/**
+ * for public dropdown
+ */
 function imagepicker_get_public_grouplist($account = FALSE, $admin = FALSE) {
   if ($account) {
     $user = $account;
@@ -1980,6 +2075,9 @@ function imagepicker_get_public_grouplist($account = FALSE, $admin = FALSE) {
   return FALSE;
 }
 
+/**
+ * how many public groups
+ */
 function _imagepicker_has_public_groups($account=FALSE, $admin = FALSE) {
   if (! variable_get('imagepicker_groups_enabled', 0)) {
     return 0;
@@ -1994,6 +2092,9 @@ function _imagepicker_has_public_groups($account=FALSE, $admin = FALSE) {
   return 0;
 }
 
+/**
+ * how many groups
+ */
 function _imagepicker_has_groups($account=FALSE) {
   if (! variable_get('imagepicker_groups_enabled', 0)) {
     return 0;
@@ -2009,7 +2110,9 @@ function _imagepicker_has_groups($account=FALSE) {
   return $row['ct'];
 }
 
-// get enabled groups that have images. usually just one
+/**
+ * get enabled groups that have images. usually just one
+ */
 function imagepicker_get_enabled_group($account = FALSE) {
   if (! variable_get('imagepicker_groups_enabled', 0)) {
     return FALSE;
@@ -2036,6 +2139,9 @@ function imagepicker_get_enabled_group($account = FALSE) {
   return FALSE;
 }
 
+/**
+ * all the groups for the current user which have images attached
+ */
 function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
   if ($account) {
     $user = $account;
@@ -2044,7 +2150,6 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
     global $user;
   }
 
-  // all the groups for the current user which have images attached
   $grouplist = imagepicker_get_grouplist($user);
   if ($account) {
     $enabledlist = variable_get('imagepicker_currentgroup', 0);
@@ -3346,7 +3451,9 @@ function imagepicker_group_images_count($gid) {
   return $row['ct'];
 }
 
-// all iframe links pass through here
+/**
+ * all iframe links pass through here
+ */
 function imagepicker_box() {
   $a1 = FALSE;
   $a2 = 0;
