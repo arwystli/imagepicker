@@ -230,7 +230,7 @@ function imagepicker_theme() {
     ),
     'imagepicker_browse_admin' => array(
       'arguments' => array(
-        'content' => '',
+        'forms' => '',
         'message' => '',
         'pref' => '',
         'suff' => '',
@@ -247,7 +247,37 @@ function imagepicker_theme() {
         'form' => array(),
       ),
     ),
+    'imagepicker_import_form' => array(
+      'arguments' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_import_dir_form' => array(
+      'arguments' => array(
+        'form' => NULL,
+      ),
+    ),
   );
+}
+
+// preprocess for imagepicker.tpl.php
+function template_preprocess_imagepicker(&$variables) {
+  global $language;
+  if (module_exists('admin_menu')) {
+    admin_menu_suppress();
+  }
+
+  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
+  $variables['styles'] = drupal_get_css();
+  $variables['scripts'] = drupal_get_js();
+  // fix jquery version thing in the iframe
+  if (module_exists('jquery_update')) {
+    jquery_update_preprocess_page($variables);
+  }
+  $variables['tabs'] = theme('menu_local_tasks');
+  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
+  $variables['language'] = $language;
+
 }
 
 // set up the iframe
@@ -318,9 +348,11 @@ function theme_imagepicker_browser($content, $forms='', $message='', $help='', $
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   // forms
   if ($forms) {
-    foreach ($forms AS $form) {
-      $output .= $form;
-    }
+    $output .= $forms['browse_search'];
+    $output .= $forms['browse_groups'];
+    $output .= $forms['browse_public'];
+    $output .= $forms['browse_public_groups'];
+    $output .= $forms['browse_order'];
   }
   if ($rows) {
     // help message
@@ -664,26 +696,6 @@ function theme_imagepicker_settings_form($form) {
   return $output;
 }
 
-// preprocess for imagepicker.tpl.php
-function template_preprocess_imagepicker(&$variables) {
-  global $language;
-  if (module_exists('admin_menu')) {
-    admin_menu_suppress();
-  }
-
-  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
-  $variables['styles'] = drupal_get_css();
-  $variables['scripts'] = drupal_get_js();
-  // fix jquery version thing in the iframe
-  if (module_exists('jquery_update')) {
-    jquery_update_preprocess_page($variables);
-  }
-  $variables['tabs'] = theme('menu_local_tasks');
-  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
-  $variables['language'] = $language;
-
-}
-
 function theme_imagepicker_browse_admin_form($form) {
   $src = $form['options']['src']['#value'];
   $cols = $form['options']['cols']['#value'];
@@ -754,10 +766,16 @@ function theme_imagepicker_browse_admin_form($form) {
   return $output;
 }
 
-function theme_imagepicker_browse_admin($content='', $message="", $pref="", $suff="", $label="") {
+function theme_imagepicker_browse_admin($forms='', $message="", $pref="", $suff="", $label="") {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
-  if ($content) {
-    $output .= $pref . $content . $suff;
+  if ($forms) {
+    $output .= $pref;
+    $output .= $forms['browse_search'];
+    $output .= $forms['browse_groups'];
+    $output .= $forms['browse_public'];
+    $output .= $forms['browse_public_groups'];
+    $output .= $forms['browse_admin'];
+    $output .= $suff;
   }
   else {
     $output .= '<div class="messages">'. $message .'</div>';
@@ -782,3 +800,14 @@ function theme_imagepicker_multitask_groups_form($form) {
   return $output;
 }
 
+function theme_imagepicker_import_form($form) {
+  $output = '';
+  $output .= drupal_render($form);
+  return $output;
+}
+
+function theme_imagepicker_import_dir_form($form) {
+  $output = '';
+  $output .= drupal_render($form);
+  return $output;
+}

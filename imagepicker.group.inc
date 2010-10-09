@@ -314,12 +314,13 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
     $cols = 6;
   }
 
+  $countsql = "SELECT COUNT(DISTINCT(g.gid)) FROM {imagepicker_user_groups} g JOIN {imagepicker_group_images} u USING(gid) WHERE  g.uid=%d";
   $sql = "SELECT g.gid, g.group_name, g.group_description, g.public, COUNT(i.img_id) AS ct
     FROM {imagepicker_user_groups} g LEFT JOIN {imagepicker_group_images} i USING(gid)
-    WHERE  uid=%d
+    WHERE  g.uid=%d
     GROUP BY g.gid". tablesort_sql($header);
 
-  $result = pager_query($sql, $how_many, 0, NULL, array($user->uid));
+  $result = pager_query($sql, $how_many, 0, $countsql, array($user->uid));
   $rows = array();
   $totcount = 0;
   $rowcount = 0;

@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-10-09
+------------------------------------
+by hutch, improved theming in browse and list
+fixed sql count in group table
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-10-06
 ------------------------------------
 by hutch, added groups to Bulk Operations
