@@ -1,7 +1,7 @@
 ; $Id$
 name = Imagepicker
 description = Upload, browse and add images to your nodes.
-package = Other
+package = Media
 core = 7.x
 
 files[] = imagepicker.install
