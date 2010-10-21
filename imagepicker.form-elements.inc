@@ -257,6 +257,6 @@ function imagepicker_rows_per_page_elem($default = NULL) {
     '#title' => t('Rows per page in tables'),
     '#size' => 5,
     '#required' => TRUE,
-    '#default_value' =>($default != NULL ? $default : variable_get('imagepicker_rows_per_page', 25)),
+    '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_rows_per_page', 25)),
   );
 }

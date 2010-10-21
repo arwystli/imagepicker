@@ -21,27 +21,25 @@ function imagepicker_theme() {
     'imagepicker_iframe' => array(
       'variables' => array(
         'content' => NULL,
-        'img' => NULL,
-        'public' => NULL,
+        'img'  => NULL,
+        'public'  => NULL,
       ),
     ),
     'imagepicker_list' => array(
       'variables' => array(
         'header' => array(),
-        'rows' => NULL,
+        'rows' => array(),
         'max' => 50,
-        'message' => NULL,
-        'pref' => NULL,
-        'suff' => NULL,
-        'label' => NULL,
-        'forms' => NULL,
+        'message' => "",
+        'pref' => "",
+        'suff' => "",
+        'label' => "",
       ),
     ),
     'imagepicker_stats' => array(
       'variables' => array(
         'header' => array(),
         'rows' => array(),
-        'message' => NULL,
         'pref' => "",
         'suff' => "",
         'label' => "",
@@ -58,7 +56,7 @@ function imagepicker_theme() {
     ),
     'imagepicker_fullpage' => array(
       'variables' => array(
-        'image' => NULL,
+        'image' => array(),
         'source' => "",
         'link' => 1,
       ),
@@ -67,7 +65,7 @@ function imagepicker_theme() {
       'variables' => array(
         'message1' => "",
         'message2' => "",
-        'form' => array(),
+        'form' => NULL,
         'label' => "",
         'help' => "",
       ),
@@ -88,7 +86,7 @@ function imagepicker_theme() {
     ),
     'imagepicker_quota' => array(
       'variables' => array(
-        'quotaform' => '',
+        'form' => NULL,
         'message' => "",
         'label' => "",
       ),
@@ -100,7 +98,7 @@ function imagepicker_theme() {
     ),
     'imagepicker_user_config' => array(
       'variables' => array(
-        'form' => array(),
+        'form' => NULL,
         'label' => "",
         'help' => "",
         'message1' => "",
@@ -110,60 +108,179 @@ function imagepicker_theme() {
     'imagepicker_user_view' => array(
       'variables' => array(
         'view' => "",
-        'form1' => array(),
-        'form2' => array(),
-        'form3' => array(),
+        'form1' => NULL,
+        'form2' => NULL,
+        'form3' => NULL,
       ),
     ),
     'imagepicker_admin_view' => array(
       'variables' => array(
         'view' => "",
-        'form1' => array(),
-        'form2' => array(),
-        'form3' => array(),
+        'form1' => NULL,
+        'form2' => NULL,
+        'form3' => NULL,
       ),
     ),
-    'imagepicker_admin_images' => array(
-      'variables' => array(
-        'view' => "",
-        'form1' => array(),
-        'form2' => array(),
-        'form3' => array(),
-      ),
-    ),
+#    'imagepicker_admin_images' => array(
+#      'variables' => array(
+#        'view' => "",
+#        'form1' => NULL,
+#        'form2' => NULL,
+#        'form3' => NULL,
+#      ),
+#    ),
     'imagepicker_insert' => array(
       'variables' => array(
         'img' => NULL,
         'public' => NULL,
-        'form1' => array(),
-        'form2' => array(),
+        'form1' => NULL,
+        'form2' => NULL,
       ),
     ),
-    'imagepicker_usert_search_form' => array(
-      'render element' => 'form'
+    'imagepicker_upload_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_groupt_search_form' => array(
-      'render element' => 'form'
+    'imagepicker_user_image_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_groupt_form' => array(
-      'render element' => 'form'
+    'imagepicker_user_config_admin_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_general_form' => array(
-      'render element' => 'form'
+    'imagepicker_admin_image_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_browset_search_form' => array(
-      'render element' => 'form'
+    'imagepicker_user_search_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_browset_public_form' => array(
-      'render element' => 'form'
+    'imagepicker_group_search_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_browset_public_groups_form' => array(
-      'render element' => 'form'
+    'imagepicker_quota_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
-    'imagepicker_browset_order_form' => array(
-      'render element' => 'form'
+    'imagepicker_edit_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_groups_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_group_delete_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_image_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_groups_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_public_groups_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_group_images_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_order_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_public_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_search_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_copy_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_admin_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_browse_admin' => array(
+      'variables' => array(
+        'forms' => NULL,
+        'pref' => '',
+        'suff' => '',
+        'label' => '',
+      ),
+    ),
+    'imagepicker_multitask_delete_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_multitask_groups_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_import_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
+    ),
+    'imagepicker_import_dir_form' => array(
+      'variables' => array(
+        'form' => NULL,
+      ),
     ),
   );
+}
+
+// preprocess for imagepicker.tpl.php
+function template_preprocess_imagepicker(&$variables) {
+  global $language;
+  if (module_exists('admin_menu')) {
+    admin_menu_suppress();
+  }
+
+  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
+  $variables['styles'] = drupal_get_css();
+  $variables['scripts'] = drupal_get_js();
+  // fix jquery version thing in the iframe
+  if (module_exists('jquery_update')) {
+    jquery_update_preprocess_page($variables);
+  }
+  $variables['tabs'] = theme('menu_local_tasks');
+  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
+  $variables['language'] = $language;
+
 }
 
 // set up the iframe
@@ -172,7 +289,7 @@ function theme_imagepicker_iframe($variables) {
   $img = (isset($variables['img']) ? $variables['img'] : '');
   $public = (isset($variables['public']) ? $variables['public'] : FALSE);
 
-  drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
+  drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
   if ($img) {
     global $user;
     $img_title = check_plain($img->img_title);
@@ -197,58 +314,51 @@ function theme_imagepicker_iframe($variables) {
       ),
     );
     drupal_add_js($settings, 'setting');
-    drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_iframe.js');
+    drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_iframe.js');
   }
   return $content;
 }
 
 function theme_imagepicker_list($variables) {
 
-  // header, rows, max, message, pref, suff label, forms
-  $output = ($variables['label']  ? '<fieldset><legend>' . $variables['label'] . '</legend>' : '');
-  if ($variables['rows'] ) {
-    // only show the forms if there is something there
-    if ($variables['forms']) {
-      if ($variables['forms']['browse_public']) {
-        $form = theme('imagepicker_browset_public_form', array('form' => $variables['forms']['browse_public']));
-        $output .= $form;
-      }
-      if ($variables['forms']['browse_public_groups']) {
-        $form = theme('imagepicker_browset_public_groups_form', array('form' => $variables['forms']['browse_public_groups']));
-        $output .= $form;
-      }
-      if ($variables['forms']['groups']) {
-        $form = theme('imagepicker_groupt_form', array('form' => $variables['forms']['groups']));
-        $output .= $form;
-      }
-      if ($variables['forms']['search']) {
-        $form = theme('imagepicker_browset_search_form', array('form' => $variables['forms']['search']));
-        $output .= $form;
-      }
-    }
+  $header = $variables['header'];
+  $rows =  $variables['rows'];
+  $max = $variables['max'];
+  $message = $variables['message'];
+  $pref = $variables['pref'];
+  $suff = $variables['suff'];
+  $label = $variables['label'];
 
-    $output .= $variables['pref'] . theme('table', array('header' => $variables['header'], 'rows' => $variables['rows'])) . theme('pager') . $variables['suff'];
-  }
-  else {
-    $output .= '<div class="messages">' . $variables['message'] . '</div>';
-  }
-  $output .= ($variables['label'] ? '</fieldset>' : '');
+  $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
+  $build['imagepicker_list'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => $message,
+  );
+  $build['imagepicker_pager'] = array('#theme' => 'pager');
+  $output .= $pref . render($build) . $suff;
+  $output .= ($label ? '</fieldset>' : '');
   return $output;
+
 }
 
 function theme_imagepicker_stats($variables) {
 
-  $output = ($variables['label'] ? '<fieldset><legend>' . $variables['label'] . '</legend>' : '');
-  if (count($variables['rows']) ) {
-    $output .=
-      $variables['pref'] .
-      theme('table', array('header' => $variables['header'], 'rows' => $variables['rows']) ) .
-      $variables['suff'];
+  $header = $variables['header'];
+  $rows =  $variables['rows'];
+  $message = $variables['message'];
+  $pref = $variables['pref'];
+  $suff = $variables['suff'];
+  $label = $variables['label'];
+  $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
+  if (count($rows)) {
+    $output .= $pref . theme('table', array('header' => $header, 'rows' => $rows)) . $suff;
   }
   else {
-    $output .= '<div class="messages">' . $variables['message'] . '</div>';
+    $output .= '<div class="messages">' . $message . '</div>';
   }
-  $output .= ($variables['label'] ? '</fieldset>' : '');
+  $output .= ($label ? '</fieldset>' : '');
   return $output;
 }
 
@@ -272,25 +382,24 @@ function theme_imagepicker_browser($variables) {
   if ($rows) {
     // forms
     if ($forms) {
-      // browse_order browse_public browse_search
-      if (isset($forms['browse_order'])) {
-        $form = theme('imagepicker_browset_order_form', array('form' => $forms['browse_order']));
+      if (isset($forms['browse_search'])) {
+        $form = theme('imagepicker_browse_search_form', array('form' => $forms['browse_search']));
         $output .= $form;
       }
       if (isset($forms['browse_public'])) {
-        $form = theme('imagepicker_browset_public_form', array('form' => $forms['browse_public']));
+        $form = theme('imagepicker_browse_public_form', array('form' => $forms['browse_public']));
         $output .= $form;
       }
       if (isset($forms['browse_public_groups'])) {
-        $form = theme('imagepicker_browset_public_groups_form', array('form' => $forms['browse_public_groups']));
+        $form = theme('imagepicker_browse_public_groups_form', array('form' => $forms['browse_public_groups']));
         $output .= $form;
       }
       if (isset($forms['browse_groups'])) {
-        $form = theme('imagepicker_groupt_form', array('form' => $forms['browse_groups']));
+        $form = theme('imagepicker_browse_groups_form', array('form' => $forms['browse_groups']));
         $output .= $form;
       }
-      if (isset($forms['browse_search'])) {
-        $form = theme('imagepicker_browset_search_form', array('form' => $forms['browse_search']));
+      if (isset($forms['browse_order'])) {
+        $form = theme('imagepicker_browse_order_form', array('form' => $forms['browse_order']));
         $output .= $form;
       }
     }
@@ -341,12 +450,7 @@ function theme_imagepicker_quota_message($variables) {
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($message1 ? '<p class="messages">' . $message1 . '</p>' : '') ;
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
-  if (is_array($form) ) {
-    $output .= drupal_render($form);
-  }
-  else {
-    $output .= $form;
-  }
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
   $output .= ($message2 ? '<p class="messages">' . $message2 . '</p>' : '') ;
   $output .= ($label ? '</fieldset>' : '');
 
@@ -420,7 +524,7 @@ function theme_imagepicker_quota($variables) {
   $label = $variables['label'];
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($message ? '<p class="messages">' . $message . '</p>' : '') ;
-  $output .= drupal_render($form);
+  $output .= (is_array($form) ? drupal_render($form) : $form);
   $output .= ($label ? '</fieldset>' : '');
   return $output;
 }
@@ -444,7 +548,7 @@ function theme_imagepicker_user_config($variables) {
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
   $output .= ($message1 ? '<p class="messages">' . $message1 . '</p>' : '') ;
-  $output .= drupal_render($form);
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
   $output .= ($message2 ? '<p class="messages">' . $message2 . '</p>' : '') ;
   $output .= ($label ? '</fieldset>' : '');
   return $output;
@@ -460,10 +564,10 @@ function theme_imagepicker_user_view($variables) {
   $output = "";
   $output .= $view;
   $output .= '<br />';
-  $output .= ($form1 ? drupal_render($form1) : '') ;
+  $output .= (is_array($form1) ? drupal_render($form1) : $form1) ;
   $output .= '<br />';
-  $output .= ($form2 ? drupal_render($form2) : '') ;
-  $output .= ($form3 ? drupal_render($form3) : '') ;
+  $output .= (is_array($form2) ? drupal_render($form2) : $form2) ;
+  $output .= (is_array($form3) ? drupal_render($form3) : $form3) ;
   return $output;
 }
 
@@ -477,27 +581,10 @@ function theme_imagepicker_admin_view($variables) {
   $output = "";
   $output .= $view;
   $output .= '<br />';
-  $output .= ($form1 ? drupal_render($form1) : '') ;
+  $output .= (is_array($form1) ? drupal_render($form1) : $form1) ;
   $output .= '<br />';
-  $output .= ($form2 ? drupal_render($form2) : '') ;
-  $output .= ($form3 ? drupal_render($form3) : '') ;
-  return $output;
-}
-
-function theme_imagepicker_admin_images($variables) {
-
-  $view = $variables['view'];
-  $form1 = $variables['form1'];
-  $form2 = $variables['form2'];
-  $form3 = $variables['form3'];
-
-  $output = "";
-  $output .= $view;
-  $output .= '<br />';
-  $output .= ($form1 ? drupal_render($form1) : '') ;
-  $output .= '<br />';
-  $output .= ($form2 ? drupal_render($form2) : '') ;
-  $output .= ($form3 ? drupal_render($form3) : '') ;
+  $output .= (is_array($form2) ? drupal_render($form2) : $form2) ;
+  $output .= (is_array($form3) ? drupal_render($form3) : $form3) ;
   return $output;
 }
 
@@ -521,124 +608,292 @@ function theme_imagepicker_insert($variables) {
     $output .= '<div id="imgp_img_holder">';
     $output .= '<img id="imgp_img" src="' . $imgpath . '" alt="' . (isset($img->img_title) ? check_plain($img->img_title) : t('Image') ) . '" title="' . $img->img_name . '" />';
     $output .= '</div>';
-    if (is_array($form1)) {
-      $output .= drupal_render($form1);
-    }
-    if (is_array($form2)) {
-      $output .= drupal_render($form2);
-    }
+    $output .= (is_array($form1) ?  drupal_render($form1) : $form1);
+    $output .= (is_array($form2) ?  drupal_render($form2) : $form2);
   }
   return $output;
 }
 
-function theme_imagepicker_usert_search_form($variables) {
+function theme_imagepicker_upload_form($variables) {
 
   $form = $variables['form'];
   $output = '';
-  if (is_array($form)) {
-    $output .= '<div id="imgp_users_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
   return $output;
 }
 
-function theme_imagepicker_groupt_search_form($variables) {
+function theme_imagepicker_user_image_form($variables) {
 
   $form = $variables['form'];
   $output = '';
-  if (is_array($form)) {
-    $output .= '<div id="imgp_users_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
   return $output;
 }
-
-function theme_imagepicker_browset_search_form($variables) {
-
-  $form = $variables['form'];
-  $output = '';
-  if (is_array($form)) {
-    $output .= '<div id="imgp_search_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
-  return $output;
-}
-
-function theme_imagepicker_browset_public_form($variables) {
+function theme_imagepicker_user_config_admin_form($variables) {
 
   $form = $variables['form'];
   $output = '';
   if (is_array($form)) {
-    $output .= '<div id="imgp_browse_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
-  return $output;
-}
-
-function theme_imagepicker_browset_public_groups_form($variables) {
-
-  $form = $variables['form'];
-  $output = '';
-  if (is_array($form)) {
-    $output .= '<div id="imgp_browse_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
-  return $output;
-}
-
-function theme_imagepicker_browset_order_form($variables) {
-
-  $form = $variables['form'];
-  $output = '';
-  if (is_array($form)) {
-    $output .= '<div id="imgp_order_form" class="container-inline">';
-    $output .= drupal_render($form);
-    $output .= '</div>';
-  }
-  return $output;
-}
-
-function theme_imagepicker_groupt_form($variables) {
-
-  $form = $variables['form'];
-  $output = '';
-  if (is_array($form)) {
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align']['#prefix'] = '<div class="imgp_img_options">';
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align']['#suffix'] = '</div>';
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show']['#prefix'] = '<div class="imgp_img_options">';
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show']['#suffix'] = '</div>';
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#prefix'] = '<div class="imgp_img_options">';
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#suffix'] = '</div>';
+    $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div class="container-inline">';
+    $form['imagepicker_watermark']['imagepicker_watermark_image_delete']['#suffix'] = '</div>';
+    $form['submit']['#prefix'] = '<div class="container-inline">';
+    $form['reset']['#suffix'] = '</div>';
     $output .= drupal_render($form);
   }
   return $output;
 }
 
-function theme_imagepicker_general_form($variables) {
+function theme_imagepicker_admin_image_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+
+function theme_imagepicker_user_search_form($variables) {
 
   $form = $variables['form'];
   $output = '';
   if (is_array($form)) {
+    $form['imagepicker_currentuser']['#prefix'] = '<div id="imgp_users_form" class="container-inline">';
+    $form['imagepicker_user_search_submit']['#suffix'] = '</div>';
     $output .= drupal_render($form);
   }
   return $output;
 }
 
-// preprocess for imagepicker.tpl.php
-function template_preprocess_imagepicker(&$variables) {
-  global $language;
-  if (module_exists('admin_menu')) {
-    admin_menu_suppress();
-  }
+function theme_imagepicker_group_search_form($variables) {
 
-  $variables['head_title']  = (drupal_get_title() ? strip_tags(drupal_get_title()) : variable_get('site_name', 'Drupal'));
-  $variables['styles'] = drupal_get_css();
-  $variables['scripts'] = drupal_get_js();
-  // fix jquery version thing in the iframe
-  if (module_exists('jquery_update')) {
-    jquery_update_preprocess_page($variables);
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['imagepicker_currentgroup']['#prefix'] = '<div id="imgp_groups_form" class="container-inline">';
+    $form['imagepicker_group_search_submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
   }
-  $variables['tabs'] = theme('menu_local_tasks');
-  $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
-  $variables['language'] = $language;
-
+  return $output;
 }
+
+function theme_imagepicker_quota_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['imagepicker_quota']['#prefix'] = '<div id="imgp_quota_form" class="container-inline">';
+    $form['submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_edit_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['title']['#prefix'] = '<div id="imgp_edit_form">';
+    $form['description']['#suffix'] = '</div>';
+    $form['submit']['#prefix'] = '<div id="imgp_controls">';
+    $form['cancel']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_groups_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['groupsave']['group_public_roles']['#prefix'] = '<div id="wrap-group-public-roles">';
+    $form['groupsave']['group_public_roles']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_group_delete_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+
+function theme_imagepicker_image_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['align']['#prefix'] = '<div class="imgp_img_options">';
+    $form['align']['#suffix'] = '</div>';
+    $form['show']['#prefix'] = '<div class="imgp_img_options">';
+    $form['show']['#suffix'] = '</div>';
+    $form['link']['#prefix'] = '<div class="imgp_img_options">';
+    $form['link']['#suffix'] = '</div>';
+    $form['desc']['#prefix'] = '<div id="imgp_desc_control">';
+    $form['desc']['#suffix'] = '</div>';
+    $form['insert']['#prefix'] = '<div id="imgp_controls">';
+    $form['delete']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_browse_groups_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['gid']['#prefix'] = '<div id="imgp_groups_form" class="container-inline">';
+    $form['submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_browse_public_groups_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['gid']['#prefix'] = '<div id="imgp_groups_form" class="container-inline">';
+    $form['submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_group_images_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+
+function theme_imagepicker_browse_order_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['imagepicker_browser_order']['#prefix'] = '<div id="imgp_order_form" class="container-inline">';
+    $form['submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_browse_public_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['imagepicker_browse_public']['#prefix'] = '<div id="imgp_browse_form" class="container-inline">';
+    $form['submit']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_browse_search_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $form['imagepicker_browser_search']['#prefix'] = '<div id="imgp_search_form" class="container-inline">';
+    $form['reset']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_copy_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+
+function theme_imagepicker_browse_admin_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $src = $form['options']['src']['#value'];
+    $cols = $form['options']['cols']['#value'];
+    $public = $form['options']['public']['#value'];
+    $form['options']['#prefix'] = '<div class="container-inline">';
+    $form['options']['#suffix'] = '</div>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_browse_admin($variables) {
+
+  $forms = $variables['forms'];
+  $pref = $variables['pref'];
+  $suff = $variables['suff'];
+  $label = $variables['label'];
+  $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
+  $output .= $pref;
+  $output .= theme('imagepicker_browse_search_form', array('form' => $forms['browse_search']));
+  $output .= theme('imagepicker_browse_groups_form', array('form' => $forms['browse_groups']));
+  $output .= theme('imagepicker_browse_public_form', array('form' => $forms['browse_public']));
+  $output .= theme('imagepicker_browse_public_groups_form', array('form' => $forms['browse_public_groups']));
+  $output .= theme('imagepicker_browse_admin_form', array('form' => $forms['browse_admin']));
+  $output .= $suff;
+  $output .= ($label ? '</fieldset>' : '');
+  return $output;
+}
+
+function theme_imagepicker_multitask_delete_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+    $count = $form['countnids']['#value'];
+    $output .= '<p>' . t('You have selected %c to be deleted', array('%c' => format_plural( $count, '1 image', '@count images'))) . '</p>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_multitask_groups_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  if (is_array($form)) {
+
+    $count = $form['countnids']['#value'];
+    $output .= '<p>' . t('You have selected %c to be grouped', array('%c' => format_plural( $count, '1 image', '@count images'))) . '</p>';
+    $output .= drupal_render($form);
+  }
+  return $output;
+}
+
+function theme_imagepicker_import_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+
+function theme_imagepicker_import_dir_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $output .= (is_array($form) ? drupal_render($form) : $form) ;
+  return $output;
+}
+

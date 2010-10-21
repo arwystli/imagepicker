@@ -8,21 +8,19 @@
  */
 
 function imagepicker_groups() {
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
 
   // from iframe
   if (! arg(2)) {
     $content = imagepicker_groups_list();
-    $form = drupal_get_form('imagepicker_groups_form');
-    $content .= drupal_render($form);
+    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form')));
   }
   elseif ( arg(2) == 'edit') {
     $record = imagepicker_get_user_group(arg(3));
-    $form = drupal_get_form('imagepicker_groups_form', $record);
-    $content .= drupal_render($form);
+    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
   }
   elseif (arg(2) == 'delete') {
-    $form = drupal_get_form('imagepicker_group_delete_form', arg(3));
-    $content .= drupal_render($form);
+    $content .= theme('imagepicker_group_delete_form', array('form' => drupal_get_form('imagepicker_group_delete_form', arg(3))));
   }
   elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
     imagepicker_set_user_group_state(1, arg(2));
@@ -42,17 +40,14 @@ function imagepicker_user_groups($mode="", $gid=0) {
   $content = '';
   if (empty($mode)) {
     $content = imagepicker_groups_list('account');
-    $form = drupal_get_form('imagepicker_groups_form');
-    $content .= theme('imagepicker_general_form', array('form' => $form));
+    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form')));
   }
   elseif ($mode == 'edit') {
     $record = imagepicker_get_user_group($gid);
-    $form = drupal_get_form('imagepicker_groups_form', $record);
-    $content .= theme('imagepicker_general_form', array('form' => $form));
+    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
   }
   elseif ($mode == 'delete') {
-    $form = drupal_get_form('imagepicker_group_delete_form', $gid);
-    $content .= theme('imagepicker_general_form', array('form' => $form));
+    $content .= theme('imagepicker_group_delete_form', array('form' => drupal_get_form('imagepicker_group_delete_form', arg(3))));
   }
 
   return $content;
@@ -72,7 +67,6 @@ function imagepicker_groups_form($form, &$form_state, $record=FALSE, $account=FA
     '#title' => t('Group name'),
     '#size' => 20,
     '#default_value' => ($record ? $record->group_name : ''),
-    '#description' => t(''),
     '#required' => TRUE
   );
   $form['groupsave']['group_description'] = array(
@@ -241,7 +235,7 @@ function imagepicker_delete_user_group($gid) {
 function imagepicker_group_edit($gid) {
 
   $record = imagepicker_get_user_group($gid);
-  $content .= drupal_get_form('imagepicker_groups_form', $record);
+    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
   return $content;
 }
 

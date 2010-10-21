@@ -27,7 +27,7 @@ function imagepicker_import_dir_check($account = FALSE) {
   else {
     global $user;
   }
-  if (file_prepare_directory($importdir, FILE_CREATE_DIRECTORY)) {
+  if (file_prepare_directory($importdir, FILE_MODIFY_PERMISSIONS)) {
 
     // clear out the noisy 'created' messages
     drupal_get_messages('status', TRUE);
@@ -36,14 +36,14 @@ function imagepicker_import_dir_check($account = FALSE) {
     $bad_importlist = array();
     if (count($importlist)) {
       foreach ($importlist AS $k => $v) {
-        $file = $importlist[$k]->basename;
-        $fullfile = $importlist[$k]->filename;
-        $image = image_load($fullfile);
-        if ( file_validate_is_image($image)) {
-          $checked_importlist[] = $file;
+        $file = $importlist[$k]->filename;
+        $fullfile = $importlist[$k]->uri;
+        $err = file_validate_is_image($importlist[$k]);
+        if (count($err)) {
+          $bad_importlist[] = $fullfile;
         }
         else {
-          $bad_importlist[] = $fullfile;
+          $checked_importlist[] = $file;
         }
       }
     }
@@ -80,10 +80,7 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
 
   // provide checkbox list of groups if any
   // default watermark
-  $form['total'] = array(
-    '#type' => 'markup',
-    '#value' => t('!total images found in the imagepicker import folder.<br />Selected user is %user', array('!total' => $total, '%user' => $user->name )),
-  );
+  $form['total'] = array('#markup' => '<p>' . t('!total images found in the imagepicker import folder.<br />Selected user is %user', array('!total' => $total, '%user' => $user->name )) . '</p>');
 
   $form['thumb'] = array(
     '#type' => 'textfield',
@@ -281,78 +278,86 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
 
     // Check the file is OK
     $filename = $index;
-    $source_filepath = file_check_location($options['sourcedir'] . DIRECTORY_SEPARATOR . $filename, $options['sourcedir']);
-    if ($source_filepath and file_validate_is_image(image_load($source_filepath))) {
-      $source = $source_filepath;
-      $file = $filename;
+    $source_filepath = imagepicker_file_check_location($options['sourcedir'] . DIRECTORY_SEPARATOR . $filename, $options['sourcedir']);
+    if ($source_filepath) {
+      $object = new stdClass();
+      $object->uri = $source_filepath;
+      $err = file_validate_is_image($object);
+      if (! count($err)) {
+        $source = $source_filepath;
+        $file = $filename;
 
-      // copy original
-      if (file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['origdirscheme'], FILE_EXISTS_RENAME)) {
-        $file = basename($source);
-        $orig = $options['origdir'] . $file;
-        $scaleto = ($form_state['values']['scale'] !="" ? $form_state['values']['scale'] : FALSE );
-        if ($scaleto) {
-          $imagescaled = imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme'] . $file, $scaleto);
-        }
-        else {
-          // no scaling, save direct from $origdir to $destdir
-          file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme'] , FILE_EXISTS_RENAME);
+        // copy original
+        if (file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['origdirscheme'], FILE_EXISTS_RENAME)) {
           $file = basename($source);
-        }
-        // if watermark is enabled just apply to destdir image, not orig or the thumbs
-        if ( $form_state['values']['watermark'] ) {
-          if (! imagepicker_watermark_process($options['destdir'] . $file, $user)) {
-            $_SESSION['imagepicker_import_status'] = t('Error while watermarking imported image %im.', array('%im' => $file));
-          }
-        }
-        // thumbsdir
-        // not sure why this has to be restated, but if not done the thumbs
-        // get wmarked too when not scaling image above
-        $orig = $options['origdir'] . $file;
-        $maxthumbsize = $form_state['values']['thumb'] ? $form_state['values']['thumb'] : 100;
-        if (imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['thumbsdirscheme'] . $file, $maxthumbsize)) {
-          imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['browserdirscheme'] . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
-          $title = htmlspecialchars($form_state['values']['title']);
-          $description = htmlspecialchars($form_state['values']['description']);
-          $nextimgid = imagepicker_insert_image($user->uid, $file, $title, $description);
-          if ($nextimgid) {
-            if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
-              // SELECT img_id FROM {imagepicker} WHERE uid = '%d' AND img_name = '%s'
-              $query = db_select('imagepicker', 'i');
-              $query->fields('i', array('img_id') );
-              $query->condition('uid', $user->uid)->condition('img_name', $file);
-              $record = $query->execute()->fetchObject();
-
-              #$record['img_id']  = $row['img_id'];
-              foreach ($form_state['values']['grouplist'] AS $gid) {
-                $record->gid = $gid;
-                imagepicker_insert_group_image($record);
-              }
-            }
-            // delete
-            if (variable_get('imagepicker_import_delete', 0)) {
-              file_unmanaged_delete($source_filepath);
-            }
+          $orig = $options['origdir'] . $file;
+          $scaleto = ($form_state['values']['scale'] !="" ? $form_state['values']['scale'] : FALSE );
+          if ($scaleto) {
+            $imagescaled = imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme'] . $file, $scaleto);
           }
           else {
-            file_unmanaged_delete($options['thumbsdir'] . $file);
-            file_unmanaged_delete($options['browserdir'] . $file);
-            file_unmanaged_delete($options['origdir'] . $file);
-            file_unmanaged_delete($options['destdir'] . $file);
-            $_SESSION['imagepicker_import_status'] = t('Error while saving information to database for imported image %im.', array('%im' => $file));
+            // no scaling, save direct from $origdir to $destdir
+            file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme'] , FILE_EXISTS_RENAME);
+            $file = basename($source);
           }
+          // if watermark is enabled just apply to destdir image, not orig or the thumbs
+          if ( $form_state['values']['watermark'] ) {
+            if (! imagepicker_watermark_process($options['destdir'] . $file, $user)) {
+              $_SESSION['imagepicker_import_status'] = t('Error while watermarking imported image %im.', array('%im' => $file));
+            }
+          }
+          // thumbsdir
+          // not sure why this has to be restated, but if not done the thumbs
+          // get wmarked too when not scaling image above
+          $orig = $options['origdir'] . $file;
+          $maxthumbsize = $form_state['values']['thumb'] ? $form_state['values']['thumb'] : 100;
+          if (imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['thumbsdirscheme'] . $file, $maxthumbsize)) {
+            imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['browserdirscheme'] . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
+            $title = htmlspecialchars($form_state['values']['title']);
+            $description = htmlspecialchars($form_state['values']['description']);
+            $nextimgid = imagepicker_insert_image($user->uid, $file, $title, $description);
+            if ($nextimgid) {
+              if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+                // SELECT img_id FROM {imagepicker} WHERE uid = '%d' AND img_name = '%s'
+                $query = db_select('imagepicker', 'i');
+                $query->fields('i', array('img_id') );
+                $query->condition('uid', $user->uid)->condition('img_name', $file);
+                $record = $query->execute()->fetchObject();
 
+                #$record['img_id']  = $row['img_id'];
+                foreach ($form_state['values']['grouplist'] AS $gid) {
+                  $record->gid = $gid;
+                  imagepicker_insert_group_image($record);
+                }
+              }
+              // delete
+              if (variable_get('imagepicker_import_delete', 0)) {
+                file_unmanaged_delete($source_filepath);
+              }
+            }
+            else {
+              file_unmanaged_delete($options['thumbsdir'] . $file);
+              file_unmanaged_delete($options['browserdir'] . $file);
+              file_unmanaged_delete($options['origdir'] . $file);
+              file_unmanaged_delete($options['destdir'] . $file);
+              $_SESSION['imagepicker_import_status'] = t('Error while saving information to database for imported image %im.', array('%im' => $file));
+            }
+
+          }
+          else {
+            $_SESSION['imagepicker_import_status'] = t('Could not scale %file', array('%file' => $source_filepath));
+          }
         }
         else {
-          $_SESSION['imagepicker_import_status'] = t('Could not scale %file', array('%file' => $source_filepath));
+          $_SESSION['imagepicker_import_status'] = t('Could not copy to original: %file', array('%file' => $source_filepath));
         }
       }
       else {
-        $_SESSION['imagepicker_import_status'] = t('Could not copy to original: %file', array('%file' => $source_filepath));
+        $_SESSION['imagepicker_import_status'] = t('Invalid image: %file', array('%file' => $source_filepath));
       }
     }
     else {
-      $_SESSION['imagepicker_import_status'] = t('Invalid image: %file', array('%file' => $source_filepath));
+      $_SESSION['imagepicker_import_status'] = t('File not found');
     }
     // Update our progress information.
     $context['sandbox']['progress']++;
@@ -388,7 +393,7 @@ function imagepicker_import_dir_form($form, &$form_state) {
   $form['imagepicker_import'] = array(
     '#type' => 'fieldset',
     '#title' => t('Imagepicker Import Folder'),
-    '#description' => t('Path of the import folder, relative to the Drupal root or an absolute path.<br />This is where you upload images to, via FTP or rsync.'),
+    '#description' => t('Path of the import folder, relative to the Drupal root or an absolute path.<br />This is where you upload images to, via FTP or rsync.<br />This folder must be writeable by the webserver.'),
     '#collapsible' => TRUE,
     '#collapsed' => (variable_get('imagepicker_import_dir', '') ? TRUE : FALSE),
   );
@@ -414,7 +419,7 @@ function imagepicker_import_dir_form($form, &$form_state) {
 function imagepicker_import_dir_form_validate($form, &$form_state) {
 
   $importdir = $form_state['values']['imagepicker_import_dir'];
-  if ($importdir && ! file_prepare_directory($importdir, FILE_CREATE_DIRECTORY)) {
+  if ($importdir && ! file_prepare_directory($importdir, FILE_MODIFY_PERMISSIONS)) {
     form_set_error('imagepicker_import_dir', t('The folder does not exist.'));
   }
 }
@@ -425,4 +430,21 @@ function imagepicker_import_dir_form_validate($form, &$form_state) {
 function imagepicker_import_dir_form_submit($form, &$form_state) {
 
   variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
+}
+
+// D7 has lost file_check_location()
+function imagepicker_file_check_location($source, $directory = '') {
+  $check = realpath($source);
+  if ($check) {
+    $source = $check;
+  }
+  else {
+    // This file does not yet exist
+    $source = realpath(dirname($source)) . '/' . basename($source);
+  }
+  $directory = realpath($directory);
+  if ($directory && strpos($source, $directory) !== 0) {
+    return 0;
+  }
+  return $source;
 }

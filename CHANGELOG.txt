@@ -1,6 +1,11 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-10-21
+------------------------------------
+by hutch, fixed imports, added bulk operations, 
+reworked theming, many bugfixes.
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-30
 ------------------------------------
 by hutch, fixed MENU_CALLBACK, no dynamic entries allowed

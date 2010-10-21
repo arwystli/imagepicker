@@ -10,6 +10,7 @@
 function imagepicker_user_page($uid, $path="", $func="", $id=0) {
 
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
   $content = '';
   // path/func/id
   if ($path == 'images') {
@@ -51,7 +52,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       $content .= imagepicker_user_groups();
     }
     elseif ($func == 'delete') {
-      $content .= drupal_get_form('imagepicker_group_delete_form', $id);
+      $content .= theme('imagepicker_group_delete_form', array('form' => drupal_get_form('imagepicker_group_delete_form', $id)));
     }
   }
   elseif ($path == 'stats') {
@@ -104,24 +105,17 @@ function imagepicker_user_view($img_id) {
       $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img->img_name);
     }
     $view = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
-    $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
+    $form1 = theme('imagepicker_user_image_form', array('form' => drupal_get_form('imagepicker_user_image_form', $img_id)));
     // copy form
     if (variable_get('imagepicker_copy_enabled', 0)) {
-      $form2 = drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name);
+      $form2 = theme('imagepicker_copy_form',  array('form' => drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name)));
     }
     // group form
     global $user;
     if (_imagepicker_has_groups($user)) {
-      $form3 = drupal_get_form('imagepicker_group_images_form', $img->img_id);
+      $form3 = theme('imagepicker_group_images_form', array('form' => drupal_get_form('imagepicker_group_images_form', $img->img_id)));
     }
-    $content = theme('imagepicker_user_view',
-      array(
-        'view' => $view,
-        'form1' => $form1,
-        'form2' => $form2,
-        'form3' => $form3
-      )
-    );
+    $content = theme('imagepicker_user_view', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
@@ -180,7 +174,7 @@ function imagepicker_user_image_form_edit($form, &$form_state) {
  */
 function imagepicker_user_config_admin() {
 
-  $content = drupal_get_form('imagepicker_user_config_admin_form');
+  $content = theme('imagepicker_user_config_admin_form', array('form' => drupal_get_form('imagepicker_user_config_admin_form')));
   return theme('imagepicker_user_config', array('form' => $content, 'label' => '', 'help' => t('Imagepicker configuration page.'), 'message1' => '', 'message2' => ''));
 }
 
@@ -294,13 +288,11 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#default_value' => imagepicker_get_user_settings('imagepicker_watermark_image', ''),
       '#options' => $wf,
       '#title' => t('Select Watermark image'),
-      '#prefix' => '<div class="container-inline">',
       );
       $form['imagepicker_watermark']['imagepicker_watermark_image_delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
       '#submit' => array('imagepicker_user_config_admin_form_delete'),
-      '#suffix' => '</div>'
       );
     }
     $form['imagepicker_watermark']['file_upload'] = array(
@@ -376,13 +368,11 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save configuration'),
-    '#prefix' => '<div class="container-inline">',
   );
   $form['reset'] = array(
     '#type' => 'submit',
     '#value' => t('Reset'),
     '#submit' => array('imagepicker_user_config_form_reset'),
-    '#suffix' => '</div>'
   );
   return $form;
 }

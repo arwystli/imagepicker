@@ -31,7 +31,6 @@ function imagepicker_edit_form($form, &$form_state, $img, $src='iframe', $accoun
     '#title' => t('Title'),
     '#description' => t('Edit title of your image'),
     '#default_value' => htmlspecialchars_decode($img->img_title),
-    '#prefix' => '<div id="imgp_edit_form">'
   );
   $form['description'] = array(
     '#type' => 'textarea',
@@ -40,7 +39,6 @@ function imagepicker_edit_form($form, &$form_state, $img, $src='iframe', $accoun
     '#cols' => 80,
     '#description' => t('Edit description of your image'),
     '#default_value' => htmlspecialchars_decode($img->img_description),
-    '#suffix' => '</div>'
   );
   if ($account) {
     $form['account'] = array(
@@ -59,13 +57,11 @@ function imagepicker_edit_form($form, &$form_state, $img, $src='iframe', $accoun
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-    '#prefix' => '<div id="imgp_controls">',
     '#submit' => array('imagepicker_edit_form_process'),
   );
   $form['cancel'] = array(
     '#type' => 'submit',
     '#value' => t('Cancel'),
-    '#suffix' => '</div>',
     '#submit' => array('imagepicker_edit_form_cancel'),
   );
   return $form;
@@ -175,8 +171,7 @@ function _imagepicker_edit_img($img_id, $src='iframe', $account=FALSE) {
   if ($img) {
     $imgsrc = imagepicker_get_image_path($img, 'browser', $userdir);
     $content .= theme('imagepicker_image_edit_header', array('image' => $img, 'source' => $imgsrc));
-    $form = drupal_get_form('imagepicker_edit_form', $img, $src, $account);
-    $content .= theme('imagepicker_general_form', array('form' => $form));
+    $content .= theme('imagepicker_edit_form', array('form' => drupal_get_form('imagepicker_edit_form', $img, $src, $account)));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
