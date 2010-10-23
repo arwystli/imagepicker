@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-10-23
+------------------------------------
+by hutch, fixed colorbox integration
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-10-21
 ------------------------------------
 by hutch, fixed imports, added bulk operations, 

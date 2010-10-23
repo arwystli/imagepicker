@@ -310,6 +310,7 @@ function theme_imagepicker_iframe($variables) {
         'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
         'lightbox2_insert' => (isset($user->data['imagepicker_lightbox2_insert']) ? $user->data['imagepicker_lightbox2_insert'] : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
         'colorbox_enable' => (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)),
+        'colorbox_iframe' => (imagepicker_get_colorbox_perms()),
         'node_editbody' => 'edit-body-' . variable_get('imagepicker_node_lang', '') . '-' . variable_get('imagepicker_node_pos', 0) . '-value',
       ),
     );

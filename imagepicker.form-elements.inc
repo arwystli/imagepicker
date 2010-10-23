@@ -227,6 +227,9 @@ function imagepicker_get_link_opts($default = NULL) {
   if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1) ) {
     $linkoptions['lightbox'] = t('Lightbox');
   }
+  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0) ) {
+    $linkoptions['colorbox'] = t('Colorbox');
+  }
   return array(
     '#type' => 'radios',
     '#title' => t('Link'),

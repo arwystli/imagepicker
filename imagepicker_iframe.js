@@ -38,22 +38,23 @@
       var imgpImageStyle;
       var imgpImageCss = 'class="imgp_img"';
       var imgpInsertion;
-      var imgpImageAlt = Drupal.settings['imagepicker_iframe']['imgpImageAlt'];
-      var imgpImageTitle = Drupal.settings['imagepicker_iframe']['imgpImageTitle'];
-      var imgpImageDesc = Drupal.settings['imagepicker_iframe']['imgpImageDesc'];
-      var imgpFileLink = Drupal.settings['imagepicker_iframe']['imgpFileLink'];
-      var imgpThumbLink = Drupal.settings['imagepicker_iframe']['imgpThumbLink'];
-      var imgpPageLink = Drupal.settings['imagepicker_iframe']['imgpPageLink'];
-      var isFCKeditor = Drupal.settings['imagepicker_iframe']['isFCKeditor'];
-      var isWysiwyg = Drupal.settings['imagepicker_iframe']['isWysiwyg'];
-      var use_cssbox = Drupal.settings['imagepicker_iframe']['use_cssbox'];
-      var align_show = Drupal.settings['imagepicker_iframe']['default_align_show'];
-      var lightbox2_insert = Drupal.settings['imagepicker_iframe']['lightbox2_insert'];
-      var fleft = Drupal.settings['imagepicker_iframe']['default_fleft'];
-      var fright = Drupal.settings['imagepicker_iframe']['default_fright'];
+      var imgpImageAlt = Drupal.settings.imagepicker_iframe.imgpImageAlt;
+      var imgpImageTitle = Drupal.settings.imagepicker_iframe.imgpImageTitle;
+      var imgpImageDesc = Drupal.settings.imagepicker_iframe.imgpImageDesc;
+      var imgpFileLink = Drupal.settings.imagepicker_iframe.imgpFileLink;
+      var imgpThumbLink = Drupal.settings.imagepicker_iframe.imgpThumbLink;
+      var imgpPageLink = Drupal.settings.imagepicker_iframe.imgpPageLink;
+      var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
+      var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
+      var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
+      var default_align_show = Drupal.settings.imagepicker_iframe.default_align_show;
+      var lightbox2_insert = Drupal.settings.imagepicker_iframe.lightbox2_insert;
+      var fleft = Drupal.settings.imagepicker_iframe.default_fleft;
+      var fright = Drupal.settings.imagepicker_iframe.default_fright;
+      var colorbox_iframe = Drupal.settings.imagepicker_iframe.colorbox_iframe;
 //      var node_lang = Drupal.settings['imagepicker_iframe']['node_lang'];
 //      var node_pos = Drupal.settings['imagepicker_iframe']['node_pos'];
-      var node_editbody = Drupal.settings['imagepicker_iframe']['node_editbody'];
+      var node_editbody = Drupal.settings.imagepicker_iframe.node_editbody;
 //      var editbody = 'edit-body-' + node_lang + '-' + node_pos + '-value';
       var i;
 
@@ -77,7 +78,7 @@
         }
       }
       // alignment settings
-      if (align_show) {
+      if (default_align_show) {
         // Get align value
         for (i = 0; i < imgpForm.align.length; i++) {
           if(imgpForm.align[i].checked) {
@@ -133,6 +134,9 @@
           break;
         case 'lightbox':
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' rel= '" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
+          break;
+        case 'colorbox':
+          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='colorbox' >" + imgpImageElement + "</a>";
           break;
         case 'file':
         default:
@@ -200,7 +204,9 @@
           insertAtCursor(blockBody, imgpInsertion);
         }
       }
-      win.location.hash = 'body_hash';
+      if (! colorbox_iframe) {
+        win.location.hash = 'body_hash';
+      }
     }
   }
 

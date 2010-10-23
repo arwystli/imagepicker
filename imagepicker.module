@@ -590,7 +590,15 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     $height = imagepicker_get_user_settings('imagepicker_advanced_iframe_height', variable_get('imagepicker_advanced_iframe_height', 500));
     $border = imagepicker_get_user_settings('imagepicker_advanced_iframe_border', variable_get('imagepicker_advanced_iframe_border', "0"));
 
-    $iurl = '<iframe id="imagepicker" style="width: ' . $width . '; height: ' . $height . 'px; border: ' . $border . ';" src="' . url('imagepicker') . '">Imagepicker requires iframe support.</iframe>';
+    if (imagepicker_get_colorbox_perms()) {
+      $iurl = l('Run imagepicker', 'imagepicker', array(
+        'query' => array('width' => $width, 'height' => $height, 'iframe' => 'true'),
+        'attributes' => array('class' => array('colorbox-load'))
+      ));
+    }
+    else {
+      $iurl = '<iframe id="imagepicker" style="width: ' . $width . '; height: ' . $height . 'px; border: ' . $border . ';" src="' . url('imagepicker') . '">Imagepicker requires iframe support.</iframe>';
+    }
 
     $fselement = array(
       '#type' => 'fieldset',
@@ -2959,6 +2967,24 @@ function _imagepicker_quota_check($src, $account = FALSE) {
     }
   }
   return array($quota_ok, $message1, $message2);
+}
+
+
+function imagepicker_get_colorbox_perms() {
+  global $user;
+  if ((module_exists('colorbox')
+    && isset($user->imagepicker_advanced_colorbox)
+    && $user->imagepicker_advanced_colorbox
+    && variable_get('imagepicker_advanced_colorbox', 0 )
+    && variable_get('colorbox_load', 0))
+      || (module_exists('colorbox')
+    && ! isset($user->imagepicker_advanced_colorbox)
+    && variable_get('imagepicker_advanced_colorbox', 0)
+    && variable_get('colorbox_load', 0))
+    ) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
