@@ -9,18 +9,18 @@
 
 function imagepicker_groups() {
   drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
-
+  $content = '';
   // from iframe
   if (! arg(2)) {
-    $content = imagepicker_groups_list();
-    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form')));
+    $content .= imagepicker_groups_list();
+    $content .= render(drupal_get_form('imagepicker_groups_form'));
   }
   elseif ( arg(2) == 'edit') {
     $record = imagepicker_get_user_group(arg(3));
-    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
+    $content .= render(drupal_get_form('imagepicker_groups_form', $record));
   }
   elseif (arg(2) == 'delete') {
-    $content .= theme('imagepicker_group_delete_form', array('form' => drupal_get_form('imagepicker_group_delete_form', arg(3))));
+    $content .= render(drupal_get_form('imagepicker_group_delete_form', arg(3)));
   }
   elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
     imagepicker_set_user_group_state(1, arg(2));
@@ -40,14 +40,14 @@ function imagepicker_user_groups($mode="", $gid=0) {
   $content = '';
   if (empty($mode)) {
     $content = imagepicker_groups_list('account');
-    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form')));
+    $content .= render(drupal_get_form('imagepicker_groups_form'));
   }
   elseif ($mode == 'edit') {
     $record = imagepicker_get_user_group($gid);
-    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
+    $content .= render(drupal_get_form('imagepicker_groups_form', $record));
   }
   elseif ($mode == 'delete') {
-    $content .= theme('imagepicker_group_delete_form', array('form' => drupal_get_form('imagepicker_group_delete_form', arg(3))));
+    $content .= render(drupal_get_form('imagepicker_group_delete_form', arg(3)));
   }
 
   return $content;
@@ -235,7 +235,7 @@ function imagepicker_delete_user_group($gid) {
 function imagepicker_group_edit($gid) {
 
   $record = imagepicker_get_user_group($gid);
-    $content .= theme('imagepicker_groups_form', array('form' => drupal_get_form('imagepicker_groups_form', $record)));
+  $content = render(drupal_get_form('imagepicker_groups_form', $record));
   return $content;
 }
 

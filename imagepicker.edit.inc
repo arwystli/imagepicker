@@ -171,7 +171,7 @@ function _imagepicker_edit_img($img_id, $src='iframe', $account=FALSE) {
   if ($img) {
     $imgsrc = imagepicker_get_image_path($img, 'browser', $userdir);
     $content .= theme('imagepicker_image_edit_header', array('image' => $img, 'source' => $imgsrc));
-    $content .= theme('imagepicker_edit_form', array('form' => drupal_get_form('imagepicker_edit_form', $img, $src, $account)));
+    $content .= render(drupal_get_form('imagepicker_edit_form', $img, $src, $account));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');

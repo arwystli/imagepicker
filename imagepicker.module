@@ -328,7 +328,6 @@ function imagepicker_menu() {
     'page callback' => 'imagepicker_multitask',
     'access callback'  => 'imagepicker_access_admin',
     'type' => MENU_CALLBACK,
-#    'file' => 'imagepicker.admin.inc',
   );
   // My imagepicker
   $items['user/%imagepicker_uid/imagepicker'] = array(
@@ -666,13 +665,13 @@ function imagepicker_image_select($img_id, $showgroup=TRUE, $public = FALSE, $ac
   if ($img) {
     $form1 = '';
     if ($user->uid == $img->uid || $public) {
-      $form1 = theme('imagepicker_image_form', array('form' => drupal_get_form('imagepicker_image_form', $img_id, $public)));
+      $form1 = render(drupal_get_form('imagepicker_image_form', $img_id, $public));
     }
 
     // groups
     $form2 = '';
     if (_imagepicker_has_groups() && $showgroup) {
-      $form2 = theme('imagepicker_group_images_form', array('form' => drupal_get_form('imagepicker_group_images_form', $img->img_id)));
+      $form2 = render(drupal_get_form('imagepicker_group_images_form', $img->img_id));
     }
 
     $content = theme('imagepicker_insert', array('img' => $img, 'public' => $public, 'form1' => $form1, 'form2' => $form2));
@@ -1303,12 +1302,12 @@ function imagepicker_multitask() {
     switch ($mode) {
       case 'delete':
         // really delete?, auto themed
-        $output .= theme('imagepicker_multitask_delete_form', array('form' => drupal_get_form('imagepicker_multitask_delete_form', $simg_ids, $returnpath)));
+        $output .= render(drupal_get_form('imagepicker_multitask_delete_form', $simg_ids, $returnpath));
         $output .= l(t('Cancel'), $cancelpath);
         break;
       case 'groups':
         // select some groups
-        $output .= theme('imagepicker_multitask_groups_form', array('form' => drupal_get_form('imagepicker_multitask_groups_form', $simg_ids, $returnpath)));
+        $output .= render(drupal_get_form('imagepicker_multitask_groups_form', $simg_ids, $returnpath));
         $output .= l(t('Cancel'), $cancelpath);
         break;
     }
@@ -1551,7 +1550,6 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
   // finish
   $a = explode(' ', $order);
   $query->orderBy($a[0], (isset($a[1]) ? $a[1] : 'ASC'));
-#dd((string) $query, 'browse');
 
   $records = $query->execute();
   $content = _imagepicker_thumbs_getrows($records, FALSE, $src);
@@ -1584,27 +1582,27 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
 
   if ( $src == 'admin') {
     if (variable_get('imagepicker_show_browse_order_form', 1)) {
-      $forms['browse_order'] = drupal_get_form('imagepicker_browse_order_form', $user, TRUE);
+      $forms['browse_order'] = render(drupal_get_form('imagepicker_browse_order_form', $user, TRUE));
     }
   }
   elseif ((variable_get('imagepicker_show_browse_order_form', 1) && isset($user->data['imagepicker_show_browse_order_form']) && $user->data['imagepicker_show_browse_order_form'])
     || (variable_get('imagepicker_show_browse_order_form', 1) && ! isset($user->data['imagepicker_show_browse_order_form']) )) {
-    $forms['browse_order'] = drupal_get_form('imagepicker_browse_order_form', $user, FALSE);
+    $forms['browse_order'] = render(drupal_get_form('imagepicker_browse_order_form', $user, FALSE));
   }
 
   if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_groups($user) && imagepicker_has_grouplist($user)) {
     // add groups select here
-    $forms['browse_groups'] = drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE));
+    $forms['browse_groups'] = render(drupal_get_form('imagepicker_browse_groups_form', ($account ? $user : FALSE)));
   }
 
   if ( $src == 'admin') {
     if (variable_get('imagepicker_show_browse_search_form', 1)) {
-      $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form', $user, TRUE);
+      $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form', $user, TRUE));
     }
   }
   elseif ((variable_get('imagepicker_show_browse_search_form', 1) && isset($user->data['imagepicker_show_browse_search_form']) && $user->data['imagepicker_show_browse_search_form'])
     || (variable_get('imagepicker_show_browse_search_form', 1) && ! isset($user->data['imagepicker_show_browse_search_form']))) {
-    $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form', $user, FALSE);
+    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form', $user, FALSE));
   }
 
   if ($src == "account" || $src == "admin") {
@@ -1751,31 +1749,31 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   $forms = array();
   if (isset($user->data['imagepicker_show_browse_order_form'])) {
     if ($user->data['imagepicker_show_browse_order_form']) {
-      $forms['browse_order'] = drupal_get_form('imagepicker_browse_order_form');
+      $forms['browse_order'] = render(drupal_get_form('imagepicker_browse_order_form'));
     }
   }
   elseif (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $forms['browse_order'] = drupal_get_form('imagepicker_browse_order_form');
+    $forms['browse_order'] = render(drupal_get_form('imagepicker_browse_order_form'));
   }
 
   if ( $src == 'admin' && variable_get('imagepicker_groups_enabled', 1)) {
-    $forms['browse_public'] = drupal_get_form('imagepicker_browse_public_form');
+    $forms['browse_public'] = render(drupal_get_form('imagepicker_browse_public_form'));
   }
 
   if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
     // add groups select here
-    $forms['browse_public_groups'] = drupal_get_form('imagepicker_browse_public_groups_form', $user, ($src=='admin' ? TRUE : FALSE));
+    $forms['browse_public_groups'] = render(drupal_get_form('imagepicker_browse_public_groups_form', $user, ($src=='admin' ? TRUE : FALSE)));
   }
 
   // search form
   if ( $src == 'admin') {
     if (variable_get('imagepicker_show_browse_search_form', 1)) {
-      $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form', $user, TRUE);
+      $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form', $user, TRUE));
     }
   }
   elseif ((variable_get('imagepicker_show_browse_search_form', 1) && isset($user->data['imagepicker_show_browse_search_form']) && $user->data['imagepicker_show_browse_search_form'])
     || (variable_get('imagepicker_show_browse_search_form', 1) && ! isset($user->data['imagepicker_show_browse_search_form']))) {
-    $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form', $user, FALSE);
+    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form', $user, FALSE));
   }
 
   if ($src == "account" || $src == 'admin') {
@@ -1882,26 +1880,26 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
     if (! $public) {
       if (_imagepicker_has_groups( ($src == 'admin' ? $user : FALSE) ) && imagepicker_has_grouplist(($src == 'admin' ? $user : FALSE))) {
         // add groups select here
-        $forms['browse_groups'] = drupal_get_form('imagepicker_browse_groups_form', ($src == 'admin' ? $user : FALSE));
+        $forms['browse_groups'] = render(drupal_get_form('imagepicker_browse_groups_form', ($src == 'admin' ? $user : FALSE)));
       }
     }
   }
 
   $searchform = '';
   if ($src != 'admin' && imagepicker_get_user_settings('imagepicker_show_browse_search_form', variable_get('imagepicker_show_browse_search_form', 1)) ) {
-    $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form');
+    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form'));
   }
   elseif (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $forms['browse_search'] = drupal_get_form('imagepicker_browse_search_form');
+    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form'));
   }
 
-  $forms['browse_admin'] = drupal_get_form('imagepicker_browse_admin_form', $src, $account, $public, $range);
+  $forms['browse_admin'] = render(drupal_get_form('imagepicker_browse_admin_form', $src, $account, $public, $range));
   $pref = '<div class="imgp_imgs_list">';
   $suff = '</div>';
   if ($public && $src == 'admin') {
-    $forms['browse_public'] = drupal_get_form('imagepicker_browse_public_form');
+    $forms['browse_public'] = render(drupal_get_form('imagepicker_browse_public_form'));
     if ( variable_get('imagepicker_groups_enabled', 1) && _imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
-      $forms['browse_public_groups'] = drupal_get_form('imagepicker_browse_public_groups_form', $user, TRUE);
+      $forms['browse_public_groups'] = render(drupal_get_form('imagepicker_browse_public_groups_form', $user, TRUE));
     }
   }
   return theme('imagepicker_browse_admin', array('forms' => $forms, 'pref' => $pref, 'suff' => $suff, 'label' => $label));
@@ -2880,14 +2878,14 @@ function imagepicker_quota_ok($src, $account = FALSE, $label="", $help="") {
   if ($quota_ok) {
     if ($account) {
       if ($src == 'admin') {
-        $form = theme('imagepicker_upload_form', array('form' => drupal_get_form('imagepicker_upload_form', $user, TRUE)));
+        $form = render(drupal_get_form('imagepicker_upload_form', $user, TRUE));
       }
       elseif ($src == 'user') {
-        $form = theme('imagepicker_upload_form', array('form' => drupal_get_form('imagepicker_upload_form', $user)));
+        $form = render(drupal_get_form('imagepicker_upload_form', $user));
       }
     }
     else {
-      $form = theme('imagepicker_upload_form', array('form' => drupal_get_form('imagepicker_upload_form')));
+      $form = render(drupal_get_form('imagepicker_upload_form'));
     }
   }
   return theme('imagepicker_quota_message', array('message1' => $message1, 'message2' => $message2, 'form' => $form, 'label' => $label, 'help' => $help));
@@ -3509,7 +3507,7 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
     return FALSE;
   }
 
-  $nextimgid =  db_insert('imagepicker')
+  $nextimgid = db_insert('imagepicker')
     ->fields(
       array(
         'uid' => $uid,
