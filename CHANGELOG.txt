@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-10-28
+------------------------------------
+by hutch, fixed bug in enctype in upload form
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-10-24
 ------------------------------------
 by hutch, fixed form theming

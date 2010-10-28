@@ -43,7 +43,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
   else {
     global $user;
   }
-  $form['#attributes']['enctype'] = 'multipart/form-data';
+  $form['#attributes'] = array('enctype' => 'multipart/form-data');
   $form['file_upload'] = array(
     '#type' => 'file',
     '#title' => t('Image file'),
