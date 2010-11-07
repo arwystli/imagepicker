@@ -509,7 +509,7 @@ function imagepicker_access_use_group() {
 /**
  * Implementation of hook_form_alter().
  */
-function imagepicker_form_alter(&$form, &$form_state, $form_id) {
+function imagepicker_form_alter(&$form, $form_state, $form_id) {
   global $user;
 
   $node_type = FALSE;
@@ -561,7 +561,7 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
     }
 
     if (($node_type && preg_match('/node_form$/i', $form_id) ) || $comment ) {
-      $form['body_field']['body_filter']['file_upload'] = array(
+      $form['body_field']['body_filter']['imagepicker_file_upload'] = array(
         '#type' => 'fieldset',
         '#title' => t('Image picker'),
         '#collapsible' => 1,
@@ -570,21 +570,21 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
       );
 
       $form['body_field']['body_filter']['#weight'] = 2;
-      $form['body_field']['body_filter']['file_upload']['mpframe'] = array(
+      $form['body_field']['body_filter']['imagepicker_file_upload']['mpframe'] = array(
         '#type' => 'markup',
         '#value' => '<div id="imgp_tb">'. $iurl .'</div>',
       );
       $form['body_field']['#prefix'] = '<a name="body_hash"></a>'. $form['body_field']['#prefix'];
     }
     elseif ($block) {
-      $form['block_settings']['file_upload'] = array(
+      $form['block_settings']['imagepicker_file_upload'] = array(
         '#type' => 'fieldset',
         '#title' => t('Image picker'),
         '#collapsible' => TRUE,
         '#collapsed' => (isset($user->imagepicker_advanced_collapsed) ? $user->imagepicker_advanced_collapsed : variable_get('imagepicker_advanced_collapsed', 0)),
         '#weight' => $weight,
       );
-      $form['block_settings']['file_upload']['mpframe'] = array(
+      $form['block_settings']['imagepicker_file_upload']['mpframe'] = array(
         '#type' => 'markup',
         '#value' => '<div id="imgp_tb">'. $iurl .'</div>',
       );

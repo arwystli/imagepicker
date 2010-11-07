@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-11-07
+------------------------------------
+by hutch, fixed hook_form_alter reference bug and incompatibility with filepicker
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-10-09
 ------------------------------------
 by hutch, improved theming in browse and list
