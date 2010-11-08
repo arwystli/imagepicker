@@ -1162,6 +1162,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
     $img_name = check_plain($row->img_name);
     $img_id = $row->img_id;
     $description = check_plain($row->img_description);
+    $img_date = format_date($row->img_date, variable_get('imagepicker_dateformat_default', 'medium'));
     if (drupal_strlen($description) > IMAGEPICKER_DESC_LEN) {
       $description = drupal_substr($description, 0, IMAGEPICKER_DESC_LEN) . '...';
     }
@@ -1182,7 +1183,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
         'img_title' => check_plain($row->img_title),
         'img_desc' => $description,
         'img_list' => $listlink,
-        'img_date' => date('Y-m-d H:i:s', $row->img_date),
+        'img_date' => $img_date,
         'img_actions' => "$editlink $deletelink",
       );
       $cols = 7;
@@ -1196,7 +1197,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
         'img_name' => $imglink,
         'img_title' => check_plain($row->img_title),
         'img_desc' => $description,
-        'img_date' => date('Y-m-d H:i:s', $row->img_date),
+        'img_date' => $img_date,
         'img_actions' => "$editlink $deletelink",
       );
       $cols = 6;

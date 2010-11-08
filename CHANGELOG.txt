@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20010-11-08
+------------------------------------
+by hutch, added date format to config
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-10-28
 ------------------------------------
 by hutch, fixed bug in enctype in upload form
