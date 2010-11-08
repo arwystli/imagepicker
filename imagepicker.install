@@ -64,8 +64,10 @@ function imagepicker_schema() {
         'default' => ''),
       'img_date' => array(
         'description' => t('The image date'),
-        'type' => 'datetime',
-        'not null' => TRUE),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
     ),
     'indexes' => array(
       'uid' => array('uid'),
@@ -246,3 +248,24 @@ function imagepicker_update_6201() {
   $ret[] = update_sql($sql);
   return $ret;
 }
+
+function imagepicker_update_6202() {
+  $ret = array();
+  $sql = "ALTER TABLE {imagepicker} ADD img_date_new INT UNSIGNED NOT NULL DEFAULT 0 AFTER img_description";
+  $ret[] = update_sql($sql);
+  $sql = "SELECT img_id, img_date FROM {imagepicker}";
+  $result = db_query($sql);
+  while ( $row = db_fetch_array($result) ) {
+    $newdate = strtotime($row['img_date']);
+    $sql = "UPDATE {imagepicker} SET img_date_new = '". $newdate ."' WHERE img_id = " . $row['img_id'] . "";
+    $result2 = db_query($sql);
+  }
+
+  $sql = "ALTER TABLE {imagepicker} DROP img_date";
+  $ret[] = update_sql($sql);
+  $sql = "ALTER TABLE {imagepicker} CHANGE img_date_new img_date INTEGER UNSIGNED NOT NULL DEFAULT '0' AFTER img_description";
+  $ret[] = update_sql($sql);
+
+  return $ret;
+}
+

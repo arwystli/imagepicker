@@ -114,6 +114,14 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem(variable_get('imagepicker_default_pagelink', 1));
   $form['imagepicker_defaults']['imagepicker_rows_per_page'] = imagepicker_rows_per_page_elem(variable_get('imagepicker_rows_per_page', 25));
 
+  $form['imagepicker_defaults']['imagepicker_dateformat_default'] = array(
+    '#type' => 'select',
+    '#title' => t('Set Date Format'),
+    '#description' => t("Select the Date format to use in tables."),
+    '#default_value' => variable_get('imagepicker_dateformat_default', 'medium'),
+    '#options' => array('small' => t('Small'), 'medium' => t('Medium'), 'large' => t('Long')),
+  );
+
   // insert settings
   $form['imagepicker_insert_defaults'] = array(
     '#type' => 'fieldset',

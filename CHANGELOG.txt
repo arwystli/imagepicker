@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-11-08
+------------------------------------
+by hutch, changed img_date field to int, added date format to config
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-11-07
 ------------------------------------
 by hutch, fixed hook_form_alter reference bug and incompatibility with filepicker

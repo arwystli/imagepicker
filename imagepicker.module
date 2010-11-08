@@ -405,6 +405,7 @@ function imagepicker_menu() {
     'access callback'  => 'imagepicker_access_user_pages',
     'type' => MENU_CALLBACK,
   );
+
   return $items;
 }
 
@@ -548,10 +549,10 @@ function imagepicker_form_alter(&$form, $form_state, $form_id) {
     }
 
     if (imagepicker_get_thickbox_perms()) {
-      $iurl = l('Run imagepicker', 'imagepicker' );
+      $iurl = l(t('Run imagepicker'), 'imagepicker' );
     }
     elseif (imagepicker_get_colorbox_perms()) {
-      $iurl = l('Run imagepicker', 'imagepicker', array(
+      $iurl = l(t('Run imagepicker'), 'imagepicker', array(
         'query' => array('width' => $width, 'height' => $height, 'iframe' => 'true'),
         'attributes' => array('class' => 'colorbox-load')
       ));
@@ -1102,6 +1103,8 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
     $img_name = check_plain($row['img_name']);
     $img_id = $row['img_id'];
     $description = check_plain($row['img_description']);
+    $img_date = format_date($row['img_date'], variable_get('imagepicker_dateformat_default', 'medium'));
+
     if ( drupal_strlen($description) > 30 ) {
       $description = drupal_substr($description, 0, 30) .'...';
     }
@@ -1120,7 +1123,7 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
       $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
       $form['img_desc'][$img_id] = array('#value' => $description);
       $form['img_list'][$img_id] = array('#value' => $listlink);
-      $form['img_date'][$img_id] = array('#value' => check_plain($row['img_date']));
+      $form['img_date'][$img_id] = array('#value' => $img_date);
       $form['img_edit'][$img_id] = array('#value' => $editlink);
       $form['img_delete'][$img_id] = array('#value' => $deletelink);
       $cols = 7;
@@ -1132,7 +1135,7 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
       $form['img_name'][$img_id] = array('#value' => $imglink);
       $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
       $form['img_desc'][$img_id] = array('#value' => $description);
-      $form['img_date'][$img_id] = array('#value' => check_plain($row['img_date']));
+      $form['img_date'][$img_id] = array('#value' => $img_date);
       $form['img_edit'][$img_id] = array('#value' => $editlink);
       $form['img_delete'][$img_id] = array('#value' => $deletelink);
       $cols = 6;
@@ -3373,7 +3376,7 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
   if (! $uid || ! $img_name) {
     return FALSE;
   }
-  $date = date('Y-m-d H:i:s');
+  $date = time();
   $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($uid, $img_name, $img_title, $img_description, $date));
   if ($result) {
     $nextimgid = db_last_insert_id("imagepicker", 'img_id');
@@ -3509,3 +3512,4 @@ function imagepicker_box() {
   exit;
 
 }
+

@@ -117,7 +117,7 @@ function imagepicker_edit_form_process($form, &$form_state) {
     if ($img['uid'] == $user->uid) {
       $title = htmlspecialchars($form_state['values']['title']);
       $description = htmlspecialchars($form_state['values']['description']);
-      $date = date('Y-m-d H:i:s');
+      $date = time();
       if (db_query("UPDATE {imagepicker} SET img_title = '%s', img_description = '%s', img_date = '%s' WHERE img_id = '%d'",
           array($title, $description, $date, $img_id))) {
         drupal_set_message(t('Image was successfully updated.'));
