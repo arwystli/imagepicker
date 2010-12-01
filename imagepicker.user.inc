@@ -39,7 +39,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       imagepicker_image_delete($id, FALSE, 'account');
     }
   }
-  elseif (variable_get('imagepicker_groups_enabled', 1) && $path == 'groups') {
+  elseif (imagepicker_variable_get('imagepicker_groups_enabled', 1) && $path == 'groups') {
     module_load_include('inc', 'imagepicker', 'imagepicker.group');
     if ($func == 'edit' && is_numeric($id) && $id > 0) {
       $content .= imagepicker_user_groups($func, $id);
@@ -107,7 +107,7 @@ function imagepicker_user_view($img_id) {
     $view = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
     $form1 = render(drupal_get_form('imagepicker_user_image_form', $img_id));
     // copy form
-    if (variable_get('imagepicker_copy_enabled', 0)) {
+    if (imagepicker_variable_get('imagepicker_copy_enabled', 0)) {
       $form2 = render(drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name));
     }
     // group form
@@ -200,10 +200,10 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
     '#collapsed' => FALSE,
     '#weight' => -38,
   );
-  $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem(imagepicker_get_user_settings('imagepicker_default_thumbnail_size', NULL));
-  $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem(imagepicker_get_user_settings('imagepicker_default_scale', NULL));
-  $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem(imagepicker_get_user_settings('imagepicker_default_pagelink', NULL));
-  $form['imagepicker_defaults']['imagepicker_rows_per_page'] = imagepicker_rows_per_page_elem(imagepicker_get_user_settings('imagepicker_rows_per_page', NULL));
+  $form['imagepicker_defaults']['imagepicker_default_thumbnail_size'] = imagepicker_thumbnail_size_elem(imagepicker_variable_get('imagepicker_default_thumbnail_size', NULL, $user->uid));
+  $form['imagepicker_defaults']['imagepicker_default_scale'] = imagepicker_scale_elem(imagepicker_variable_get('imagepicker_default_scale', NULL, $user->uid));
+  $form['imagepicker_defaults']['imagepicker_default_pagelink'] = imagepicker_pagelink_elem(imagepicker_variable_get('imagepicker_default_pagelink', NULL, $user->uid));
+  $form['imagepicker_defaults']['imagepicker_rows_per_page'] = imagepicker_rows_per_page_elem(imagepicker_variable_get('imagepicker_rows_per_page', NULL, $user->uid));
 
   // insert settings
   $form['imagepicker_insert_defaults'] = array(
@@ -213,13 +213,13 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
     '#collapsed' => FALSE,
     '#weight' => -36,
   );
-  if (variable_get('imagepicker_default_align_show', 1)) {
-    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts(imagepicker_get_user_settings('imagepicker_insert_defaults_align', NULL));
+  if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
+    $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts(imagepicker_variable_get('imagepicker_insert_defaults_align', NULL, $user->uid));
   }
-  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(imagepicker_get_user_settings('imagepicker_insert_defaults_show', NULL));
-  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(imagepicker_get_user_settings('imagepicker_insert_defaults_link', NULL));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(imagepicker_variable_get('imagepicker_insert_defaults_show', NULL, $user->uid));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(imagepicker_variable_get('imagepicker_insert_defaults_link', NULL, $user->uid));
 
-  if (variable_get('imagepicker_default_align_show', 1)) {
+  if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
     // alignment settings
     $form['imagepicker_align'] = array(
       '#type' => 'fieldset',
@@ -228,8 +228,8 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#collapsed' => FALSE,
       '#weight' => -34,
     );
-    $form['imagepicker_align']['imagepicker_default_fleft'] = imagepicker_fleft_elem(imagepicker_get_user_settings('imagepicker_default_fleft', NULL));
-    $form['imagepicker_align']['imagepicker_default_fright'] = imagepicker_fright_elem(imagepicker_get_user_settings('imagepicker_default_fright', NULL));
+    $form['imagepicker_align']['imagepicker_default_fleft'] = imagepicker_fleft_elem(imagepicker_variable_get('imagepicker_default_fleft', NULL, $user->uid));
+    $form['imagepicker_align']['imagepicker_default_fright'] = imagepicker_fright_elem(imagepicker_variable_get('imagepicker_default_fright', NULL, $user->uid));
   }
 
   // browser
@@ -241,20 +241,20 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
     '#collapsed' => FALSE,
     '#weight' => -20,
   );
-  $form['imagepicker_browser']['imagepicker_default_browser_thumbnail_size'] = imagepicker_browser_thumbnail_size_elem(imagepicker_get_user_settings('imagepicker_default_browser_thumbnail_size', NULL));
-  $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = imagepicker_browser_columns_elem(imagepicker_get_user_settings('imagepicker_advanced_browser_columns', NULL));
-  $form['imagepicker_browser']['imagepicker_advanced_browser_page'] = imagepicker_browser_page_elem(imagepicker_get_user_settings('imagepicker_advanced_browser_page', NULL));
-  if (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $form['imagepicker_browser']['imagepicker_show_browse_order_form'] = imagepicker_show_browse_order_form_elem(imagepicker_get_user_settings('imagepicker_show_browse_order_form', NULL));
+  $form['imagepicker_browser']['imagepicker_default_browser_thumbnail_size'] = imagepicker_browser_thumbnail_size_elem(imagepicker_variable_get('imagepicker_default_browser_thumbnail_size', NULL, $user->uid));
+  $form['imagepicker_browser']['imagepicker_advanced_browser_columns'] = imagepicker_browser_columns_elem(imagepicker_variable_get('imagepicker_advanced_browser_columns', NULL, $user->uid));
+  $form['imagepicker_browser']['imagepicker_advanced_browser_page'] = imagepicker_browser_page_elem(imagepicker_variable_get('imagepicker_advanced_browser_page', NULL, $user->uid));
+  if (imagepicker_variable_get('imagepicker_show_browse_order_form', 1)) {
+    $form['imagepicker_browser']['imagepicker_show_browse_order_form'] = imagepicker_show_browse_order_form_elem(imagepicker_variable_get('imagepicker_show_browse_order_form', NULL, $user->uid));
   }
-  $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(imagepicker_get_user_settings('imagepicker_default_browser_order', NULL));
-  if (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem(imagepicker_get_user_settings('imagepicker_show_browse_search_form', NULL));
+  $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(imagepicker_variable_get('imagepicker_default_browser_order', NULL, $user->uid));
+  if (imagepicker_variable_get('imagepicker_show_browse_search_form', 1)) {
+    $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem(imagepicker_variable_get('imagepicker_show_browse_search_form', NULL, $user->uid));
   }
 
   if ( imagepicker_image_check_functions(TRUE)
-    && variable_get('imagepicker_watermark_enable', 0)
-    && ! variable_get('imagepicker_watermark_image', '')
+    && imagepicker_variable_get('imagepicker_watermark_enable', 0)
+    && ! imagepicker_variable_get('imagepicker_watermark_image', '')
   ) {
 
     $desc = "";
@@ -278,14 +278,14 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#type' => 'checkbox',
       '#title' => t('Enable watermark'),
       '#description' => $desc,
-      '#default_value' => imagepicker_get_user_settings('imagepicker_watermark_enable', FALSE),
+      '#default_value' => imagepicker_variable_get('imagepicker_watermark_enable', FALSE, $user->uid),
       '#return_value' => 1,
     );
 
     if ($wf) {
       $form['imagepicker_watermark']['imagepicker_watermark_image'] = array(
       '#type' => 'select',
-      '#default_value' => imagepicker_get_user_settings('imagepicker_watermark_image', ''),
+      '#default_value' => imagepicker_variable_get('imagepicker_watermark_image', '', $user->uid),
       '#options' => $wf,
       '#title' => t('Select Watermark image'),
       );
@@ -305,7 +305,7 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
     );
     $form['imagepicker_watermark']['imagepicker_watermark_position'] = array(
       '#type' => 'select',
-      '#default_value' => imagepicker_get_user_settings('imagepicker_watermark_position', 0),
+      '#default_value' => imagepicker_variable_get('imagepicker_watermark_position', 0, $user->uid),
       '#options' =>  imagepicker_watermark_opts(),
       '#title' => t('Select watermark position'),
     );
@@ -313,7 +313,7 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#type' => 'checkbox',
       '#title' => t('Use watermark by default'),
       '#description' => t('Check the "Use watermark" checkbox on the upload form by default'),
-      '#default_value' => imagepicker_get_user_settings('imagepicker_watermark_use', FALSE),
+      '#default_value' => imagepicker_variable_get('imagepicker_watermark_use', FALSE, $user->uid),
       '#return_value' => 1,
     );
 
@@ -322,14 +322,14 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#type' => 'fieldset',
       '#title' => t('Watermark scaling'),
       '#collapsible' => TRUE,
-      '#collapsed' => (isset($user->data['imagepicker_watermark_scaling']) ? TRUE : FALSE),
+      '#collapsed' => (imagepicker_variable_get('imagepicker_watermark_scaling', FALSE, $user->uid) ? TRUE : FALSE),
     );
-    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling'] = imagepicker_watermark_scaling_elem(imagepicker_get_user_settings('imagepicker_watermark_scaling', FALSE));
-    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem(imagepicker_get_user_settings('imagepicker_watermark_scaling_percentage', 50));
-    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(imagepicker_get_user_settings('imagepicker_watermark_min_width', 0));
+    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling'] = imagepicker_watermark_scaling_elem(imagepicker_variable_get('imagepicker_watermark_scaling', FALSE, $user->uid));
+    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem(imagepicker_variable_get('imagepicker_watermark_scaling_percentage', 50, $user->uid));
+    $form['imagepicker_watermark']['imagepicker_user_watermark']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(imagepicker_variable_get('imagepicker_watermark_min_width', 0, $user->uid));
   }
 
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
+  if (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1)) {
     // Iframe
     $form['imagepicker_lightbox2'] = array(
       '#type' => 'fieldset',
@@ -338,7 +338,7 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#collapsed' => FALSE,
       '#weight' => -23,
     );
-    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem(imagepicker_get_user_settings('imagepicker_lightbox2_insert', NULL));
+    $form['imagepicker_lightbox2']['imagepicker_lightbox2_insert'] = imagepicker_lightbox2_insert_elem(imagepicker_variable_get('imagepicker_lightbox2_insert', NULL, $user->uid));
   }
 
   // Iframe
@@ -352,12 +352,12 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
   );
 
   if (module_exists('colorbox') && variable_get('colorbox_load', 0)) {
-    $form['imagepicker_iframe']['imagepicker_advanced_colorbox'] = imagepicker_colorbox_elem(imagepicker_get_user_settings('imagepicker_advanced_colorbox', NULL));
+    $form['imagepicker_iframe']['imagepicker_advanced_colorbox'] = imagepicker_colorbox_elem(imagepicker_variable_get('imagepicker_advanced_colorbox', NULL, $user->uid));
   }
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem(imagepicker_get_user_settings('imagepicker_advanced_iframe_width', NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(imagepicker_get_user_settings('imagepicker_advanced_iframe_height', NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(imagepicker_get_user_settings('imagepicker_advanced_iframe_border', NULL));
-  $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem(imagepicker_get_user_settings('imagepicker_advanced_collapsed', NULL));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_width'] = imagepicker_iframe_width_elem(imagepicker_variable_get('imagepicker_advanced_iframe_width', NULL, $user->uid));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(imagepicker_variable_get('imagepicker_advanced_iframe_height', NULL, $user->uid));
+  $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(imagepicker_variable_get('imagepicker_advanced_iframe_border', NULL, $user->uid));
+  $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem(imagepicker_variable_get('imagepicker_advanced_collapsed', NULL, $user->uid));
 
   if ($account) {
     $form['uid'] = array(
@@ -395,7 +395,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
   }
 
-  if (variable_get('imagepicker_default_align_show', 1)) {
+  if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
     if (! drupal_strlen($form_state['values']['imagepicker_default_fleft'])) {
       form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));
     }
@@ -424,7 +424,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
+  if (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1)) {
     if (! drupal_strlen($form_state['values']['imagepicker_lightbox2_insert'])) {
       form_set_error('imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
     }
@@ -491,57 +491,56 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   if ($file) {
     $form_state['values']['imagepicker_watermark_image'] = $file;
   }
-
-  $userdata['data'] = $user->data;
-  // save all
+###
   if (isset($form_state['values']['imagepicker_watermark_image'])) {
-    $userdata['data']['imagepicker_watermark_enable'] = $form_state['values']['imagepicker_watermark_enable'];
-    $userdata['data']['imagepicker_watermark_image'] = $form_state['values']['imagepicker_watermark_image'];
-    $userdata['data']['imagepicker_watermark_position'] = $form_state['values']['imagepicker_watermark_position'];
-    $userdata['data']['imagepicker_watermark_use'] = $form_state['values']['imagepicker_watermark_use'];
+    imagepicker_variable_set('imagepicker_watermark_enable', $form_state['values']['imagepicker_watermark_enable'], $user->uid);
+    imagepicker_variable_set('imagepicker_watermark_image', $form_state['values']['imagepicker_watermark_image'], $user->uid);
+    imagepicker_variable_set('imagepicker_watermark_position', $form_state['values']['imagepicker_watermark_position'], $user->uid);
+    imagepicker_variable_set('imagepicker_watermark_use', $form_state['values']['imagepicker_watermark_use'], $user->uid);
     if ($form_state['values']['imagepicker_watermark_scaling']) {
-      $userdata['data']['imagepicker_watermark_scaling'] = $form_state['values']['imagepicker_watermark_scaling'];
-      $userdata['data']['imagepicker_watermark_scaling_percentage'] = $form_state['values']['imagepicker_watermark_scaling_percentage'];
-      $userdata['data']['imagepicker_watermark_min_width'] = $form_state['values']['imagepicker_watermark_min_width'];
+      imagepicker_variable_set('imagepicker_watermark_scaling', $form_state['values']['imagepicker_watermark_scaling'], $user->uid);
+      imagepicker_variable_set('imagepicker_watermark_scaling_percentage', $form_state['values']['imagepicker_watermark_scaling_percentage'], $user->uid);
+      imagepicker_variable_set('imagepicker_watermark_min_width', $form_state['values']['imagepicker_watermark_min_width'], $user->uid);
     }
+
   }
   else {
-    $userdata['data']['imagepicker_watermark_image'] = '';
+    imagepicker_variable_del('imagepicker_watermark_image', $user->uid);
   }
-  $userdata['data']['imagepicker_default_thumbnail_size'] = $form_state['values']['imagepicker_default_thumbnail_size'];
-  $userdata['data']['imagepicker_default_scale'] = $form_state['values']['imagepicker_default_scale'];
-  $userdata['data']['imagepicker_rows_per_page'] = $form_state['values']['imagepicker_rows_per_page'];
-  $userdata['data']['imagepicker_default_pagelink'] = $form_state['values']['imagepicker_default_pagelink'];
-  if (variable_get('imagepicker_default_align_show', 1)) {
-    $userdata['data']['imagepicker_insert_defaults_align'] = $form_state['values']['imagepicker_insert_defaults_align'];
+  imagepicker_variable_set('imagepicker_default_thumbnail_size', $form_state['values']['imagepicker_default_thumbnail_size'], $user->uid);
+  imagepicker_variable_set('imagepicker_default_scale', $form_state['values']['imagepicker_default_scale'], $user->uid);
+  imagepicker_variable_set('imagepicker_rows_per_page', $form_state['values']['imagepicker_rows_per_page'], $user->uid);
+  imagepicker_variable_set('imagepicker_default_pagelink', $form_state['values']['imagepicker_default_pagelink'], $user->uid);
+  if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
+    imagepicker_variable_set('imagepicker_insert_defaults_align', $form_state['values']['imagepicker_insert_defaults_align'], $user->uid);
   }
-  $userdata['data']['imagepicker_insert_defaults_show'] = $form_state['values']['imagepicker_insert_defaults_show'];
-  $userdata['data']['imagepicker_insert_defaults_link'] = $form_state['values']['imagepicker_insert_defaults_link'];
-  if (variable_get('imagepicker_default_align_show', 1)) {
-    $userdata['data']['imagepicker_default_fleft'] = $form_state['values']['imagepicker_default_fleft'];
-    $userdata['data']['imagepicker_default_fright'] = $form_state['values']['imagepicker_default_fright'];
+  imagepicker_variable_set('imagepicker_insert_defaults_show', $form_state['values']['imagepicker_insert_defaults_show'], $user->uid);
+  imagepicker_variable_set('imagepicker_insert_defaults_link', $form_state['values']['imagepicker_insert_defaults_link'], $user->uid);
+  if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
+    imagepicker_variable_set('imagepicker_default_fleft', $form_state['values']['imagepicker_default_fleft'], $user->uid);
+    imagepicker_variable_set('imagepicker_default_fright', $form_state['values']['imagepicker_default_fright'], $user->uid);
   }
-  $userdata['data']['imagepicker_default_browser_thumbnail_size'] = $form_state['values']['imagepicker_default_browser_thumbnail_size'];
-  $userdata['data']['imagepicker_advanced_browser_columns'] = $form_state['values']['imagepicker_advanced_browser_columns'];
-  $userdata['data']['imagepicker_advanced_browser_page'] = $form_state['values']['imagepicker_advanced_browser_page'];
-  if (variable_get('imagepicker_show_browse_order_form', 1)) {
-    $userdata['data']['imagepicker_show_browse_order_form'] = $form_state['values']['imagepicker_show_browse_order_form'];
+  imagepicker_variable_set('imagepicker_default_browser_thumbnail_size', $form_state['values']['imagepicker_default_browser_thumbnail_size'], $user->uid);
+  imagepicker_variable_set('imagepicker_advanced_browser_columns', $form_state['values']['imagepicker_advanced_browser_columns'], $user->uid);
+  imagepicker_variable_set('imagepicker_advanced_browser_page', $form_state['values']['imagepicker_advanced_browser_page'], $user->uid);
+  if (imagepicker_variable_get('imagepicker_show_browse_order_form', 1)) {
+    imagepicker_variable_set('imagepicker_show_browse_order_form', $form_state['values']['imagepicker_show_browse_order_form'], $user->uid);
   }
-  $userdata['data']['imagepicker_default_browser_order'] = $form_state['values']['imagepicker_default_browser_order'];
-  if (variable_get('imagepicker_show_browse_search_form', 1)) {
-    $userdata['data']['imagepicker_show_browse_search_form'] = $form_state['values']['imagepicker_show_browse_search_form'];
+  imagepicker_variable_set('imagepicker_default_browser_order', $form_state['values']['imagepicker_default_browser_order'], $user->uid);
+  if (imagepicker_variable_get('imagepicker_show_browse_search_form', 1)) {
+    imagepicker_variable_set('imagepicker_show_browse_search_form', $form_state['values']['imagepicker_show_browse_search_form'], $user->uid);
   }
   if (isset($form_state['values']['imagepicker_advanced_colorbox']) && module_exists('colorbox')) {
-    $userdata['data']['imagepicker_advanced_colorbox'] = $form_state['values']['imagepicker_advanced_colorbox'];
+    imagepicker_variable_set('imagepicker_advanced_colorbox', $form_state['values']['imagepicker_advanced_colorbox'], $user->uid);
   }
-  $userdata['data']['imagepicker_advanced_iframe_width'] = $form_state['values']['imagepicker_advanced_iframe_width'];
-  $userdata['data']['imagepicker_advanced_iframe_height'] = $form_state['values']['imagepicker_advanced_iframe_height'];
-  $userdata['data']['imagepicker_advanced_iframe_border'] = $form_state['values']['imagepicker_advanced_iframe_border'];
-  $userdata['data']['imagepicker_advanced_collapsed'] = $form_state['values']['imagepicker_advanced_collapsed'];
-  if (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)) {
-    $userdata['data']['imagepicker_lightbox2_insert'] = $form_state['values']['imagepicker_lightbox2_insert'];
+  imagepicker_variable_set('imagepicker_advanced_iframe_width', $form_state['values']['imagepicker_advanced_iframe_width'], $user->uid);
+  imagepicker_variable_set('imagepicker_advanced_iframe_height', $form_state['values']['imagepicker_advanced_iframe_height'], $user->uid);
+  imagepicker_variable_set('imagepicker_advanced_iframe_border', $form_state['values']['imagepicker_advanced_iframe_border'], $user->uid);
+  imagepicker_variable_set('imagepicker_advanced_collapsed', $form_state['values']['imagepicker_advanced_collapsed'], $user->uid);
+
+  if (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1)) {
+    imagepicker_variable_set('imagepicker_lightbox2_insert', $form_state['values']['imagepicker_lightbox2_insert'], $user->uid);
   }
-  user_save($user, $userdata);
 
   drupal_set_message(t('Configuration settings saved'));
 }
@@ -549,37 +548,34 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
 function imagepicker_user_config_form_reset($form, &$form_state) {
 
   global $user;
-  $userdata['data'] = $user->data;
-  $userdata['data']['imagepicker_watermark_enable'] = '';
-  $userdata['data']['imagepicker_watermark_image'] = '';
-  $userdata['data']['imagepicker_watermark_position'] = '';
-  $userdata['data']['imagepicker_watermark_use'] = '';
-  $userdata['data']['imagepicker_watermark_scaling'] = '';
-  $userdata['data']['imagepicker_watermark_scaling_percentage'] = '';
-  $userdata['data']['imagepicker_watermark_min_width'] = '';
-  $userdata['data']['imagepicker_default_thumbnail_size'] = '';
-  $userdata['data']['imagepicker_default_scale'] = '';
-  $userdata['data']['imagepicker_rows_per_page'] = '';
-  $userdata['data']['imagepicker_insert_defaults_align'] = '';
-  $userdata['data']['imagepicker_insert_defaults_show'] = '';
-  $userdata['data']['imagepicker_insert_defaults_link'] = '';
-  $userdata['data']['imagepicker_default_fleft'] = '';
-  $userdata['data']['imagepicker_default_fright'] = '';
-  $userdata['data']['imagepicker_default_browser_thumbnail_size'] = '';
-  $userdata['data']['imagepicker_advanced_browser_columns'] = '';
-  $userdata['data']['imagepicker_advanced_browser_page'] = '';
-  $userdata['data']['imagepicker_show_browse_order_form'] = '';
-  $userdata['data']['imagepicker_default_browser_order'] = '';
-  $userdata['data']['imagepicker_show_browse_search_form'] = '';
-  $userdata['data']['imagepicker_default_pagelink'] = '';
-  $userdata['data']['imagepicker_advanced_colorbox'] = '';
-  $userdata['data']['imagepicker_advanced_iframe_width'] = '';
-  $userdata['data']['imagepicker_advanced_iframe_height'] = '';
-  $userdata['data']['imagepicker_advanced_iframe_border'] = '';
-  $userdata['data']['imagepicker_advanced_collapsed'] = '';
-  $userdata['data']['imagepicker_lightbox2_insert'] = '';
-
-  user_save($user, $userdata);
+  imagepicker_variable_del('imagepicker_watermark_enable', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_image', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_position', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_use', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_scaling', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_scaling_percentage', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_min_width', $user->uid);
+  imagepicker_variable_del('imagepicker_default_thumbnail_size', $user->uid);
+  imagepicker_variable_del('imagepicker_default_scale', $user->uid);
+  imagepicker_variable_del('imagepicker_rows_per_page', $user->uid);
+  imagepicker_variable_del('imagepicker_insert_defaults_align', $user->uid);
+  imagepicker_variable_del('imagepicker_insert_defaults_show', $user->uid);
+  imagepicker_variable_del('imagepicker_insert_defaults_link', $user->uid);
+  imagepicker_variable_del('imagepicker_default_fleft', $user->uid);
+  imagepicker_variable_del('imagepicker_default_fright', $user->uid);
+  imagepicker_variable_del('imagepicker_default_browser_thumbnail_size', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_browser_columns', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_browser_page', $user->uid);
+  imagepicker_variable_del('imagepicker_show_browse_order_form', $user->uid);
+  imagepicker_variable_del('imagepicker_default_browser_order', $user->uid);
+  imagepicker_variable_del('imagepicker_show_browse_search_form', $user->uid);
+  imagepicker_variable_del('imagepicker_default_pagelink', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_colorbox', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_iframe_width', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_iframe_height', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_iframe_border', $user->uid);
+  imagepicker_variable_del('imagepicker_advanced_collapsed', $user->uid);
+  imagepicker_variable_del('imagepicker_lightbox2_insert', $user->uid);
 
   drupal_set_message(t('Configuration settings reset'));
 }
@@ -597,9 +593,7 @@ function imagepicker_user_config_admin_form_delete($form, &$form_state) {
     if (file_exists($file)) {
       file_unmanaged_delete($file);
     }
-    $userdata['data'] = $user->data;
-    $userdata['data']['imagepicker_watermark_image'] = '';
-    user_save($user, $userdata);
+    imagepicker_variable_del('imagepicker_watermark_image', $user->uid);
 
     drupal_set_message(t('Watermark File deleted'));
   }

@@ -51,10 +51,10 @@ function imagepicker_watermark_process($image_path, $account=FALSE) {
   else {
     global $user;
   }
-  $watermark_path = variable_get('imagepicker_watermark_image', FALSE);
+  $watermark_path = imagepicker_variable_get('imagepicker_watermark_image', FALSE);
   $use_global_watermark = ($watermark_path ? TRUE : FALSE);
   if (! $watermark_path ) {
-    $watermark_path = (isset($account->data['imagepicker_watermark_image']) ? $account->data['imagepicker_watermark_image'] : FALSE);
+    $watermark_path = imagepicker_variable_get('imagepicker_watermark_image', FALSE, $account->uid);
   }
   if (! $watermark_path ) {
     return FALSE;
@@ -63,12 +63,12 @@ function imagepicker_watermark_process($image_path, $account=FALSE) {
   $status = FALSE;
 
   if ($use_global_watermark) {
-    $scaling = variable_get('imagepicker_watermark_scaling', FALSE);
-    $position = variable_get('imagepicker_watermark_position', 0);
+    $scaling = imagepicker_variable_get('imagepicker_watermark_scaling', FALSE);
+    $position = imagepicker_variable_get('imagepicker_watermark_position', 0);
   }
   else {
-    $scaling = (isset($user->data['imagepicker_watermark_scaling']) ? $user->data['imagepicker_watermark_scaling'] : FALSE);
-    $position = (isset($user->data['imagepicker_watermark_position']) ? $user->data['imagepicker_watermark_position'] : 0);
+    $scaling = imagepicker_variable_get('imagepicker_watermark_scaling', FALSE, $account->uid);
+    $position = imagepicker_variable_get('imagepicker_watermark_position', 0, $account->uid);
     $wdir = imagepicker_get_watermarks_dir($user);
     $watermark_path = $wdir . DIRECTORY_SEPARATOR . $watermark_path;
   }
@@ -98,12 +98,12 @@ function imagepicker_watermark_process($image_path, $account=FALSE) {
   if ($scaling) {
     // rescale wm image to desired percentage of dest image WIDTH
     if ($use_global_watermark) {
-      $percentage = variable_get('imagepicker_watermark_scaling_percentage', 50) / 100;
-      $min_width = intval(variable_get('imagepicker_watermark_min_width', 0));
+      $percentage = imagepicker_variable_get('imagepicker_watermark_scaling_percentage', 50) / 100;
+      $min_width = intval(imagepicker_variable_get('imagepicker_watermark_min_width', 0));
     }
     else {
-      $percentage = ( isset($user->data['imagepicker_watermark_scaling_percentage']) ? $user->data['imagepicker_watermark_scaling_percentage'] : 50 ) / 100;
-      $min_width = (isset($user->data['imagepicker_watermark_min_width']) ? intval($user->data['imagepicker_watermark_min_width']) : 0);
+      $percentage = imagepicker_variable_get('imagepicker_watermark_scaling_percentage', 50, $account->uid) / 100;
+      $min_width = intval(imagepicker_variable_get('imagepicker_watermark_min_width', 0, $account->uid));
     }
 
     $desired_width = $im_x * $percentage;

@@ -16,9 +16,9 @@ module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
 // iframe
 function imagepicker_upload() {
 
-  variable_del('imagepicker_advanced_browser_pagestart');
-  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
-    $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
+  imagepicker_variable_del('imagepicker_advanced_browser_pagestart');
+  if (imagepicker_variable_get('imagepicker_upload_progress_enabled', 1)) {
+    $content = imagepicker_upload_progress_get_script(imagepicker_variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= imagepicker_quota_ok('iframe', FALSE, '', t('Upload images. You can give them a title and description'));
   return theme('imagepicker_iframe', array('content' => $content));
@@ -27,9 +27,9 @@ function imagepicker_upload() {
 function imagepicker_user_upload() {
 
   global $user;
-  variable_del('imagepicker_advanced_browser_pagestart');
-  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
-    $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
+  imagepicker_variable_del('imagepicker_advanced_browser_pagestart');
+  if (imagepicker_variable_get('imagepicker_upload_progress_enabled', 1)) {
+    $content = imagepicker_upload_progress_get_script(imagepicker_variable_get('imagepicker_upload_progress_delay', 0));
   }
   $content .= imagepicker_quota_ok('user', $user, '', t('Upload images. You can give them a title and description'));
   return $content;
@@ -56,7 +56,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
     '#type' => 'textfield',
     '#title' => t('Thumbnail size'),
     '#size' => 10,
-    '#default_value' => (isset($user->data['imagepicker_default_thumbnail_size']) ? $user->data['imagepicker_default_thumbnail_size'] : variable_get('imagepicker_default_thumbnail_size', 100)),
+    '#default_value' => imagepicker_variable_get('imagepicker_default_thumbnail_size', imagepicker_variable_get('imagepicker_default_thumbnail_size', 100), $user->uid),
     '#description' => t('Size in pixels of thumbnail\'s bigger side'),
     '#required' => TRUE,
   );
@@ -64,7 +64,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
     '#type' => 'textfield',
     '#title' => t('Scale image'),
     '#size' => 10,
-    '#default_value' => (isset($user->data['imagepicker_default_scale']) ? $user->data['imagepicker_default_scale'] : variable_get('imagepicker_default_scale', '')),
+    '#default_value' => imagepicker_variable_get('imagepicker_default_scale', imagepicker_variable_get('imagepicker_default_scale', ''), $user->uid),
     '#description' => t('Scale image to this size in pixels if not left empty'),
   );
   $form['title'] = array(
@@ -79,18 +79,18 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
     '#cols' => 80,
     '#description' => t('Add a description for your image'),
   );
-  if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
-    if (! variable_get('imagepicker_watermark_image', '')
-      && (imagepicker_get_user_settings('imagepicker_watermark_image', FALSE, $user->uid))
-      && $user->data['imagepicker_watermark_enable']) {
+  if ( imagepicker_image_check_functions(TRUE) && imagepicker_variable_get('imagepicker_watermark_enable', 0)) {
+    if (! imagepicker_variable_get('imagepicker_watermark_image', '')
+      && imagepicker_variable_get('imagepicker_watermark_image', '', $user->uid)
+      && imagepicker_variable_get('imagepicker_watermark_enable', 0, $user->uid)) {
       $form['watermark'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use watermark'),
         '#description' => t('Use watermark on this image.'),
-        '#default_value' => ($user->data['imagepicker_watermark_use'] ? $user->data['imagepicker_watermark_use'] : FALSE),
+        '#default_value' => imagepicker_variable_get('imagepicker_watermark_use', 0, $user->uid),
       );
     }
-    elseif (variable_get('imagepicker_watermark_image', '')) {
+    elseif (imagepicker_variable_get('imagepicker_watermark_image', '')) {
       $form['watermark'] = array(
         '#type' => 'value',
         '#value' => 1,
@@ -98,7 +98,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
     }
   }
   // groups
-  if (variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1)) {
+  if (imagepicker_variable_get('imagepicker_groups_enabled', 1) && imagepicker_variable_get('imagepicker_groups_in_upload_enabled', 1)) {
     $grouplist = imagepicker_get_groups( ($admin ? $user : FALSE));
     if ($grouplist) {
       $form['grouplist'] = array(
@@ -126,7 +126,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
     '#type' => 'submit',
     '#value' => t('Upload'),
   );
-  if (variable_get('imagepicker_upload_progress_enabled', 1)) {
+  if (imagepicker_variable_get('imagepicker_upload_progress_enabled', 1)) {
     $form['#suffix'] = imagepicker_upload_progress_busy();
   }
   return $form;
@@ -232,12 +232,12 @@ function imagepicker_upload_form_submit($form, &$form_state) {
         }
 
         if (imagepicker_scale_image($source, IMAGEPICKER_FILE_SCHEME . $thumbsdirscheme . $file, $maxthumbsize)) {
-          imagepicker_scale_image($source, IMAGEPICKER_FILE_SCHEME . $browserdirscheme . $file, (isset($user->data['imagepicker_default_browser_thumbnail_size']) ? $user->data['imagepicker_default_browser_thumbnail_size'] : variable_get('imagepicker_default_browser_thumbnail_size', 100)));
+          imagepicker_scale_image($source, IMAGEPICKER_FILE_SCHEME . $browserdirscheme . $file, imagepicker_variable_get('imagepicker_default_browser_thumbnail_size', imagepicker_variable_get('imagepicker_default_browser_thumbnail_size', 100), $user->uid));
           $title = htmlspecialchars($form_state['values']['title']);
           $description = htmlspecialchars($form_state['values']['description']);
           $nextimgid = imagepicker_insert_image($user->uid, $file, $title, $description);
           if ($nextimgid) {
-            if ( isset($form_state['values']['grouplist']) && is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+            if ( isset($form_state['values']['grouplist']) && is_array($form_state['values']['grouplist']) && imagepicker_variable_get('imagepicker_groups_enabled', 1) && imagepicker_variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
               $query = db_select('imagepicker', 'i');
               $query->fields('i', array('img_id') );
               $query->condition('uid', $user->uid)->condition('img_name', $file);
@@ -368,7 +368,7 @@ function imagepicker_upload_progress_get_script($delay) {
 
 function imagepicker_upload_progress_busy() {
 
-  $message = variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.'));
+  $message = imagepicker_variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.'));
   return theme('imagepicker_upload_progress_message', array('message' => $message));
 }
 

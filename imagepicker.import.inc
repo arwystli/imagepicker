@@ -18,7 +18,7 @@ module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
  */
 function imagepicker_import_dir_check($account = FALSE) {
 
-  if (! $importdir = variable_get('imagepicker_import_dir', '')) {
+  if (! $importdir = imagepicker_variable_get('imagepicker_import_dir', '')) {
     return FALSE;
   }
   if ($account) {
@@ -27,12 +27,11 @@ function imagepicker_import_dir_check($account = FALSE) {
   else {
     global $user;
   }
+  $checked_importlist = array();
   if (file_prepare_directory($importdir, FILE_MODIFY_PERMISSIONS)) {
-
     // clear out the noisy 'created' messages
     drupal_get_messages('status', TRUE);
     $importlist = file_scan_directory($importdir, "/.*/", array('recurse' => FALSE));
-    $checked_importlist = array();
     $bad_importlist = array();
     if (count($importlist)) {
       foreach ($importlist AS $k => $v) {
@@ -52,7 +51,7 @@ function imagepicker_import_dir_check($account = FALSE) {
     }
   }
   else {
-    drupal_set_message(t('Unable to create a directory structure for your import folder.'), 'error');
+    drupal_set_message(t('Unable to create a directory structure for your import folder: !importdir', array('!importdir' => $importdir) ), 'error');
   }
   return (count($checked_importlist) > 0 ? $checked_importlist : 0);
 }
@@ -86,7 +85,7 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
     '#type' => 'textfield',
     '#title' => t('Thumbnail size'),
     '#size' => 10,
-    '#default_value' => variable_get('imagepicker_default_thumbnail_size', 100),
+    '#default_value' => imagepicker_variable_get('imagepicker_default_thumbnail_size', 100),
     '#description' => t('Size in pixels of thumbnail\'s bigger side'),
     '#required' => TRUE,
   );
@@ -94,7 +93,7 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
     '#type' => 'textfield',
     '#title' => t('Scale image'),
     '#size' => 10,
-    '#default_value' => variable_get('imagepicker_default_scale', ''),
+    '#default_value' => imagepicker_variable_get('imagepicker_default_scale', ''),
     '#description' => t('Scale all images in this import to this size in pixels if not left empty'),
   );
   $form['title'] = array(
@@ -110,18 +109,18 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
     '#description' => t('Add a description to all images in this import'),
   );
 
-  if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
-    if (! variable_get('imagepicker_watermark_image', '')
-      && ($user->data['imagepicker_watermark_image'] ? $user->data['imagepicker_watermark_image'] : FALSE)
-      && $user->data['imagepicker_watermark_enable']) {
+  if ( imagepicker_image_check_functions(TRUE) && imagepicker_variable_get('imagepicker_watermark_enable', 0)) {
+    if (! imagepicker_variable_get('imagepicker_watermark_image', '')
+      && imagepicker_variable_get('imagepicker_watermark_image', '', $user->uid)
+      && imagepicker_variable_get('imagepicker_watermark_enable', 0, $user->uid)) {
       $form['watermark'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use watermark'),
         '#description' => t('Use watermark on all images in this import.'),
-        '#default_value' => ($user->data['imagepicker_watermark_use'] ? $user->data['imagepicker_watermark_use'] : FALSE),
+        '#default_value' => imagepicker_variable_get('imagepicker_watermark_use', FALSE, $user->uid),
       );
     }
-    elseif (variable_get('imagepicker_watermark_image', '')) {
+    elseif (imagepicker_variable_get('imagepicker_watermark_image', '')) {
       $form['watermark'] = array(
         '#type' => 'value',
         '#value' => 1,
@@ -130,7 +129,7 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
   }
 
   // groups
-  if (variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1)) {
+  if (imagepicker_variable_get('imagepicker_groups_enabled', 1) && imagepicker_variable_get('imagepicker_groups_in_upload_enabled', 1)) {
     $grouplist = imagepicker_get_groups( ($admin ? $user : FALSE));
     if ($grouplist) {
       $form['grouplist'] = array(
@@ -203,7 +202,7 @@ function imagepicker_import_form_submit($form, &$form_state) {
     $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
     $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
     $origdir = $destdir . IMAGEPICKER_ORIG_DIR;
-    $sourcedir = variable_get('imagepicker_import_dir', '');
+    $sourcedir = imagepicker_variable_get('imagepicker_import_dir', '');
     // relative paths
     $destdirscheme = imagepicker_get_path(FALSE, (isset($form_state['values']['admin']) ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE), TRUE);
     $thumbsdirscheme = $destdirscheme . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR;
@@ -265,7 +264,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
   else {
     global $user;
   }
-  $max = variable_get('imagepicker_import_max', 5);
+  $max = imagepicker_variable_get('imagepicker_import_max', 5);
   if (empty($context['sandbox'])) {
     $context['sandbox']['progress'] = 0;
     $context['sandbox']['max'] = count($selected);
@@ -312,12 +311,12 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
           $orig = $options['origdir'] . $file;
           $maxthumbsize = $form_state['values']['thumb'] ? $form_state['values']['thumb'] : 100;
           if (imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['thumbsdirscheme'] . $file, $maxthumbsize)) {
-            imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['browserdirscheme'] . $file, variable_get('imagepicker_default_browser_thumbnail_size', 100));
+            imagepicker_scale_image($orig, IMAGEPICKER_FILE_SCHEME . $options['browserdirscheme'] . $file, imagepicker_variable_get('imagepicker_default_browser_thumbnail_size', 100));
             $title = htmlspecialchars($form_state['values']['title']);
             $description = htmlspecialchars($form_state['values']['description']);
             $nextimgid = imagepicker_insert_image($user->uid, $file, $title, $description);
             if ($nextimgid) {
-              if ( is_array($form_state['values']['grouplist']) && variable_get('imagepicker_groups_enabled', 1) && variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
+              if ( is_array($form_state['values']['grouplist']) && imagepicker_variable_get('imagepicker_groups_enabled', 1) && imagepicker_variable_get('imagepicker_groups_in_upload_enabled', 1) ) {
                 // SELECT img_id FROM {imagepicker} WHERE uid = '%d' AND img_name = '%s'
                 $query = db_select('imagepicker', 'i');
                 $query->fields('i', array('img_id') );
@@ -331,7 +330,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
                 }
               }
               // delete
-              if (variable_get('imagepicker_import_delete', 0)) {
+              if (imagepicker_variable_get('imagepicker_import_delete', 0)) {
                 file_unmanaged_delete($source_filepath);
               }
             }
@@ -395,7 +394,7 @@ function imagepicker_import_dir_form($form, &$form_state) {
     '#title' => t('Imagepicker Import Folder'),
     '#description' => t('Path of the import folder, relative to the Drupal root or an absolute path.<br />This is where you upload images to, via FTP or rsync.<br />This folder must be writeable by the webserver.'),
     '#collapsible' => TRUE,
-    '#collapsed' => (variable_get('imagepicker_import_dir', '') ? TRUE : FALSE),
+    '#collapsed' => (imagepicker_variable_get('imagepicker_import_dir', '') ? TRUE : FALSE),
   );
   $form['imagepicker_import']['imagepicker_import_dir'] = array(
     '#type' => 'textfield',
@@ -403,7 +402,7 @@ function imagepicker_import_dir_form($form, &$form_state) {
     '#size' => 55,
     '#maxlength' => 100,
     '#required' => FALSE,
-    '#default_value' => variable_get('imagepicker_import_dir', ''),
+    '#default_value' => imagepicker_variable_get('imagepicker_import_dir', ''),
   );
   $form['imagepicker_import']['submit'] = array(
     '#type' => 'submit',
@@ -429,7 +428,7 @@ function imagepicker_import_dir_form_validate($form, &$form_state) {
  */
 function imagepicker_import_dir_form_submit($form, &$form_state) {
 
-  variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
+  imagepicker_variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
 }
 
 // D7 has lost file_check_location()

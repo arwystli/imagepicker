@@ -78,7 +78,7 @@ function imagepicker_groups_form($form, &$form_state, $record=FALSE, $account=FA
     '#description' => t('Maximum 50 characters'),
     '#required' => FALSE
   );
-  if (user_access('use public imagepicker') && user_access('create public groups') && variable_get('imagepicker_public_enabled', 1)) {
+  if (user_access('use public imagepicker') && user_access('create public imagepicker groups') && imagepicker_variable_get('imagepicker_public_enabled', 1)) {
     $form['groupsave']['group_public'] = array(
       '#type' => 'checkbox',
       '#title' => t('Public'),
@@ -87,7 +87,7 @@ function imagepicker_groups_form($form, &$form_state, $record=FALSE, $account=FA
       '#description' => t('Make this group publicly available'),
     );
     // Create role restrictions
-    if (variable_get('imagepicker_publicroles_enabled', 1)) {
+    if (imagepicker_variable_get('imagepicker_publicroles_enabled', 1)) {
       $form['groupsave']['group_public_roles'] = array(
         '#type' => 'fieldset',
         '#title' => ( isset($record->gid) ?  t('Edit group roles') : t('Add public group roles')),
@@ -315,10 +315,10 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   }
 
   $content = "";
-  $max = variable_get('imagepicker_advanced_browser_page', 25);
-  $use_icons = variable_get('imagepicker_use_icons', 1);
+  $max = imagepicker_variable_get('imagepicker_advanced_browser_page', 25);
+  $use_icons = imagepicker_variable_get('imagepicker_use_icons', 1);
 
-  if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+  if (user_access('use public imagepicker') && imagepicker_variable_get('imagepicker_public_enabled', 1)) {
     $header = array(
       array('data' => t('Group name'), 'field' => 'g.group_name'),
       array('data' => t('Description'), 'field' => 'g.group_description'),
@@ -361,7 +361,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   $enabledlist = imagepicker_get_enabled_group($account);
   foreach ($result AS $row) {
     $rowct = $row->ct;
-    if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
+    if (user_access('use public imagepicker') && imagepicker_variable_get('imagepicker_public_enabled', 1)) {
       $row_data = array(
         check_plain($row->group_name),
         check_plain($row->group_description),

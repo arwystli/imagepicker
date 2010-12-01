@@ -63,17 +63,17 @@ Drupal.imagepicker_upload_progress_show = function() {
 
       // form enhancement
       if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
-        $("#wrap_imagepicker_quota_role").show();
+        $("#wrap-imagepicker-quota-role").show();
       }
       else {
-        $("#wrap_imagepicker_quota_role").hide();
+        $("#wrap-imagepicker-quota-role").hide();
       }
       $("#edit-imagepicker-quota-byrole").change(function() {
         if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
-          $("#wrap_imagepicker_quota_role").show();
+          $("#wrap-imagepicker-quota-role").show();
         }
         else {
-          $("#wrap_imagepicker_quota_role").hide();
+          $("#wrap-imagepicker-quota-role").hide();
         }
       });
 
@@ -121,6 +121,23 @@ Drupal.imagepicker_upload_progress_show = function() {
           $("#wrap-imagepicker-upload-progress").hide();
         }
       });
+
+      if ($("#edit-imagepicker-public-enabled").attr('checked')) {
+        $("#wrap-group-public-roles").show();
+      }
+      else {
+        $("#wrap-group-public-roles").hide();
+      }
+      $("#edit-imagepicker-public-enabled").change(function() {
+        if ($("#edit-imagepicker-public-enabled").attr('checked')) {
+          $("#wrap-group-public-roles").show();
+        }
+        else {
+          $("#wrap-group-public-roles").hide();
+        }
+      });
+
+
     }
   };
 })(jQuery);

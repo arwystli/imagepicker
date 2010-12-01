@@ -188,6 +188,9 @@ function imagepicker_theme() {
     'imagepicker_browse_search_form' => array(
       'render element' => 'form',
     ),
+    'imagepicker_settings_form' => array(
+      'render element' => 'form'
+    ),
     'imagepicker_copy_form' => array(
       'render element' => 'form',
     ),
@@ -257,15 +260,15 @@ function theme_imagepicker_iframe($variables) {
         'imgpPageLink' => url('imagepicker/image/' . $img->img_id),
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
-        'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->data['imagepicker_use_cssbox']) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->data['imagepicker_use_cssbox']) && $user->data['imagepicker_use_cssbox']) ? 1 : 0),
-        'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->data['imagepicker_default_align_show']) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->data['imagepicker_default_align_show']) && $user->data['imagepicker_default_align_show']) ? 1 : 0),
-        'default_fleft' => (isset($user->data['imagepicker_default_fleft']) ? $user->data['imagepicker_default_fleft'] : variable_get('imagepicker_default_fleft', 'style="float: left"')),
-        'default_fright' => (isset($user->data['imagepicker_default_fright']) ? $user->data['imagepicker_default_fright'] : variable_get('imagepicker_default_fright', 'style="float: right"')),
+        'use_cssbox' => imagepicker_variable_get('imagepicker_use_cssbox', imagepicker_variable_get('imagepicker_use_cssbox', 0), $user->uid),
+        'default_align_show' => imagepicker_variable_get('imagepicker_default_align_show', imagepicker_variable_get('imagepicker_default_align_show', 1), $user->uid),
+        'default_fleft' => imagepicker_variable_get('imagepicker_default_fleft', imagepicker_variable_get('imagepicker_default_fleft', 'style="float: left"'), $user->uid),
+        'default_fright' => imagepicker_variable_get('imagepicker_default_fright', imagepicker_variable_get('imagepicker_default_fright', 'style="float: right"'), $user->uid),
         'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
-        'lightbox2_insert' => (isset($user->data['imagepicker_lightbox2_insert']) ? $user->data['imagepicker_lightbox2_insert'] : variable_get('imagepicker_lightbox2_insert', 'lightbox')),
-        'colorbox_enable' => (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)),
+        'lightbox2_insert' => imagepicker_variable_get('imagepicker_lightbox2_insert', imagepicker_variable_get('imagepicker_lightbox2_insert', 'lightbox'), $user->uid),
+        'colorbox_enable' => (module_exists('colorbox') && imagepicker_variable_get('imagepicker_colorbox_enable', 0)),
         'colorbox_iframe' => (imagepicker_get_colorbox_perms()),
-        'node_editbody' => 'edit-body-' . variable_get('imagepicker_node_lang', '') . '-' . variable_get('imagepicker_node_pos', 0) . '-value',
+        'node_editbody' => 'edit-body-' . imagepicker_variable_get('imagepicker_node_lang', '') . '-' . imagepicker_variable_get('imagepicker_node_pos', 0) . '-value',
       ),
     );
     drupal_add_js($settings, 'setting');
@@ -727,6 +730,27 @@ function theme_imagepicker_browse_search_form($variables) {
   $output = '';
   $form['imagepicker_browser_search']['#prefix'] = '<div id="imgp_search_form" class="container-inline">';
   $form['reset']['#suffix'] = '</div>';
+  $output .= drupal_render_children($form);
+  return $output;
+}
+
+function theme_imagepicker_settings_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import">';
+  $form['imagepicker_import']['imagepicker_import_delete']['#suffix'] = '</div>';
+#  $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups">';
+#  $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
+  $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress">';
+  $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role">';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
+  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external">';
+  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
+  $form['imagepicker_groups']['imagepicker_publicroles_enabled']['#prefix'] = '<div id="wrap-group-public-roles">';
+  $form['imagepicker_groups']['imagepicker_publicroles_enabled']['#suffix'] = '</div>';
+
   $output .= drupal_render_children($form);
   return $output;
 }

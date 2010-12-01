@@ -147,6 +147,33 @@ function imagepicker_schema() {
     ),
   );
 
+  $schema['imagepicker_variables'] = array(
+    'fields' => array(
+      'name' => array(
+        'description' => t('imagepicker variables.'),
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'value' => array(
+        'description' => t('imagepicker variable values.'),
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => t('The user identifier.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'name' => array('name')
+    ),
+  );
+
   return $schema;
 
 }
@@ -161,3 +188,83 @@ function imagepicker_uninstall() {
     ->execute();
 }
 
+function imagepicker_update_7100() {
+  if (! db_table_exists('imagepicker_variables')) {
+    // create table imagepicker_variables
+    $schema = array();
+    $schema['imagepicker_variables'] = array(
+      'fields' => array(
+        'name' => array(
+          'description' => t('imagepicker variables.'),
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'value' => array(
+          'description' => t('imagepicker variable values.'),
+          'type' => 'text',
+          'not null' => TRUE,
+        ),
+        'uid' => array(
+          'description' => t('The user identifier.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+      'indexes' => array(
+        'name' => array('name')
+      ),
+    );
+
+    db_create_table('imagepicker_variables', $schema['imagepicker_variables']);
+    // create a list of imagepicker variables, fetch each one and load them in to the new table, then delete old one
+    // global ones first
+    $varnames = array();
+    $query = db_select('variable', 'v');
+    $query->fields('v', array('name'));
+    $query->condition('name', 'imagepicker%', 'LIKE');
+    $rows = $query->execute();
+    foreach ($rows AS $row) {
+      $varnames[] = $row->name;
+    }
+    foreach ($varnames AS $varname) {
+      $var = variable_get($varname, '');
+      // insert into new table
+      db_insert('imagepicker_variables')
+        ->fields(
+          array(
+            'name' => $varname,
+            'value' => serialize($var),
+            'uid' => 0
+          )
+        )->execute();
+
+      // delete old
+      variable_del($varname);
+    }
+    // now cycle through all users and insert their imagepicker data
+    $query = db_select('users', 'u');
+    $query->fields('u', array('uid'));
+    $query->condition('uid', 0, '>')->condition('status', 1, '=');
+    $users = $query->execute();
+    foreach ($users AS $user) {
+      $account = user_load($user->uid);
+      foreach ($varnames AS $varname) {
+        if (isset($account->data[$varname])) {
+          // insert into new table
+          db_insert('imagepicker_variables')
+            ->fields(
+              array(
+                'name' => $varname,
+                'value' => serialize($account->data[$varname]),
+                'uid' => $account->uid
+              )
+            )->execute();
+        }
+      }
+    }
+  }
+}
