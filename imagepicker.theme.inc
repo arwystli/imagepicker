@@ -234,7 +234,8 @@ function template_preprocess_imagepicker(&$variables) {
   if (module_exists('jquery_update')) {
     jquery_update_preprocess_page($variables);
   }
-  $variables['tabs'] = theme('menu_local_tasks');
+  $tabs = menu_local_tabs();
+  $variables['tabs'] = theme('menu_local_tasks', array('primary' => $tabs['#primary']));
   $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
   $variables['language'] = $language;
 
