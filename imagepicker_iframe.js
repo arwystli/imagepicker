@@ -168,22 +168,43 @@ function imagepickerInsert(button) {
       inst = win.oFCKeditor.InstanceName;
     }
     else if (isWysiwyg == 'yes') {
-      inst = 'edit-body';
+      //inst = 'edit-body';
+      inst = win.Drupal.wysiwyg.activeId;
     }
 
     if (inst) {
       if (win.FCKeditorAPI) {
-        myFCKeditor = win.FCKeditorAPI.GetInstance(inst);
-        if (myFCKeditor) {
-          myFCKeditor.InsertHtml(imgpInsertion);
+        if (win.FCKeditorAPI.GetInstance(inst)) {
+          win.FCKeditorAPI.GetInstance(inst).InsertHtml(imgpInsertion);
+          jobdone = true;
+        }
+      }
+      // ckeditor 3.?
+      if (win.CKEDITOR) {
+        if (win.CKEDITOR.instances[inst]) {
+          win.CKEDITOR.instances[inst].insertHtml(imgpInsertion);
+          jobdone = true;
+        }
+      }
+      // tinyMCE v3
+      if (win.tinyMCE) {
+        if (win.tinyMCE.execInstanceCommand(inst, 'mceInsertContent', false, imgpInsertion)){
           jobdone = true;
         }
       }
     }
+    // older ckeditor
+    if (! jobdone && win.Drupal.ckeditorInstance && win.Drupal.ckeditorInsertHtml) {
+      if (win.Drupal.ckeditorInsertHtml(imgpInsertion)) {
+        jobdone = true;
+      }
+      //else
+      //  return;
+    }
 
     //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
-    var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
-    if (isTinyMCE) {
+    //var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
+    if (! jobdone && win.tinyMCE) {
       win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
       jobdone = true;
     }
