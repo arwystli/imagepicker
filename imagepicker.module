@@ -1041,7 +1041,8 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
   }
 
   $use_icons = imagepicker_variable_get('imagepicker_use_icons', 1);
-  if ($account && $src == 'admin') {
+  #if ($account && $src == 'admin') {
+  if ($src == 'admin') {
     $max = imagepicker_variable_get('imagepicker_rows_per_page', 25);
     $searchs = imagepicker_variable_get('imagepicker_browser_search', '');
   }
@@ -1049,8 +1050,10 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
     $max = imagepicker_variable_get('imagepicker_rows_per_page', imagepicker_variable_get('imagepicker_rows_per_page', 25), $user->uid);
     $searchs = imagepicker_variable_get('imagepicker_browser_search', '', $user->uid);
   }
-  $searchs = trim($searchs);
-  $searchs = check_plain($searchs);
+  if ($searchs) {
+    $searchs = trim($searchs);
+    $searchs = check_plain($searchs);
+  }
 
   if ($public && $src == 'admin') {
     if ($range == 1 ||  $range == 2) {
@@ -1113,7 +1116,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
   // do search
   $searchsql = '';
   if ($searchs) {
-    $searchsql = _imagepicker_search_opts2($searchs, $account);
+    $searchsql = _imagepicker_search_opts($searchs, $account);
   }
   if (is_array($searchsql) ) {
     $query->condition($searchsql[0], $searchsql[1], $searchsql[2]);
@@ -1519,8 +1522,10 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
     $searchs = imagepicker_variable_get('imagepicker_browser_search', '', $user->uid);
     $max = imagepicker_variable_get('imagepicker_advanced_browser_page', imagepicker_variable_get('imagepicker_advanced_browser_page', 25), $user->uid);
   }
-  $searchs = trim($searchs);
-  $searchs = check_plain($searchs);
+  if ($searchs) {
+    $searchs = trim($searchs);
+    $searchs = check_plain($searchs);
+  }
 
   // filter by selected group
   if ($gid) {
@@ -1542,7 +1547,7 @@ function _imagepicker_browse($src="iframe", $account = FALSE, $label="") {
   // do search
   $searchsql = '';
   if ($searchs) {
-    $searchsql = _imagepicker_search_opts2($searchs, $account);
+    $searchsql = _imagepicker_search_opts($searchs, $account);
   }
   if (is_array($searchsql) ) {
     $query->condition($searchsql[0], $searchsql[1], $searchsql[2]);
@@ -1642,8 +1647,10 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   else {
     $searchs = imagepicker_variable_get('imagepicker_browser_search', '', $user->uid);
   }
-  $searchs = trim($searchs);
-  $searchs = check_plain($searchs);
+  if ($searchs) {
+    $searchs = trim($searchs);
+    $searchs = check_plain($searchs);
+  }
   $sarr = '';
 
   // Build sql for public with role restriction matching
@@ -1680,7 +1687,7 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   // search
   $searchsql = '';
   if ($searchs) {
-    $searchsql = _imagepicker_search_opts2($searchs, ($src == 'admin' ? TRUE : FALSE));
+    $searchsql = _imagepicker_search_opts($searchs, ($src == 'admin' ? TRUE : FALSE));
   }
   if (is_array($searchsql) ) {
     $query->condition($searchsql[0], $searchsql[1], $searchsql[2]);
@@ -1888,7 +1895,7 @@ function _imagepicker_browse_admin($src="iframe", $account=FALSE, $public=FALSE,
     $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form'));
   }
   elseif (imagepicker_variable_get('imagepicker_show_browse_search_form', 1)) {
-    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form'));
+    $forms['browse_search'] = render(drupal_get_form('imagepicker_browse_search_form', FALSE, TRUE));
   }
 
   $forms['browse_admin'] = render(drupal_get_form('imagepicker_browse_admin_form', $src, $account, $public, $range));
@@ -3097,7 +3104,7 @@ function imagepicker_browse_search_form_reset_func($admin = FALSE) {
 }
 
 
-function _imagepicker_search_opts2($searchs, $account) {
+function _imagepicker_search_opts($searchs, $account) {
 
   if ($account) {
     $search_opts = imagepicker_variable_get('imagepicker_browser_search_opts', array());
