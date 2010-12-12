@@ -510,7 +510,7 @@ function imagepicker_access_use_group() {
 /**
  * Implementation of hook_form_alter().
  */
-function imagepicker_form_alter(&$form, $form_state, $form_id) {
+function imagepicker_form_alter(&$form, &$form_state, $form_id) {
   global $user;
 
   $node_type = FALSE;
