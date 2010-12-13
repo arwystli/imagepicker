@@ -476,8 +476,10 @@ function theme_imagepicker_quota($variables) {
 function theme_imagepicker_upload_progress_message($variables) {
 
   $output = '<div id="sending" class="progress" style="display: none;">';
-  $output .= '<div class="status">' . $variables['message'] . '</div>';
-  $output .= '<div class="bar"></div></div>';
+  $output .= '<div class="imgp_status">' . $variables['message'] . '</div>';
+  $output .= '<div class="imgp_progress"></div>';
+  $output .= '<a id="imagepicker_upload_progress_cancel_link" href="#">' . t('Cancel') . '</a>';
+  $output .= '</div>';
   return $output;
 }
 
@@ -739,18 +741,30 @@ function theme_imagepicker_settings_form($variables) {
 
   $form = $variables['form'];
   $output = '';
-  $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import">';
-  $form['imagepicker_import']['imagepicker_import_delete']['#suffix'] = '</div>';
-#  $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups">';
-#  $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
-  $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress">';
+
+  $jshide = ($form['imagepicker_import']['imagepicker_import_enabled']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';
+  $form['imagepicker_import']['imagepicker_import_max']['#suffix'] = '</div>';
+
+  $jshide = ($form['imagepicker_groups']['imagepicker_groups_enabled']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"'. $jshide .'>';
+  $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
+
+  $jshide = ($form['imagepicker_progress']['imagepicker_upload_progress_enabled']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress"'. $jshide .'>';
   $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
-  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role">';
-  $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
-  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external">';
+
+  $jshide = ($form['imagepicker_exif']['imagepicker_exifinfo_enable']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external"'. $jshide .'>';
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
-  $form['imagepicker_groups']['imagepicker_publicroles_enabled']['#prefix'] = '<div id="wrap-group-public-roles">';
-  $form['imagepicker_groups']['imagepicker_publicroles_enabled']['#suffix'] = '</div>';
+
+  $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap_imagepicker_quota_role"'. $jshide .'>';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
+
+  $jshide = ($form['imagepicker_watermark']['imagepicker_watermark_enable']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div id="wrap-imagepicker-watermark"'. $jshide .'>';
+  $form['imagepicker_watermark']['imagepicker_watermark_scale']['#suffix'] = '</div>';
 
   $output .= drupal_render_children($form);
   return $output;

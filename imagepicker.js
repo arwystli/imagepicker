@@ -1,142 +1,101 @@
 // $Id$
-// Original Id: upload_progress.js,v 1.1 2007/11/17 06:47:47 pfournier Exp
+
 /**
  * @file
- * Javascript functions for progress bar status on node creation forms
+ * Javascript functions for progress bar anf form enhancement
  *
- * @author Patrick Fournier <patrick at patrickfournier dot com>
- * @author Fabio Varesano <fvaresano at yahoo dot it>
- * Adapted by Bob Hutchinson for imagepicker upload form
+ * By Bob Hutchinson for imagepicker upload form
 */
 
+(function ($) {
 /**
  * Hide the node form and show the busy div
 */
-function imagepicker_upload_progress_hide() {
-  $('#imagepicker-upload-form').hide();
-  $("#sending").show();
-  $("#imagepicker_upload_progress_cancel_link").click(imagepicker_upload_progress_show);
-}
 
-function imagepicker_upload_progress_show() {
-  $('#imagepicker-upload-form').show();
-  $("#sending").hide();
+  Drupal.imagepicker_upload_progress_hide = function() {
+    $('#imagepicker-upload-form').hide();
+    $("#sending").show();
+    $("#imagepicker_upload_progress_cancel_link").click(Drupal.imagepicker_upload_progress_show);
+  }
 
-  // "reload" the form
-  window.location = window.location;
-}
+  Drupal.imagepicker_upload_progress_hide_timeout = function() {
+    var delay = Drupal.settings.imagepicker_upload_progress.delay;
+    setTimeout(Drupal.imagepicker_upload_progress_hide, delay*1000);
+  }
 
-function imagepicker_upload_progress_hide_timeout() {
-  var delay = Drupal.settings["imagepicker_upload_progress"]["delay"];
-  setTimeout('imagepicker_upload_progress_hide()', delay*1000);
+  Drupal.imagepicker_upload_progress_show = function() {
+    $('#imagepicker-upload-form').show();
+    $("#sending").hide();
 
-}
+    // "reload" the form
+    window.location = window.location;
+  }
 
-/*
-
-Drupal.imagepicker_upload_progress_hide_timeout = function() {
-  var delay = Drupal.settings["imagepicker_upload_progress"]["delay"];
-  setTimeout('imagepicker_upload_progress_hide()', delay*1000);
-}
-
-Drupal.imagepicker_upload_progress_show = function() {
-  $('#imagepicker-upload-form').show();
-  $("#sending").hide();
-
-  // "reload" the form
-  window.location = window.location;
-}
-*/
-
-
-(function ($) {
   Drupal.behaviors.imagepicker = {
     attach: function(context) {
 
       // Attaches the upload behaviour to the imagepicker upload form.
-      $('#imagepicker-upload-form').submit(imagepicker_upload_progress_hide_timeout);
+      $('#imagepicker-upload-form', context).submit(Drupal.imagepicker_upload_progress_hide_timeout);
 
       // exif info toggle
-      $('#imgp_trig').click(function() {
+      $('#imgp_trig', context).click(function() {
         $('#imgp_targ').toggle('slow');
       });
 
       // form enhancement
-      if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
-        $("#wrap-imagepicker-quota-role").show();
-      }
-      else {
-        $("#wrap-imagepicker-quota-role").hide();
-      }
-      $("#edit-imagepicker-quota-byrole").change(function() {
-        if ($("#edit-imagepicker-quota-byrole").attr('checked')) {
-          $("#wrap-imagepicker-quota-role").show();
+      $("#edit-imagepicker-quota-byrole", context).change(function() {
+        if ($(this).attr('checked')) {
+          $("#wrap-imagepicker-quota-role", context).show();
         }
         else {
-          $("#wrap-imagepicker-quota-role").hide();
+          $("#wrap-imagepicker-quota-role", context).hide();
         }
       });
 
-      if ($("#edit-imagepicker-import-enabled").attr('checked')) {
-        $("#wrap-imagepicker-import").show();
-      }
-      else {
-        $("#wrap-imagepicker-import").hide();
-      }
-      $("#edit-imagepicker-import-enabled").change(function() {
-        if ($("#edit-imagepicker-import-enabled").attr('checked')) {
-          $("#wrap-imagepicker-import").show();
+      $("#edit-imagepicker-import-enabled", context).change(function() {
+        if ($(this).attr('checked')) {
+          $("#wrap-imagepicker-import", context).show();
         }
         else {
-          $("#wrap-imagepicker-import").hide();
+          $("#wrap-imagepicker-import", context).hide();
         }
       });
 
-      if ($("#edit-imagepicker-exifinfo-enable").attr('checked')) {
-        $("#wrap-imagepicker-exifinfo-external").show();
-      }
-      else {
-        $("#wrap-imagepicker-exifinfo-external").hide();
-      }
-      $("#edit-imagepicker-exifinfo-enable").change(function() {
+      $("#edit-imagepicker-exifinfo-enable", context).change(function() {
         if ($("#edit-imagepicker-exifinfo-enable").attr('checked')) {
-          $("#wrap-imagepicker-exifinfo-external").show();
+          $("#wrap-imagepicker-exifinfo-external", context).show();
         }
         else {
-          $("#wrap-imagepicker-exifinfo-external").hide();
+          $("#wrap-imagepicker-exifinfo-external", context).hide();
         }
       });
 
-      if ($("#edit-imagepicker-upload-progress-enabled").attr('checked')) {
-        $("#wrap-imagepicker-upload-progress").show();
-      }
-      else {
-        $("#wrap-imagepicker-upload-progress").hide();
-      }
-      $("#edit-imagepicker-upload-progress-enabled").change(function() {
+      $("#edit-imagepicker-upload-progress-enabled", context).change(function() {
         if ($("#edit-imagepicker-upload-progress-enabled").attr('checked')) {
-          $("#wrap-imagepicker-upload-progress").show();
+          $("#wrap-imagepicker-upload-progress", context).show();
         }
         else {
-          $("#wrap-imagepicker-upload-progress").hide();
+          $("#wrap-imagepicker-upload-progress", context).hide();
         }
       });
 
-      if ($("#edit-imagepicker-public-enabled").attr('checked')) {
-        $("#wrap-group-public-roles").show();
-      }
-      else {
-        $("#wrap-group-public-roles").hide();
-      }
-      $("#edit-imagepicker-public-enabled").change(function() {
-        if ($("#edit-imagepicker-public-enabled").attr('checked')) {
-          $("#wrap-group-public-roles").show();
+      $("#edit-imagepicker-groups-enabled", context).change(function() {
+        if ($(this).attr('checked')) {
+          $("#wrap-imagepicker-groups", context).show();
         }
         else {
-          $("#wrap-group-public-roles").hide();
+          $("#wrap-imagepicker-groups", context).hide();
         }
       });
 
+      $("#edit-imagepicker-watermark-enable", context).change(function() {
+        if ($(this).attr('checked')) {
+          $("#wrap-imagepicker-watermark", context).show();
+        }
+        else {
+          $("#wrap-imagepicker-watermark", context).hide();
+        }
+      });
 
     }
   };
