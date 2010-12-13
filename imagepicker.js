@@ -21,7 +21,6 @@
     $("#imagepicker_upload_progress_cancel_link").click(Drupal.imagepicker_upload_progress_show);
   }
 
-
   Drupal.imagepicker_upload_progress_hide_timeout = function() {
     var delay = Drupal.settings["imagepicker_upload_progress"]["delay"];
     setTimeout(Drupal.imagepicker_upload_progress_hide, delay*1000);
@@ -88,6 +87,15 @@
       }
       else {
         $("#wrap-imagepicker-groups", context).hide();
+      }
+    });
+
+    $("#edit-imagepicker-watermark-enable", context).change(function() {
+      if ($(this).attr('checked')) {
+        $("#wrap-imagepicker-watermark", context).show();
+      }
+      else {
+        $("#wrap-imagepicker-watermark", context).hide();
       }
     });
 

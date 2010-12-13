@@ -684,25 +684,29 @@ function theme_imagepicker_settings_form($form) {
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#prefix'] = '<div class="imgp_img_options">';
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#suffix'] = '</div>';
 
-  $jshide = (variable_get('imagepicker_import_enabled', 0) ? '' : ' class="js-hide"');
+  $jshide = ($form['imagepicker_import']['imagepicker_import_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';
   $form['imagepicker_import']['imagepicker_import_max']['#suffix'] = '</div>';
 
-  $jshide = (variable_get('imagepicker_groups_enabled', 0) ? '' : ' class="js-hide"');
+  $jshide = ($form['imagepicker_groups']['imagepicker_groups_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"'. $jshide .'>';
   $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
 
-  $jshide = (variable_get('imagepicker_upload_progress_enabled', 0) ? '' : ' class="js-hide"');
+  $jshide = ($form['imagepicker_progress']['imagepicker_upload_progress_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress"'. $jshide .'>';
   $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
 
-  $jshide = (variable_get('imagepicker_exifinfo_enable', 0) ? '' : ' class="js-hide"');
+  $jshide = ($form['imagepicker_exif']['imagepicker_exifinfo_enable']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external"'. $jshide .'>';
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
 
-  $jshide = (variable_get('imagepicker_quota_byrole', 0) ? '' : ' class="js-hide"');
+  $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap_imagepicker_quota_role"'. $jshide .'>';
   $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
+
+  $jshide = ($form['imagepicker_watermark']['imagepicker_watermark_enable']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div id="wrap-imagepicker-watermark"'. $jshide .'>';
+  $form['imagepicker_watermark']['imagepicker_watermark_scale']['#suffix'] = '</div>';
 
   $output .= drupal_render($form);
   return $output;

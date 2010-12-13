@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-12-13
+------------------------------------
+by hutch, cleaned up js and themeing
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-11-08
 ------------------------------------
 by hutch, changed img_date field to int, added date format to config
