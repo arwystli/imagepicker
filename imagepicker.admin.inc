@@ -354,6 +354,37 @@ function imagepicker_settings_form($form, &$form_state) {
     '#size' => 60,
     '#default_value' => imagepicker_variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
   );
+  $vok = FALSE;
+  $extok = FALSE;
+  if (version_compare(phpversion(), IMAGEPICKER_UPLOAD_STATUS_MIN_PHP) >= 0 ) {
+    $vok = TRUE;
+    if (extension_loaded('uploadprogress')) {
+      $extok = TRUE;
+    }
+  }
+
+  if ($vok && $extok) {
+    $form['imagepicker_progress']['imagepicker_uploadprogress'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Upload Progress Extension'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+
+    $form['imagepicker_progress']['imagepicker_uploadprogress']['imagepicker_uploadprogress_server'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable PECL uploadprogress'),
+      '#default_value' => imagepicker_variable_get('imagepicker_uploadprogress_server', ''),
+    );
+    $form['imagepicker_progress']['imagepicker_uploadprogress']['imagepicker_uploadprogress_interval'] = array(
+      '#title' => t('Interval Time'),
+      '#description' => t('The interval between each check.'),
+      '#type' => 'textfield',
+      '#size' => 5,
+      '#default_value' => imagepicker_variable_get('imagepicker_uploadprogress_interval', 1),
+      '#field_suffix' => t('seconds'),
+    );
+  }
 
   // Groups
   $form['imagepicker_groups'] = array(
@@ -481,6 +512,11 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) || $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
     form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
   }
+  if (isset($form_state['values']['imagepicker_uploadprogress_interval'])) {
+    if ( ! is_numeric($form_state['values']['imagepicker_uploadprogress_interval']) && $form_state['values']['imagepicker_uploadprogress_interval'] < 1) {
+      form_set_error('imagepicker_uploadprogress_interval', t('The progress interval must be a positive number'));
+    }
+  }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_align'])) {
     form_set_error('imagepicker_insert_defaults_align', t('You must fill in the default align field'));
   }
@@ -589,6 +625,10 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_upload_progress_enabled', $form_state['values']['imagepicker_upload_progress_enabled']);
   imagepicker_variable_set('imagepicker_upload_progress_delay', $form_state['values']['imagepicker_upload_progress_delay']);
   imagepicker_variable_set('imagepicker_upload_progress_message', $form_state['values']['imagepicker_upload_progress_message']);
+  if (isset($form_state['values']['imagepicker_uploadprogress_server'])) {
+    imagepicker_variable_set('imagepicker_uploadprogress_server', $form_state['values']['imagepicker_uploadprogress_server']);
+    imagepicker_variable_set('imagepicker_uploadprogress_interval', $form_state['values']['imagepicker_uploadprogress_interval']);
+  }
   imagepicker_variable_set('imagepicker_groups_enabled', $form_state['values']['imagepicker_groups_enabled']);
   imagepicker_variable_set('imagepicker_public_enabled', $form_state['values']['imagepicker_public_enabled']);
   imagepicker_variable_set('imagepicker_publicroles_enabled', $form_state['values']['imagepicker_publicroles_enabled']);

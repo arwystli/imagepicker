@@ -8,28 +8,6 @@
 */
 
 (function ($) {
-/**
- * Hide the node form and show the busy div
-*/
-
-  Drupal.imagepicker_upload_progress_hide = function() {
-    $('#imagepicker-upload-form').hide();
-    $("#sending").show();
-    $("#imagepicker_upload_progress_cancel_link").click(Drupal.imagepicker_upload_progress_show);
-  }
-
-  Drupal.imagepicker_upload_progress_hide_timeout = function() {
-    var delay = Drupal.settings.imagepicker_upload_progress.delay;
-    setTimeout(Drupal.imagepicker_upload_progress_hide, delay*1000);
-  }
-
-  Drupal.imagepicker_upload_progress_show = function() {
-    $('#imagepicker-upload-form').show();
-    $("#sending").hide();
-
-    // "reload" the form
-    window.location = window.location;
-  }
 
   Drupal.behaviors.imagepicker = {
     attach: function(context) {

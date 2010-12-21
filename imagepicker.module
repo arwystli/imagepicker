@@ -16,6 +16,9 @@ define('IMAGEPICKER_DESC_LEN', 30);
 define('IMAGEPICKER_FILE_SCHEME', 'public://');
 define('IMAGEPICKER_ADMIN_PATH', 'admin/config/media/imagepicker');
 define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
+// Minimum PHP version for extension
+define('IMAGEPICKER_UPLOAD_STATUS_MIN_PHP', '5.2.1');
+define('IMAGEPICKER_UPLOAD_ID', 'UPLOAD_IDENTIFIER');
 
 /**
  * Implement hook_help().
@@ -127,6 +130,12 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_box',
     'access arguments' => array('access content'),
     'type'             => MENU_CALLBACK
+  );
+  // uploadprogress callback
+  $items['imagepicker/progress'] = array(
+    'page callback' => 'imagepicker_uploadprogress_callback',
+    'access arguments' => array(TRUE),
+    'type' => MENU_CALLBACK,
   );
   // admin settings
   $items[IMAGEPICKER_ADMIN_PATH] = array(
@@ -3688,3 +3697,32 @@ function imagepicker_box() {
 
 }
 
+/**
+ * callback for uploadprogress information function.
+ */
+function imagepicker_uploadprogress_callback($progress_key='') {
+
+  if (! $progress_key) {
+    $progress_key = $_GET['key'];
+  }
+
+  if (imagepicker_variable_get('imagepicker_uploadprogress_server', '') && function_exists('uploadprogress_get_info') && $progress_key) {
+    $status = uploadprogress_get_info($progress_key);
+    if ($status['bytes_total']) {
+      $status['status'] = 1;
+      $status['percentage'] = round($status['bytes_uploaded']/$status['bytes_total'] * 100, 0);
+      $eta = sprintf("%02d:%02d", $status['est_sec'] / 60, $status['est_sec'] % 60 );
+      $speed = _imagepicker_bkmg($status['speed_average']);
+      $bytes_total = _imagepicker_bkmg($status['bytes_total']);
+      $status['message'] = t('Filesize: !bytes_total. !eta left at !speed/sec.', array('!eta' => $eta, '!speed' => $speed, '!bytes_total' => $bytes_total));
+    }
+    else {
+      $status['status'] = 1;
+      $status['percentage'] = -1;
+      $status['message'] = imagepicker_variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.'));
+    }
+    echo json_encode($status);
+  }
+
+  exit;
+}

@@ -3,6 +3,10 @@
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-12-13
 ------------------------------------
+by hutch, added PECL uploadprogress support
+
+Image Picker  for D7 in DRUPAL-7--1, 20010-12-13
+------------------------------------
 by hutch  fixed upload progress
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-12-09
