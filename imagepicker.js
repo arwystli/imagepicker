@@ -1,43 +1,12 @@
 // $Id$
-// Original Id: upload_progress.js,v 1.1 2007/11/17 06:47:47 pfournier Exp
 /**
  * @file
- * Javascript functions for progress bar status on node creation forms
+ * Javascript functions for admin form enhancement
  *
- * @author Patrick Fournier <patrick at patrickfournier dot com>
- * @author Fabio Varesano <fvaresano at yahoo dot it>
- * Adapted by Bob Hutchinson for imagepicker upload form
 */
 
 (function ($) {
-
-
-/**
- * Hide the node form and show the busy div
-*/
-  Drupal.imagepicker_upload_progress_hide = function() {
-    $('#imagepicker-upload-form').hide();
-    $("#sending").show();
-    $("#imagepicker_upload_progress_cancel_link").click(Drupal.imagepicker_upload_progress_show);
-  }
-
-  Drupal.imagepicker_upload_progress_hide_timeout = function() {
-    var delay = Drupal.settings["imagepicker_upload_progress"]["delay"];
-    setTimeout(Drupal.imagepicker_upload_progress_hide, delay*1000);
-  }
-
-  Drupal.imagepicker_upload_progress_show = function() {
-    $('#imagepicker-upload-form').show();
-    $("#sending").hide();
-
-    // "reload" the form
-    window.location = window.location;
-  }
-
   Drupal.behaviors.imagepicker = function(context) {
-
-    // Attaches the upload behaviour to the imagepicker upload form.
-    $('#imagepicker-upload-form', context).submit(Drupal.imagepicker_upload_progress_hide_timeout);
 
     // exif info toggle
     $('#imgp_trig', context).click(function() {
@@ -98,7 +67,5 @@
         $("#wrap-imagepicker-watermark", context).hide();
       }
     });
-
   };
-
 })(jQuery);

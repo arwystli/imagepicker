@@ -364,6 +364,37 @@ function imagepicker_settings_form($form_state) {
     '#size' => 60,
     '#default_value' => variable_get('imagepicker_upload_progress_message', t('Processing form... please wait.')),
   );
+  $vok = FALSE;
+  $extok = FALSE;
+  if (version_compare(phpversion(), IMAGEPICKER_UPLOAD_STATUS_MIN_PHP) >= 0 ) {
+    $vok = TRUE;
+    if (extension_loaded('uploadprogress')) {
+      $extok = TRUE;
+    }
+  }
+
+  if ($vok && $extok) {
+    $form['imagepicker_progress']['imagepicker_uploadprogress'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Upload Progress Extension'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+
+    $form['imagepicker_progress']['imagepicker_uploadprogress']['imagepicker_uploadprogress_server'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable PECL uploadprogress'),
+      '#default_value' => variable_get('imagepicker_uploadprogress_server', ''),
+    );
+    $form['imagepicker_progress']['imagepicker_uploadprogress']['imagepicker_uploadprogress_interval'] = array(
+      '#title' => t('Interval Time'),
+      '#description' => t('The interval between each check.'),
+      '#type' => 'textfield',
+      '#size' => 5,
+      '#default_value' => variable_get('imagepicker_uploadprogress_interval', 1),
+      '#field_suffix' => t('seconds'),
+    );
+  }
 
   // Groups
   $form['imagepicker_groups'] = array(

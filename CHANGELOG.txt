@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20010-12-21
+------------------------------------
+by hutch  added PECL uploadprogress support
+
 Image Picker  for D6 in DRUPAL-6--2, 20010-12-13
 ------------------------------------
 by hutch, cleaned up js and themeing

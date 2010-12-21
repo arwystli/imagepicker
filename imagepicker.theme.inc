@@ -90,11 +90,6 @@ function imagepicker_theme() {
         'label' => "",
       ),
     ),
-    'imagepicker_upload_progress_message' => array(
-      'arguments' => array(
-        'message' => "",
-      ),
-    ),
     'imagepicker_user_config' => array(
       'arguments' => array(
         'form' => array(),
@@ -463,15 +458,6 @@ function theme_imagepicker_quota($form, $message, $label) {
   return $output;
 }
 
-function theme_imagepicker_upload_progress_message($message) {
-  $output = '<div id="sending" class="progress" style="display: none;">';
-  $output .= '<div class="status">'. $message .'</div>';
-  $output .= '<div class="bar"></div>';
-  $output .= '<a id="imagepicker_upload_progress_cancel_link" href="#">' . t('Cancel') . '</a>';
-  $output .= '</div>';
-  return $output;
-}
-
 function theme_imagepicker_user_config($form, $label='', $help='', $message1='', $message2='') {
   $output = ($label ? '<fieldset><legend>'. $label .'</legend>' : '');
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
@@ -694,7 +680,12 @@ function theme_imagepicker_settings_form($form) {
 
   $jshide = ($form['imagepicker_progress']['imagepicker_upload_progress_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress"'. $jshide .'>';
-  $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
+  if (version_compare(phpversion(), IMAGEPICKER_UPLOAD_STATUS_MIN_PHP) >= 0 && extension_loaded('uploadprogress')) {
+    $form['imagepicker_progress']['imagepicker_uploadprogress']['#suffix'] = '</div>';
+  }
+  else {
+    $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
+  }
 
   $jshide = ($form['imagepicker_exif']['imagepicker_exifinfo_enable']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external"'. $jshide .'>';
