@@ -41,7 +41,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
   }
   $form['#attributes']['enctype'] = 'multipart/form-data';
   if (variable_get('imagepicker_upload_progress_enabled', 1) && variable_get('imagepicker_uploadprogress_server', '')) {
-    $form['UPLOAD_IDENTIFIER'] = array(
+    $form[IMAGEPICKER_UPLOAD_ID] = array(
       '#type' => 'hidden',
       '#value' => uniqid(),
       '#weight' => -50,
@@ -371,7 +371,7 @@ function imagepicker_upload_progress_get_script($delay) {
       'imagepicker_upload_progress' => array(
         'callback' => 'http://' . $_SERVER['HTTP_HOST'] . url('imagepicker/progress'),
         'interval' => variable_get('imagepicker_uploadprogress_interval', 1),
-        'name' => 'edit-UPLOAD-IDENTIFIER',
+        'name' => IMAGEPICKER_UPLOAD_ID,
         'delay' => $delay,
         'initmessage' => $message,
         'cancelmessage' => t('Cancel'),

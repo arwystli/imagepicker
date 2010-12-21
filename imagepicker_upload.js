@@ -25,7 +25,7 @@
     $('#imagepicker-upload-form', context).submit(function() {
       $("#imagepicker-sending").addClass('progress');
       $("#imagepicker-sending").addClass('processed');
-      $("#imagepicker-sending").html('<div class="status">' + initmessage + '</div>'+
+      $("#imagepicker-sending").html('<div class="message">' + initmessage + '</div>'+
           '<div class="bar"><div class="filled"></div></div>'+
           '<div class="percentage"></div>'+
           '<a id="imagepicker_upload_progress_cancel_link" href="#">' + cancelmessage + '</a>'+
@@ -33,14 +33,14 @@
       Drupal.imagepicker_upload_progress_hide_timeout(delay);
       // are we using PECL uploadprogress
       if (name) {
-        progress_key = $("#"+name).val();
+        progress_key = $("input:hidden[name=" + name + "]").val();
         var i = setInterval(function() {
           $.getJSON(callback + '?key=' + progress_key, function(data) {
             if (data == null) {
               clearInterval(i);
               return;
             }
-            $(".status").html(data.message);
+            $("#imagepicker-sending div.message").html(data.message);
             var percentage = data.percentage;
             if (percentage >= 0 && percentage <= 100) {
               $('div.filled').css('width', percentage +'%');
