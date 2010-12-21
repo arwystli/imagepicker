@@ -515,6 +515,11 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) && $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
     form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
   }
+  if (isset($form_state['values']['imagepicker_uploadprogress_interval'])) {
+    if ( ! is_numeric($form_state['values']['imagepicker_uploadprogress_interval']) && $form_state['values']['imagepicker_uploadprogress_interval'] < 1) {
+      form_set_error('imagepicker_uploadprogress_interval', t('The progress interval must be a positive number'));
+    }
+  }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_align'])) {
     form_set_error('imagepicker_insert_defaults_align', t('You must fill in the default align field'));
   }
