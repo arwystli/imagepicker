@@ -226,9 +226,9 @@ function template_preprocess_imagepicker(&$variables) {
   $variables['styles'] = drupal_get_css();
   $variables['scripts'] = drupal_get_js();
   // fix jquery version thing in the iframe
-  if (module_exists('jquery_update')) {
-    jquery_update_preprocess_page($variables);
-  }
+#  if (module_exists('jquery_update')) {
+#    jquery_update_preprocess_page($variables);
+#  }
   $tabs = menu_local_tabs();
   $variables['tabs'] = theme('menu_local_tasks', array('primary' => $tabs['#primary']));
   $variables['messages'] = imagepicker_strip_messages(theme('status_messages'));
@@ -749,7 +749,7 @@ function theme_imagepicker_settings_form($variables) {
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap_imagepicker-quota-role"'. $jshide .'>';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role"'. $jshide .'>';
   $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_watermark']['imagepicker_watermark_enable']['#default_value'] ? '' : ' class="js-hide"');
