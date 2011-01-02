@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20011-01-02
+------------------------------------
+by hutch, fixed db_delete bug #1012008
+
 Image Picker  for D7 in DRUPAL-7--1, 20010-12-26
 ------------------------------------
 by hutch, removed jquery_update check
