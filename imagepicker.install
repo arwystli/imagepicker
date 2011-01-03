@@ -183,9 +183,9 @@ function imagepicker_schema() {
  */
 function imagepicker_uninstall() {
   // DELETE FROM {variable} WHERE name LIKE 'imagepicker_%'
-  $query = db_delete('variable')
-    ->condition('name', 'imagepicker_%', 'LIKE')
-    ->execute();
+#  $query = db_delete('variable')
+#    ->condition('name', 'imagepicker_%', 'LIKE')
+#    ->execute();
 }
 
 function imagepicker_update_7100() {

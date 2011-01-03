@@ -443,14 +443,14 @@ function imagepicker_settings_form($form, &$form_state) {
   $form['imagepicker_import']['imagepicker_import_delete'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Bulk import deletion'),
-    '#description' => t('Delete uploaded source images after succesful import into imagepicker.'),
+    '#description' => t('Delete uploaded source images after succesful import into imagepicker.<br />The image files should be writeable by the web server for this option to work.'),
     '#return_value' => 1,
     '#default_value' => imagepicker_variable_get('imagepicker_import_delete', 0),
   );
   $form['imagepicker_import']['imagepicker_import_max'] = array(
     '#type' => 'textfield',
     '#title' => t('Default Import Batch size'),
-    '#description' => t('How many files to process at a time. Must be greater than 1 and less than 100.'),
+    '#description' => t('How many files to process at a time. Must be greater than 0 and less than 100.'),
     '#size' => 3,
     '#required' => TRUE,
     '#default_value' => imagepicker_variable_get('imagepicker_import_max', 5),
@@ -1188,14 +1188,12 @@ function imagepicker_admin_import() {
     $uid = arg(5);
   }
   $content = "";
-  $importdir = imagepicker_variable_get('imagepicker_import_dir', '');
-  if (empty($importdir)) {
+  if (! $importdir = imagepicker_variable_get('imagepicker_import_dir', '')) {
     drupal_set_message(t('You need to set the import folder'));
   }
   $content = render(drupal_get_form('imagepicker_import_dir_form'));
   if ($importdir) {
-    $import_files = imagepicker_import_dir_check();
-    if ($import_files > 0) {
+    if ($import_files = imagepicker_import_dir_check()) {
       $content .= render(drupal_get_form('imagepicker_user_search_form', 'import'));
       if ($uid) {
         $account = user_load($uid);

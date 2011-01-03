@@ -16,43 +16,54 @@ module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
  * @return
  *   Returns the number of images.
  */
-function imagepicker_import_dir_check($account = FALSE) {
+function imagepicker_import_dir_check($checkonly = FALSE) {
 
+  $importok = TRUE;
   if (! $importdir = imagepicker_variable_get('imagepicker_import_dir', '')) {
+    $importok = FALSE;
+    $errmsg = t('Import Directory not set');
+    $errstatus = 'status';
+  }
+  elseif (imagepicker_variable_get('imagepicker_import_delete', 0)) {
+    if (! file_prepare_directory($importdir)) {
+      $importok = FALSE;
+      $errmsg = t('Directory not found or not writeable');
+      $errstatus = 'error';
+    }
+  }
+  elseif (! file_exists($importdir)) {
+    $importok = FALSE;
+    $errmsg = t('Directory not found or not readable');
+    $errstatus = 'error';
+  }
+  if (! $importok) {
+    drupal_set_message($errmsg, $errstatus);
     return FALSE;
   }
-  if ($account) {
-    $user = $account;
+
+  if ($checkonly) {
+    return TRUE;
   }
-  else {
-    global $user;
-  }
+
+  // clear out the noisy 'created' messages
+  drupal_get_messages('status', TRUE);
+  $importlist = file_scan_directory($importdir, "/.*/", array('recurse' => FALSE));
+
   $checked_importlist = array();
-  if (file_prepare_directory($importdir, FILE_MODIFY_PERMISSIONS)) {
-    // clear out the noisy 'created' messages
-    drupal_get_messages('status', TRUE);
-    $importlist = file_scan_directory($importdir, "/.*/", array('recurse' => FALSE));
-    $bad_importlist = array();
-    if (count($importlist)) {
-      foreach ($importlist AS $k => $v) {
-        $file = $importlist[$k]->filename;
-        $fullfile = $importlist[$k]->uri;
-        $err = file_validate_is_image($importlist[$k]);
-        if (count($err)) {
-          $bad_importlist[] = $fullfile;
-        }
-        else {
-          $checked_importlist[] = $file;
-        }
+  if (count($importlist)) {
+    foreach ($importlist AS $k => $v) {
+      $filename = $importlist[$k]->filename;
+      $err = file_validate_is_image($importlist[$k]);
+      if (! count($err)) {
+        $checked_importlist[] = $filename;
       }
     }
-    else {
-      drupal_set_message(t('No files to import.'), 'warning');
-    }
   }
   else {
-    drupal_set_message(t('Unable to create a directory structure for your import folder: !importdir', array('!importdir' => $importdir) ), 'error');
+    drupal_set_message(t('No files to import.'), 'warning');
+    return FALSE;
   }
+
   return (count($checked_importlist) > 0 ? $checked_importlist : 0);
 }
 
@@ -77,10 +88,11 @@ function imagepicker_import_form($form, &$form_state, $total, $account=FALSE, $a
     global $user;
   }
 
+  $form['total'] = array(
+    '#markup' => t('!total images found in the import folder.<br />Selected user is %user', array('!total' => check_plain($total), '%user' => $user->name )),
+  );
   // provide checkbox list of groups if any
   // default watermark
-  $form['total'] = array('#markup' => '<p>' . t('!total images found in the imagepicker import folder.<br />Selected user is %user', array('!total' => $total, '%user' => $user->name )) . '</p>');
-
   $form['thumb'] = array(
     '#type' => 'textfield',
     '#title' => t('Thumbnail size'),
@@ -202,7 +214,6 @@ function imagepicker_import_form_submit($form, &$form_state) {
     $thumbsdir = $destdir . IMAGEPICKER_THUMBS_DIR;
     $browserdir = $destdir . IMAGEPICKER_BROWSER_DIR;
     $origdir = $destdir . IMAGEPICKER_ORIG_DIR;
-    $sourcedir = imagepicker_variable_get('imagepicker_import_dir', '');
     // relative paths
     $destdirscheme = imagepicker_get_path(FALSE, (isset($form_state['values']['admin']) ? array('name' => $user->name, 'uid' => $user->uid ) : TRUE), TRUE);
     $thumbsdirscheme = $destdirscheme . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR;
@@ -213,7 +224,7 @@ function imagepicker_import_form_submit($form, &$form_state) {
       && file_prepare_directory($thumbsdir, FILE_CREATE_DIRECTORY)
       && file_prepare_directory($browserdir, FILE_CREATE_DIRECTORY)
       && file_prepare_directory($origdir, FILE_CREATE_DIRECTORY)
-      && file_prepare_directory($sourcedir, FILE_CREATE_DIRECTORY)
+      && $selected = imagepicker_import_dir_check()
       ) {
       // clear out the noisy 'created' messages
       drupal_get_messages('status', TRUE);
@@ -226,9 +237,7 @@ function imagepicker_import_form_submit($form, &$form_state) {
       $options['thumbsdirscheme'] = $thumbsdirscheme;
       $options['browserdirscheme']  = $browserdirscheme;
       $options['origdirscheme']  = $origdirscheme;
-
-      $options['sourcedir'] = $sourcedir;
-      $selected = imagepicker_import_dir_check();
+      $options['sourcedir'] = imagepicker_variable_get('imagepicker_import_dir', '');
 
       $batch = array(
         'title' => t('Importing images'),
@@ -243,7 +252,7 @@ function imagepicker_import_form_submit($form, &$form_state) {
       // batch_process();
     }
     else {
-      drupal_set_message(t('Unable to create a directory structure for your images.'), 'error');
+      drupal_set_message(t('Unable to import.'), 'error');
     }
   }
 }
@@ -273,10 +282,8 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
   // Process images by groups of $max.
   $count = min($max, count($context['sandbox']['images']));
   for ($i = 0; $i < $count; $i++) {
-    $index = array_shift($context['sandbox']['images']);
-
+    $filename = array_shift($context['sandbox']['images']);
     // Check the file is OK
-    $filename = $index;
     $source_filepath = imagepicker_file_check_location($options['sourcedir'] . DIRECTORY_SEPARATOR . $filename, $options['sourcedir']);
     if ($source_filepath) {
       $object = new stdClass();
@@ -284,8 +291,6 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
       $err = file_validate_is_image($object);
       if (! count($err)) {
         $source = $source_filepath;
-        $file = $filename;
-
         // copy original
         if (file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['origdirscheme'], FILE_EXISTS_RENAME)) {
           $file = basename($source);
@@ -374,6 +379,7 @@ function imagepicker_import_finished($success, $results, $operations) {
 
   if ($success) {
     $message = format_plural(count($results), 'One image processed.', '@count images processed.');
+    imagepicker_variable_del('imagepicker_import_dir');
   }
   else {
     $message = t('Finished with an error.');
@@ -389,12 +395,17 @@ function imagepicker_import_finished($success, $results, $operations) {
  */
 function imagepicker_import_dir_form($form, &$form_state) {
 
+  $readstate = t('readable');
+  if (imagepicker_variable_get('imagepicker_import_delete', 0)) {
+    $readstate = t('writeable');
+  }
+
   $form['imagepicker_import'] = array(
     '#type' => 'fieldset',
     '#title' => t('Imagepicker Import Folder'),
-    '#description' => t('Path of the import folder, relative to the Drupal root or an absolute path.<br />This is where you upload images to, via FTP or rsync.<br />This folder must be writeable by the webserver.'),
+    '#description' => t('Path of the import folder, relative to the Drupal root or an absolute path.<br />This is where you upload images to, via FTP or rsync.<br />This folder must be !readstate by the webserver.', array('!readstate' => $readstate)),
     '#collapsible' => TRUE,
-    '#collapsed' => (imagepicker_variable_get('imagepicker_import_dir', '') ? TRUE : FALSE),
+    '#collapsed' => FALSE,
   );
   $form['imagepicker_import']['imagepicker_import_dir'] = array(
     '#type' => 'textfield',
@@ -408,6 +419,10 @@ function imagepicker_import_dir_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Save'),
   );
+  $form['imagepicker_import']['reset'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset'),
+  );
 
   return $form;
 }
@@ -418,8 +433,16 @@ function imagepicker_import_dir_form($form, &$form_state) {
 function imagepicker_import_dir_form_validate($form, &$form_state) {
 
   $importdir = $form_state['values']['imagepicker_import_dir'];
-  if ($importdir && ! file_prepare_directory($importdir, FILE_MODIFY_PERMISSIONS)) {
-    form_set_error('imagepicker_import_dir', t('The folder does not exist.'));
+  if ($form_state['values']['op'] == t('Save')) {
+    if (imagepicker_variable_get('imagepicker_import_delete', 0)) {
+      if (! file_prepare_directory($importdir)) {
+        form_set_error('imagepicker_import_dir', t('Directory not found or not writable'));
+      }
+    }
+    elseif (! file_exists($importdir)) {
+      $errmsg = t('Directory not found or not readable');
+      form_set_error('imagepicker_import_dir', t('Directory not found or not readable'));
+    }
   }
 }
 
@@ -427,8 +450,12 @@ function imagepicker_import_dir_form_validate($form, &$form_state) {
  * Submit form
  */
 function imagepicker_import_dir_form_submit($form, &$form_state) {
-
-  imagepicker_variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
+  if ($form_state['values']['op'] == t('Save')) {
+    imagepicker_variable_set('imagepicker_import_dir', $form_state['values']['imagepicker_import_dir']);
+  }
+  else {
+    imagepicker_variable_del('imagepicker_import_dir');
+  }
 }
 
 // D7 has lost file_check_location()

@@ -1169,6 +1169,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
     '#value' => $path,
   );
 
+  $fmt = imagepicker_variable_get('imagepicker_dateformat_default', 'medium');
   $rowct = 0;
   $options = array();
   // iterate
@@ -1176,7 +1177,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
     $img_name = check_plain($row->img_name);
     $img_id = $row->img_id;
     $description = check_plain($row->img_description);
-    $img_date = format_date($row->img_date, imagepicker_variable_get('imagepicker_dateformat_default', 'medium'));
+    $img_date = format_date($row->img_date, $fmt);
     if (drupal_strlen($description) > IMAGEPICKER_DESC_LEN) {
       $description = drupal_substr($description, 0, IMAGEPICKER_DESC_LEN) . '...';
     }

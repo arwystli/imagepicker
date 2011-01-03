@@ -823,6 +823,8 @@ function theme_imagepicker_import_form($variables) {
 
   $form = $variables['form'];
   $output = '';
+  $markup = $form['total']['#markup'];
+  $form['total']['#markup'] = '<p>' . $markup . '</p>';
   $output .= drupal_render_children($form);
   return $output;
 }

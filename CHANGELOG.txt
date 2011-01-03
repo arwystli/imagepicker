@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20011-01-03
+------------------------------------
+by hutch, reworked import
+
 Image Picker  for D7 in DRUPAL-7--1, 20011-01-02
 ------------------------------------
 by hutch, fixed db_delete bug #1012008
