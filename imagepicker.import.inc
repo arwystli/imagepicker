@@ -253,7 +253,8 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
     $context['sandbox']['images'] = $selected;
   }
   // Process images by groups of 5.
-  $count = min(5, count($context['sandbox']['images']));
+  $max = variable_get('imagepicker_import_max', 5);
+  $count = min($max, count($context['sandbox']['images']));
   for ($i = 0; $i < $count; $i++) {
     $index = array_shift($context['sandbox']['images']);
 
