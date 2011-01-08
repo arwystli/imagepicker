@@ -754,8 +754,13 @@ function imagepicker_user_search_form($form_state, $dir) {
 
 function imagepicker_user_search_form_submit($form, &$form_state) {
   if ($form_state['values']['imagepicker_currentuser']) {
+    if ($form_state['values']['dir'] == 'import') {
+      $result = db_query("SELECT u.uid FROM {users} u WHERE u.name = '%s'", $form_state['values']['imagepicker_currentuser']);
+    }
+    else {
+      $result = db_query("SELECT u.uid FROM {users} u, {imagepicker} i WHERE u.name = '%s' AND u.uid=i.uid", $form_state['values']['imagepicker_currentuser']);
+    }
 
-    $result = db_query("SELECT u.uid FROM {users} u, {imagepicker} i WHERE u.name = '%s' AND u.uid=i.uid", $form_state['values']['imagepicker_currentuser']);
     $row = db_fetch_array($result);
     if ($row['uid'] ) {
       variable_set('imagepicker_currentuser', $row['uid']);
@@ -1636,6 +1641,7 @@ function imagepicker_admin_import() {
     }
   }
   if ($msg = $_SESSION['imagepicker_import_status']) {
+    drupal_get_messages('status', TRUE);
     drupal_set_message($msg);
     unset($_SESSION['imagepicker_import_status']);
   }
@@ -1648,9 +1654,22 @@ function imagepicker_admin_import() {
 function imagepicker_user_autocomplete($string = '') {
   $matches = array();
   if ($string) {
-    $result = db_query_range("SELECT DISTINCT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
-    while ($user = db_fetch_object($result)) {
-      $matches[$user->name] = check_plain($user->name);
+    if (arg(3) == 'import') {
+      $result = db_query_range("SELECT u.uid, u.name FROM {users} u WHERE LOWER(u.name) LIKE LOWER('%s%%')", $string, 0, 10);
+    }
+    else {
+      $result = db_query_range("SELECT DISTINCT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
+    }
+    while ($account = db_fetch_object($result)) {
+      if (arg(3) == 'import') {
+        $user = user_load(array('uid' => $account->uid));
+        if (user_access('use imagepicker', $user)) {
+          $matches[$account->name] = check_plain($account->name);
+        }
+      }
+      else {
+        $matches[$account->name] = check_plain($account->name);
+      }
     }
   }
   print drupal_to_js($matches);
