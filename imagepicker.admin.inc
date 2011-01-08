@@ -864,9 +864,15 @@ function imagepicker_user_search_form_submit($form, &$form_state) {
 
   if ($form_state['values']['imagepicker_currentuser']) {
     $currentuser = $form_state['values']['imagepicker_currentuser'];
-    $query = db_select('users', 'u');
-    $query->fields('u', array('uid'));
-    $query->join('imagepicker', 'i', 'u.uid = i.uid');
+    if ($form_state['values']['dir'] == 'import') {
+      $query = db_select('users', 'u');
+      $query->fields('u', array('uid'));
+    }
+    else {
+      $query = db_select('users', 'u');
+      $query->fields('u', array('uid'));
+      $query->join('imagepicker', 'i', 'u.uid = i.uid');
+    }
     $query->condition('u.name', $currentuser);
     $row = $query->execute()->fetchAssoc();
     if ($row['uid']) {
@@ -1206,6 +1212,7 @@ function imagepicker_admin_import() {
   }
 
   if ( isset($_SESSION['imagepicker_import_status'])) {
+    drupal_get_messages('status', TRUE);
     drupal_set_message($_SESSION['imagepicker_import_status']);
     unset($_SESSION['imagepicker_import_status']);
   }
@@ -1219,16 +1226,33 @@ function imagepicker_user_autocomplete($string = '') {
 
   $matches = array();
   if ($string) {
-    $query = db_select('users', 'u');
-    $query->fields('u', array('name'));
-    $query->distinct();
-    $query->join('imagepicker', 'i', 'u.uid = i.uid');
-    $query->where("LOWER(u.name) LIKE LOWER(:st)", array(':st' => $string . '%') );
-    $query->condition('u.status', 1);
-    $query->range(0, 10);
+    if (arg(4) == 'import') {
+      $query = db_select('users', 'u');
+      $query->fields('u', array('uid', 'name'));
+      $query->where("LOWER(u.name) LIKE LOWER(:st)", array(':st' => $string . '%') );
+      $query->condition('u.status', 1);
+      $query->range(0, 10);
+    }
+    else {
+      $query = db_select('users', 'u');
+      $query->fields('u', array('name'));
+      $query->distinct();
+      $query->join('imagepicker', 'i', 'u.uid = i.uid');
+      $query->where("LOWER(u.name) LIKE LOWER(:st)", array(':st' => $string . '%') );
+      $query->condition('u.status', 1);
+      $query->range(0, 10);
+    }
     $result = $query->execute();
-    foreach ($result as $user) {
-      $matches[$user->name] = check_plain($user->name);
+    foreach ($result as $account) {
+      if (arg(4) == 'import') {
+        $user = user_load($account->uid);
+        if (user_access('use imagepicker', $user)) {
+          $matches[$account->name] = check_plain($account->name);
+        }
+      }
+      else {
+        $matches[$account->name] = check_plain($account->name);
+      }
     }
   }
   drupal_json_output($matches);
