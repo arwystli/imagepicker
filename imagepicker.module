@@ -743,6 +743,7 @@ function imagepicker_image_form($form, &$form_state, $img_id, $public = FALSE) {
     $form['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete image'),
+      '#submit' => array('imagepicker_image_form_delete'),
     );
   }
   $form['img_id'] = array(
