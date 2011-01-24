@@ -176,6 +176,10 @@ function imagepicker_watermark_process($image_path, $account=FALSE) {
     watchdog('imagepicker', 'Failed to merge image with watermark.', array(), WATCHDOG_ERROR);
   }
   // create an image of the same type!
+  elseif ($im_info['type'] == 'jpeg' && !$img_create_func($im, $image_path, variable_get('image_jpeg_quality', 75))) {
+    drupal_set_message(t('Failed to save merged image.'), 'error');
+    watchdog('imagepicker', 'Failed to save merged image.', array(), WATCHDOG_ERROR);
+  }
   elseif (!$img_create_func($im, $image_path)) {
     drupal_set_message(t('Failed to save merged image.'), 'error');
     watchdog('imagepicker', 'Failed to save merged image.', array(), WATCHDOG_ERROR);

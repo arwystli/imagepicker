@@ -491,6 +491,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
   }
+  if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1 ) {
+    form_set_error('imagepicker_rows_per_page', t('The rows per page field must be greater than one.'));
+  }
   if (! drupal_strlen($form_state['values']['imagepicker_default_fleft'])) {
     form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));
   }
@@ -506,17 +509,17 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
     form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_advanced_browser_columns']) && $form_state['values']['imagepicker_advanced_browser_columns'] < 0) {
+  if (! is_numeric($form_state['values']['imagepicker_advanced_browser_columns']) || $form_state['values']['imagepicker_advanced_browser_columns'] < 0) {
     form_set_error('imagepicker_advanced_browser_columns', t('The browser columns must be a positive number or zero'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) && $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
+  if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) || $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
     form_set_error('imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) && $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
+  if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) || $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
     form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
   }
   if (isset($form_state['values']['imagepicker_uploadprogress_interval'])) {
-    if ( ! is_numeric($form_state['values']['imagepicker_uploadprogress_interval']) && $form_state['values']['imagepicker_uploadprogress_interval'] < 1) {
+    if ( ! is_numeric($form_state['values']['imagepicker_uploadprogress_interval']) || $form_state['values']['imagepicker_uploadprogress_interval'] < 1) {
       form_set_error('imagepicker_uploadprogress_interval', t('The progress interval must be a positive number'));
     }
   }
