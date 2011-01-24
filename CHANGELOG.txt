@@ -3,6 +3,11 @@
 
 Image Picker  for D7 in DRUPAL-7--1, 20011-01-22
 ------------------------------------
+by hutch, fixed jpeg quality issue #1036216
+  fixed rows per page bug #1038288
+
+Image Picker  for D7 in DRUPAL-7--1, 20011-01-22
+------------------------------------
 by hutch, delete image insert page not working #1033952
 
 Image Picker  for D7 in DRUPAL-7--1, 20011-01-08
