@@ -177,10 +177,10 @@ function imagepicker_insert_user_group($record) {
   if (db_query(
     "INSERT INTO {imagepicker_user_groups} (uid, group_name, group_description, public, avail_roles) VALUES (%d, '%s', '%s', %d, '%s')",
     array($record['uid'], $record['group_name'], $record['group_description'], $record['public'], $record['avail_roles']))) {
-    drupal_set_message(t('Group was successfully inserted'));
+    drupal_set_message(t('Group was successfully created'));
   }
   else {
-    drupal_set_message(t('Error while trying to insert your group.'));
+    drupal_set_message(t('Error while trying to create your group.'));
   }
 }
 

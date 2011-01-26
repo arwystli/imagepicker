@@ -16,10 +16,10 @@
     // form enhancement
     $("#edit-imagepicker-quota-byrole", context).change(function() {
       if ($(this).attr('checked')) {
-        $("#wrap_imagepicker_quota_role", context).show();
+        $("#wrap-imagepicker-quota-role", context).show();
       }
       else {
-        $("#wrap_imagepicker_quota_role", context).hide();
+        $("#wrap-imagepicker-quota-role", context).hide();
       }
     });
 
@@ -67,5 +67,15 @@
         $("#wrap-imagepicker-watermark", context).hide();
       }
     });
+
+    $("#edit-imagepicker-galleryblocks-enabled", context).change(function() {
+      if ($(this).attr('checked')) {
+        $("#wrap-imagepicker-blocks", context).show();
+      }
+      else {
+        $("#wrap-imagepicker-blocks", context).hide();
+      }
+    });
+
   };
 })(jQuery);

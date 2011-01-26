@@ -177,17 +177,18 @@ function imagepicker_import_form($form_state, $total, $account=FALSE, $admin = F
  */
 function imagepicker_import_form_validate($form, &$form_state) {
   foreach ($form_state['values'] as $name => $value) {
-    $value = trim($value);
     switch ($name) {
       case 'thumb':
+        $value = trim($value);
         if (!preg_match('/^[0-9]{1,3}$/', $value) || $value <= 0) {
           form_set_error($name, t('Thumbnail size should be an integer between 1 and 999.'));
         }
         break;
 
       case 'scale':
+        $value = trim($value);
         if (!preg_match('/^[0-9]{0,3}$/', $value)) {
-          form_set_error($name, t('Scale value should be an integer between 1 and 999 or leave it empty if you don\'t want to scale your image.'));
+          form_set_error($name, t("Scale value should be an integer between 1 and 999 or leave it empty if you don't want to scale your image."));
         }
         break;
     }

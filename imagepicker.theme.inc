@@ -674,6 +674,10 @@ function theme_imagepicker_settings_form($form) {
   $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';
   $form['imagepicker_import']['imagepicker_import_max']['#suffix'] = '</div>';
 
+  $jshide = ($form['imagepicker_blocks']['imagepicker_galleryblocks_enabled']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany']['#prefix'] = '<div id="wrap-imagepicker-blocks"'. $jshide .'>';
+  $form['imagepicker_blocks']['close']['#suffix'] = '</div>';
+
   $jshide = ($form['imagepicker_groups']['imagepicker_groups_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"'. $jshide .'>';
   $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
@@ -692,7 +696,7 @@ function theme_imagepicker_settings_form($form) {
   $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap_imagepicker_quota_role"'. $jshide .'>';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role"'. $jshide .'>';
   $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_watermark']['imagepicker_watermark_enable']['#default_value'] ? '' : ' class="js-hide"');

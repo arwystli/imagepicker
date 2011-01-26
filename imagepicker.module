@@ -517,6 +517,75 @@ function imagepicker_access_use_group() {
 }
 
 /**
+ * Implementation of hook_block().
+ */
+function imagepicker_block($op = 'list', $delta = 0, $edit = array()) {
+
+  if(variable_get('imagepicker_galleryblocks_enabled', 0) && module_exists('colorbox')) {
+    $howmany = variable_get('imagepicker_galleryblocks_howmany', 1);
+    switch ($op) {
+      case 'list':
+        for ($i = 1; $i <= $howmany; $i++) {
+          if (variable_get('imagepicker_galleryblocks_enable_'. $i, 0)) {
+            $blocks[$i]['info'] = t('Imagepicker Gallery block !i', array('!i' => $i));
+            $blocks[$i]['cache'] = BLOCK_NO_CACHE;
+          }
+        }
+        return $blocks;
+
+      case 'view':
+        $block = array(
+          'subject' => variable_get('imagepicker_galleryblocks_title_'. $delta, t('Gallery !i', array('!i' => $delta))),
+          'content' => imagepicker_display_block($delta),
+        );
+        return $block;
+
+      case 'cache':
+        return BLOCK_NO_CACHE;
+    }
+  }
+}
+
+/**
+ * Function to display the contents of a block.
+ */
+function imagepicker_display_block($i) {
+  // fetch all the images for the group
+  $boxtype = 'colorbox';
+  $gid = variable_get('imagepicker_galleryblocks_group_' . $i, '');
+  $clickon = variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i)));
+  $group = imagepicker_get_user_group($gid);
+  $gal = $group->group_name;
+  $fpath .= file_directory_path() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
+  $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, img_description
+  FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
+  {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
+  WHERE g.img_id=i.img_id AND u.group_name = '$gal'";
+  $result = db_query($sql);
+  $ct = 0;
+  $content = "";
+  $class = '';
+  while ($img = db_fetch_object($result)) {
+    $n = $img->img_name;
+    $t = $img->img_title;
+    $d = $img->img_description;
+    $title = ($d ? $d : $t);
+    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $n;
+    if ($ct) {
+      $class = "js-hide";
+      $text = $n;
+    }
+    else {
+      $text = $clickon;
+    }
+    $content .= l($text, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
+    $ct++;
+  }
+  return $content;
+
+}
+
+/**
  * Implementation of hook_form_alter().
  */
 function imagepicker_form_alter(&$form, &$form_state, $form_id) {
@@ -2166,6 +2235,32 @@ function imagepicker_get_enabled_group($account = FALSE) {
   return FALSE;
 }
 
+
+// for blocks
+function imagepicker_get_all_groups($override = NULL) {
+  $public = FALSE;
+   if ($override == NULL) {
+    $public = variable_get('imagepicker_galleryblocks_public', 0);
+   }
+   else {
+    $public = $override;
+   }
+  $data = FALSE;
+  $sql = "SELECT gid, group_name FROM {imagepicker_user_groups}";
+  if ($public) {
+    $sql .= " WHERE public=1";
+  }
+  $result = db_query($sql);
+  while ($row = db_fetch_array($result)) {
+    $result2 = db_query("SELECT count(DISTINCT gi.img_id) AS ct FROM {imagepicker_group_images} gi, {imagepicker_user_groups} g WHERE g.gid = gi.gid AND g.gid = %d", array($row['gid']));
+    $row2 = db_fetch_array($result2);
+    $totcount = $row2['ct'];
+    $data[$row['gid']] = $row['group_name'] .' - '. format_plural($totcount, '1 image', '@count images');
+  }
+  return $data;
+}
+
+
 /**
  * all the groups for the current user which have images attached
  */
@@ -2234,7 +2329,7 @@ function imagepicker_browse_groups_form_submit($form, &$form_state) {
 }
 
 /**
- * Submit public browse groups form
+ * Public browse groups form
  *
  * @param $account
  *   Optional,
