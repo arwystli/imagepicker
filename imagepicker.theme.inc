@@ -731,6 +731,10 @@ function theme_imagepicker_settings_form($variables) {
   $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';
   $form['imagepicker_import']['imagepicker_import_max']['#suffix'] = '</div>';
 
+  $jshide = ($form['imagepicker_blocks']['imagepicker_galleryblocks_enabled']['#default_value'] ? '' : ' class="js-hide"');
+  $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany']['#prefix'] = '<div id="wrap-imagepicker-blocks"'. $jshide .'>';
+  $form['imagepicker_blocks']['close']['#suffix'] = '</div>';
+
   $jshide = ($form['imagepicker_groups']['imagepicker_groups_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"'. $jshide .'>';
   $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';

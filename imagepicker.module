@@ -554,7 +554,81 @@ function imagepicker_access_use_group() {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implements hook_block_info().
+ *
+ * This hook declares what blocks are provided by the module.
+ */
+function imagepicker_block_info() {
+  if(imagepicker_variable_get('imagepicker_galleryblocks_enabled', 0) && module_exists('colorbox')) {
+    $howmany = imagepicker_variable_get('imagepicker_galleryblocks_howmany', 0);
+    if ($howmany) {
+      for ($i = 1; $i <= $howmany; $i++) {
+        if (imagepicker_variable_get('imagepicker_galleryblocks_enable_'. $i, 0)) {
+          $blocks[$i]['info'] = t('Imagepicker Gallery block !i', array('!i' => $i));
+          $blocks[$i]['cache'] = BLOCK_NO_CACHE;
+        }
+      }
+      return $blocks;
+    }
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * This hook generates the contents of the blocks themselves.
+ */
+function imagepicker_block_view($delta = '') {
+  $block = array(
+    'subject' => imagepicker_variable_get('imagepicker_galleryblocks_title_'. $delta, t('Gallery !i', array('!i' => $delta))),
+    'content' => imagepicker_display_block($delta),
+  );
+  return $block;
+}
+
+/**
+ * Function to display the contents of a block.
+ */
+function imagepicker_display_block($i) {
+  // fetch all the images for the group
+  $boxtype = 'colorbox';
+  $gid = imagepicker_variable_get('imagepicker_galleryblocks_group_' . $i, '');
+  $clickon = imagepicker_variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i)));
+  $group = imagepicker_get_user_group($gid);
+  $gal = $group->group_name;
+  $fpath = file_stream_wrapper_get_instance_by_scheme('public')->getDirectoryPath() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
+  $query = db_select('users', 'u');
+  $query->fields('i', array('img_id', 'uid', 'img_name', 'img_title', 'img_description'));
+  $query->join('imagepicker', 'i');
+  $query->leftjoin('imagepicker_group_images', 'g', 'g.img_id = i.img_id');
+  $query->leftjoin('imagepicker_user_groups', 'iug', 'iug.gid = g.gid');
+  $query->condition('u.uid', 'iug.uid');
+  $query->condition('iug.group_name', $gal);
+  $rows = $query->execute();
+  $ct = 0;
+  $content = "";
+  $class = '';
+  foreach ($rows AS $img) {
+    $n = $img->img_name;
+    $t = $img->img_title;
+    $d = $img->img_description;
+    $title = ($d ? $d : $t);
+    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $n;
+    if ($ct) {
+      $class = "js-hide";
+      $text = $n;
+    }
+    else {
+      $text = $clickon;
+    }
+    $content .= l($text, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
+    $ct++;
+  }
+  return $content;
+}
+
+/**
+ * Implements hook_form_alter().
  */
 function imagepicker_form_alter(&$form, &$form_state, $form_id) {
 
@@ -2228,6 +2302,35 @@ function imagepicker_get_enabled_group($account = FALSE) {
   }
   return FALSE;
 }
+
+// for blocks
+function imagepicker_get_all_groups($override = NULL) {
+  $public = FALSE;
+   if ($override == NULL) {
+    $public = imagepicker_variable_get('imagepicker_galleryblocks_public', 0);
+   }
+   else {
+    $public = $override;
+   }
+  $data = FALSE;
+  $query = db_select('imagepicker_user_groups', 'g');
+  $query->fields('g', array('gid', 'group_name'));
+  if ($public) {
+    $query->condition('g.public', 1);
+  }
+  $rows = $query->execute();
+  foreach ($rows AS $row) {
+    $query2 = db_select('imagepicker_group_images', 'gi');
+    $query2->addExpression('COUNT(DISTINCT gi.img_id)', 'ct');
+    $query2->join('imagepicker_user_groups', 'g', 'g.gid = gi.gid');
+    $query2->condition('g.gid', $row->gid);
+    $row2 = $query2->execute()->fetchAssoc();
+    $totcount = $row2['ct'];
+    $data[$row->gid] = $row->group_name .' - '. format_plural($totcount, '1 image', '@count images');
+  }
+  return $data;
+}
+
 
 function imagepicker_browse_groups_form($form, &$form_state, $account = FALSE) {
 

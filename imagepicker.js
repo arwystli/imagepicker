@@ -75,6 +75,15 @@
         }
       });
 
+      $("#edit-imagepicker-galleryblocks-enabled", context).change(function() {
+        if ($(this).attr('checked')) {
+          $("#wrap-imagepicker-blocks", context).show();
+        }
+        else {
+          $("#wrap-imagepicker-blocks", context).hide();
+        }
+      });
+
     }
   };
 })(jQuery);

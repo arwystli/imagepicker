@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20011-01-26
+------------------------------------
+by hutch, added gallery blocks
+
 Image Picker  for D7 in DRUPAL-7--1, 20011-01-22
 ------------------------------------
 by hutch, fixed jpeg quality issue #1036216

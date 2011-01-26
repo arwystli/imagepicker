@@ -456,6 +456,97 @@ function imagepicker_settings_form($form, &$form_state) {
     '#default_value' => imagepicker_variable_get('imagepicker_import_max', 5),
   );
 
+  // gallery blocks
+  if (module_exists('colorbox')) {
+
+    $groups = imagepicker_get_all_groups();
+    $totgroups = 0;
+    if ($groups) {
+      $totgroups = count($groups);
+    }
+
+    $form['imagepicker_blocks'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Imagepicker Gallery Blocks'),
+      '#collapsible' => TRUE,
+      '#collapsed' => (imagepicker_variable_get('imagepicker_galleryblocks_enabled', 0) ? TRUE : FALSE),
+      '#weight' => -12,
+    );
+    $form['imagepicker_blocks']['imagepicker_galleryblocks_enabled'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable Gallery blocks'),
+      '#description' => t('Create one or more blocks containing a link to a grouped image gallery.'),
+      '#return_value' => 1,
+      '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_enabled', 0),
+
+    );
+    if ($totgroups) {
+      $level_options =  range(0, $totgroups);
+      unset($level_options[0]);
+      $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany'] = array(
+        '#type' => 'select',
+        '#title' => t('How many gallery blocks do you need?'),
+        '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_howmany', 1),
+        '#options' => $level_options,
+        '#description' => t('Select how many blocks you need and click on the Save Configuration button to make the form available.'),
+      );
+      $form['imagepicker_blocks']['message'] = array('#markup' => t('You have %c available.', array('%c' => format_plural($totgroups, '1 group', '@count groups'))),);
+    }
+    else {
+      $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany'] = array(
+        '#type' => 'value',
+        '#value' => 0,
+      );
+      $form['imagepicker_blocks']['message'] = array('#markup' => t('You need to add some groups.'),);
+    }
+    $form['imagepicker_blocks']['imagepicker_galleryblocks_public'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Only allow public groups'),
+      '#return_value' => 1,
+      '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_public', 0),
+    );
+
+    if ($totgroups) {
+      for ($i = 1; $i <= imagepicker_variable_get('imagepicker_galleryblocks_howmany', 1); $i++) {
+
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset_' . $i] = array(
+          '#type' => 'fieldset',
+          '#title' => t('Gallery block !i', array('!i' => $i)),
+          '#collapsible' => TRUE,
+          '#collapsed' => FALSE,
+        );
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset_' . $i]['imagepicker_galleryblocks_enable_'. $i] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Enable this block'),
+          '#return_value' => 1,
+          '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_enable_'. $i, 1),
+        );
+
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset_' . $i]['imagepicker_galleryblocks_title_'. $i] = array(
+          '#type' => 'textfield',
+          '#title' => t('Title for Gallery Block !i', array('!i' => $i)),
+          '#default_value' => check_plain(imagepicker_variable_get('imagepicker_galleryblocks_title_'. $i, t('Gallery !i', array('!i' => $i)))),
+          '#required' => FALSE,
+          '#description' => t('Set the title for this block.'),
+        );
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset_' . $i]['imagepicker_galleryblocks_link_'. $i] = array(
+          '#type' => 'textfield',
+          '#title' => t('Link text for Gallery Block !i', array('!i' => $i)),
+          '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i))),
+          '#required' => TRUE,
+          '#description' => t('Set the link text for this block. Can contain html.'),
+        );
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset_' . $i]['imagepicker_galleryblocks_group_'. $i] = array(
+          '#type' => 'select',
+          '#title' => t('Select a group for this block'),
+          '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_group_' . $i, ''),
+          '#options' => $groups,
+        );
+      }
+    }
+    $form['imagepicker_blocks']['close'] = array('#markup' => '',);
+  }
+
   $form = system_settings_form($form);
   unset($form['#submit']);
   $form['#submit'][] = 'imagepicker_settings_form_submit';
@@ -562,6 +653,39 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if ($form_state['values']['imagepicker_quota_enable'] != 1) {
     $form_state['values']['imagepicker_quota_byrole'] = 0;
   }
+  // gallery blocks
+  if (! module_exists('colorbox')) {
+    imagepicker_variable_del('imagepicker_galleryblocks_enabled');
+    imagepicker_variable_del('imagepicker_galleryblocks_howmany');
+  }
+  // get all groups with override and unset all
+  $totgroups = 0;
+  $groups = imagepicker_get_all_groups(0);
+  if ($groups) {
+    $totgroups = count($groups);
+  }
+  if ($totgroups) {
+    for ($i = 1; $i <= $totgroups; $i++) {
+      imagepicker_variable_del('imagepicker_galleryblocks_link_'. $i);
+      imagepicker_variable_del('imagepicker_galleryblocks_title_'. $i);
+      imagepicker_variable_del('imagepicker_galleryblocks_group_'. $i);
+      imagepicker_variable_del('imagepicker_galleryblocks_enable_'. $i);
+    }
+  }
+
+  if ($form_state['values']['imagepicker_galleryblocks_enabled']) {
+    $howmany = $form_state['values']['imagepicker_galleryblocks_howmany'];
+    for ($i = 1; $i <= $howmany; $i++) {
+      if ($form_state['values']['imagepicker_galleryblocks_enable_'. $i]) {
+        $form_state['values']['imagepicker_galleryblocks_title_'. $i] = check_plain($form_state['values']['imagepicker_galleryblocks_title_'. $i]);
+      }
+      else {
+        unset($form_state['values']['imagepicker_galleryblocks_title_'. $i]);
+        unset($form_state['values']['imagepicker_galleryblocks_link_'. $i]);
+        unset($form_state['values']['imagepicker_galleryblocks_group_'. $i]);
+      }
+    }
+  }
 }
 
 function imagepicker_settings_form_submit($form, &$form_state) {
@@ -639,6 +763,18 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_import_enabled', $form_state['values']['imagepicker_import_enabled']);
   imagepicker_variable_set('imagepicker_import_delete', $form_state['values']['imagepicker_import_delete']);
   imagepicker_variable_set('imagepicker_import_max', $form_state['values']['imagepicker_import_max']);
+
+  // gallery blocks
+  imagepicker_variable_set('imagepicker_galleryblocks_enabled', $form_state['values']['imagepicker_galleryblocks_enabled']);
+  imagepicker_variable_set('imagepicker_galleryblocks_howmany', $form_state['values']['imagepicker_galleryblocks_howmany']);
+  imagepicker_variable_set('imagepicker_galleryblocks_public', $form_state['values']['imagepicker_galleryblocks_public']);
+  $howmany = $form_state['values']['imagepicker_galleryblocks_howmany'];
+  for ($i = 1; $i <= $howmany; $i++) {
+    imagepicker_variable_set('imagepicker_galleryblocks_enable_' . $i, $form_state['values']['imagepicker_galleryblocks_enable_' . $i]);
+    imagepicker_variable_set('imagepicker_galleryblocks_title_' . $i, $form_state['values']['imagepicker_galleryblocks_title_' . $i]);
+    imagepicker_variable_set('imagepicker_galleryblocks_link_' . $i, $form_state['values']['imagepicker_galleryblocks_link_' . $i]);
+    imagepicker_variable_set('imagepicker_galleryblocks_group_' . $i, $form_state['values']['imagepicker_galleryblocks_group_' . $i]);
+  }
 
 }
 
