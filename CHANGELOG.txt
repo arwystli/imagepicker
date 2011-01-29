@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20011-01-29
+------------------------------------
+by hutch, improved gallery blocks
+
 Image Picker  for D6 in DRUPAL-6--2, 20011-01-26
 ------------------------------------
 by hutch, added gallery blocks
