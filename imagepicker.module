@@ -559,18 +559,19 @@ function imagepicker_access_use_group() {
  * This hook declares what blocks are provided by the module.
  */
 function imagepicker_block_info() {
+  $blocks = array();
   if(imagepicker_variable_get('imagepicker_galleryblocks_enabled', 0) && module_exists('colorbox')) {
     $howmany = imagepicker_variable_get('imagepicker_galleryblocks_howmany', 0);
     if ($howmany) {
       for ($i = 1; $i <= $howmany; $i++) {
         if (imagepicker_variable_get('imagepicker_galleryblocks_enable_'. $i, 0)) {
           $blocks[$i]['info'] = t('Imagepicker Gallery block !i', array('!i' => $i));
-          $blocks[$i]['cache'] = BLOCK_NO_CACHE;
+          $blocks[$i]['cache'] = DRUPAL_NO_CACHE;
         }
       }
-      return $blocks;
     }
   }
+  return $blocks;
 }
 
 /**
@@ -579,11 +580,35 @@ function imagepicker_block_info() {
  * This hook generates the contents of the blocks themselves.
  */
 function imagepicker_block_view($delta = '') {
-  $block = array(
-    'subject' => imagepicker_variable_get('imagepicker_galleryblocks_title_'. $delta, t('Gallery !i', array('!i' => $delta))),
-    'content' => imagepicker_display_block($delta),
-  );
-  return $block;
+  if ($delta) {
+    $block = array(
+      'subject' => imagepicker_variable_get('imagepicker_galleryblocks_title_'. $delta, t('Gallery !i', array('!i' => $delta))),
+      'content' => imagepicker_display_block($delta),
+    );
+    return $block;
+  }
+  return array();
+}
+
+/**
+ * Implements hook_block_configure().
+ *
+ * This hook declares configuration options for blocks provided by this module.
+ */
+function imagepicker_block_configure($delta = '') {
+  $form = imagepicker_block_form($delta);
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ *
+ * This hook declares how the configured options for a block
+ * provided by this module are saved.
+ */
+function imagepicker_block_save($delta = '', $edit = array()) {
+  imagepicker_block_form_submit($delta, $edit);
+  return;
 }
 
 /**
@@ -594,8 +619,14 @@ function imagepicker_display_block($i) {
   $boxtype = 'colorbox';
   $gid = imagepicker_variable_get('imagepicker_galleryblocks_group_' . $i, '');
   $clickon = imagepicker_variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i)));
+  $textarea = imagepicker_variable_get('imagepicker_galleryblocks_text_'. $i, '');
   $group = imagepicker_get_user_group($gid);
-  $gal = $group->group_name;
+  if ($group) {
+    $gal = $group->group_name;
+  }
+  else {
+    return;
+  }
   $fpath = file_stream_wrapper_get_instance_by_scheme('public')->getDirectoryPath() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
   $query = db_select('users', 'u');
   $query->fields('i', array('img_id', 'uid', 'img_name', 'img_title', 'img_description'));
@@ -609,22 +640,78 @@ function imagepicker_display_block($i) {
   $content = "";
   $class = '';
   foreach ($rows AS $img) {
-    $n = $img->img_name;
+    $name = $img->img_name;
     $t = $img->img_title;
     $d = $img->img_description;
     $title = ($d ? $d : $t);
-    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $n;
+    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $name;
     if ($ct) {
       $class = "js-hide";
-      $text = $n;
+      $content .= l($name, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
     }
     else {
-      $text = $clickon;
+      // first one is visible
+      $link =  l($clickon, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
+      if ($textarea && preg_match("/\[link\]/", $textarea)) {
+        $content .= preg_replace("/\[link\]/", $link, $textarea);
+      }
+      else {
+        $content .= $textarea . $link;
+      }
     }
-    $content .= l($text, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
+
     $ct++;
   }
   return $content;
+}
+// the block form
+function imagepicker_block_form($i) {
+  $groups = imagepicker_get_all_groups();
+  $form['imagepicker_galleryblocks_link_'. $i] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link text for Gallery Block !i', array('!i' => $i)),
+    '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i))),
+    '#required' => TRUE,
+    '#description' => t('Set the link text for this block. Can contain html.'),
+  );
+  $form['imagepicker_galleryblocks_group_'. $i] = array(
+    '#type' => 'select',
+    '#title' => t('Select a group for this block'),
+    '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_group_' . $i, ''),
+    '#options' => $groups,
+  );
+  $form['imagepicker_galleryblocks_text_'. $i] = array(
+    '#type' => 'textarea',
+    '#title' => t('Block text'),
+    '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_text_'. $i, ''),
+    '#required' => FALSE,
+    '#description' => t("You can add some text to the block. To include the link in the text use the token '[link]' "),
+
+  );
+  $form['imagepicker_galleryblocks_enable_'. $i] = array(
+    '#type' => 'value',
+    '#value' => 1,
+  );
+  $form['imagepicker_galleryblocks_grouptot'] =  array(
+    '#type' => 'value',
+    '#value' => count($groups),
+  );
+  return $form;
+}
+
+function imagepicker_block_form_submit($i, $edit) {
+
+  // clean out any existing ones
+  imagepicker_variable_del('imagepicker_galleryblocks_link_'. $i);
+  imagepicker_variable_del('imagepicker_galleryblocks_text_'. $i);
+  imagepicker_variable_del('imagepicker_galleryblocks_group_'. $i);
+  imagepicker_variable_del('imagepicker_galleryblocks_enable_'. $i);
+  if ($edit['imagepicker_galleryblocks_enable_'. $i] && ! empty($edit['imagepicker_galleryblocks_link_'. $i]) && $edit['imagepicker_galleryblocks_grouptot']) {
+    imagepicker_variable_set('imagepicker_galleryblocks_link_'. $i, $edit['imagepicker_galleryblocks_link_'. $i]);
+    imagepicker_variable_set('imagepicker_galleryblocks_text_'. $i, check_markup($edit['imagepicker_galleryblocks_text_'. $i]));
+    imagepicker_variable_set('imagepicker_galleryblocks_group_'. $i, $edit['imagepicker_galleryblocks_group_'. $i]);
+    imagepicker_variable_set('imagepicker_galleryblocks_enable_'. $i, $edit['imagepicker_galleryblocks_enable_'. $i]);
+  }
 }
 
 /**
@@ -2105,7 +2192,10 @@ function imagepicker_get_user_group($gid) {
   $query->fields('g', array('gid', 'uid', 'group_name', 'group_description', 'state', 'public', 'avail_roles') );
   $query->condition('g.gid', $gid);
   $row = $query->execute()->fetchObject();
-  return $row;
+  if (isset($row->gid)) {
+    return $row;
+  }
+  return FALSE;
 }
 
 // get get the gid of the selected group
