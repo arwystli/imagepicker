@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D6 in DRUPAL-6--2, 20011-02-17
+------------------------------------
+by hutch, reorganised files for reduced footprint
+
 Image Picker  for D6 in DRUPAL-6--2, 20011-01-29
 ------------------------------------
 by hutch, improved gallery blocks

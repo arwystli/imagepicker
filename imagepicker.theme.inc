@@ -691,10 +691,6 @@ function theme_imagepicker_settings_form($form) {
     $form['imagepicker_progress']['imagepicker_upload_progress_message']['#suffix'] = '</div>';
   }
 
-  $jshide = ($form['imagepicker_exif']['imagepicker_exifinfo_enable']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#prefix'] = '<div id="wrap-imagepicker-exifinfo-external"'. $jshide .'>';
-  $form['imagepicker_exif']['imagepicker_exifinfo_external']['#suffix'] = '</div>';
-
   $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role"'. $jshide .'>';
   $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';

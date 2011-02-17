@@ -32,15 +32,6 @@
       }
     });
 
-    $("#edit-imagepicker-exifinfo-enable", context).change(function() {
-      if ($(this).attr('checked')) {
-        $("#wrap-imagepicker-exifinfo-external", context).show();
-      }
-      else {
-        $("#wrap-imagepicker-exifinfo-external", context).hide();
-      }
-    });
-
     $("#edit-imagepicker-upload-progress-enabled", context).change(function() {
       if ($(this).attr('checked')) {
         $("#wrap-imagepicker-upload-progress", context).show();

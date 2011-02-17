@@ -285,15 +285,17 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_scaling'] = imagepicker_watermark_scaling_elem(variable_get('imagepicker_watermark_scaling', FALSE));
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem(variable_get('imagepicker_watermark_scaling_percentage', 50));
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(variable_get('imagepicker_watermark_min_width', 0));
+  }
 
-    $form['imagepicker_exif'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Imagepicker Exif settings'),
-      '#description' => t('Enable exif display.'),
-      '#collapsible' => TRUE,
-      '#collapsed' => (variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
-      '#weight' => -24,
-    );
+  $form['imagepicker_exif'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker Exif settings'),
+    '#description' => t('Enable exif display.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
+    '#weight' => -24,
+  );
+  if (imagepicker_exif_check(TRUE)) {
     $form['imagepicker_exif']['imagepicker_exifinfo_enable'] = array(
      '#type' => 'checkbox',
      '#title' => t('Enable Display of Exif info'),
@@ -301,16 +303,16 @@ function imagepicker_settings_form($form_state) {
      '#return_value' => 1,
      '#default_value' => variable_get('imagepicker_exifinfo_enable', 0),
     );
-    $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Use external program'),
-      '#description' => t('Enter an external program to use for exif info instead of builtin functions.<br />For instance exiftool. Requires a full filesystem path.'),
-      '#size' => 55,
-      '#maxlength' => 100,
-      '#required' => FALSE,
-      '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
-    );
   }
+  $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Use external program'),
+    '#description' => t('Enter an external program to use for exif info instead of builtin functions.<br />For instance exiftool. Requires a full filesystem path.'),
+    '#size' => 55,
+    '#maxlength' => 100,
+    '#required' => FALSE,
+    '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
+  );
   // Iframe
   $form['imagepicker_iframe'] = array(
     '#type' => 'fieldset',
