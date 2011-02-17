@@ -278,32 +278,33 @@ function imagepicker_settings_form($form, &$form_state) {
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_scaling'] = imagepicker_watermark_scaling_elem(imagepicker_variable_get('imagepicker_watermark_scaling', FALSE));
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_scaling_percentage'] = imagepicker_watermark_scaling_percentage_elem(imagepicker_variable_get('imagepicker_watermark_scaling_percentage', 50));
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(imagepicker_variable_get('imagepicker_watermark_min_width', 0));
-
-    $form['imagepicker_exif'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Imagepicker Exif settings'),
-      '#description' => t('Enable exif display.'),
-      '#collapsible' => TRUE,
-      '#collapsed' => (imagepicker_variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
-      '#weight' => -24,
-    );
+  }
+  $form['imagepicker_exif'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Imagepicker Exif settings'),
+    '#description' => t('Enable exif display.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (imagepicker_variable_get('imagepicker_exifinfo_enable', 0) ? TRUE : FALSE),
+    '#weight' => -24,
+  );
+  if (imagepicker_exif_check(TRUE)) {
     $form['imagepicker_exif']['imagepicker_exifinfo_enable'] = array(
      '#type' => 'checkbox',
      '#title' => t('Enable Display of Exif info'),
-     '#description' => t('Enable Display of Extended file information. Uses PHP builtin functions by default.'),
+     '#description' => t('Enable Display of Extended file information using PHP builtin functions.'),
      '#return_value' => 1,
      '#default_value' => imagepicker_variable_get('imagepicker_exifinfo_enable', 0),
     );
-    $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Use external program'),
-      '#description' => t('Enter an external program to use for exif info instead of builtin functions.<br />For instance exiftool. Requires a full filesystem path.'),
-      '#size' => 55,
-      '#maxlength' => 100,
-      '#required' => FALSE,
-      '#default_value' => imagepicker_variable_get('imagepicker_exifinfo_external', ''),
-    );
   }
+  $form['imagepicker_exif']['imagepicker_exifinfo_external'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Use external program'),
+    '#description' => t('Enter an external program to use for exif info instead of builtin functions.<br />For instance exiftool. Requires a full filesystem path.'),
+    '#size' => 55,
+    '#maxlength' => 100,
+    '#required' => FALSE,
+    '#default_value' => imagepicker_variable_get('imagepicker_exifinfo_external', ''),
+  );
   // Iframe
   $form['imagepicker_iframe'] = array(
     '#type' => 'fieldset',
@@ -579,9 +580,6 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) || $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
     form_set_error('imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1) {
-    form_set_error('imagepicker_rows_per_page', t('Rows per page must be a positive number'));
-  }
   if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) || $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
     form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
   }
@@ -599,7 +597,7 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
-  if ( imagepicker_image_check_functions(TRUE) && $form_state['values']['imagepicker_watermark_enable'] ) {
+  if (isset($form_state['values']['imagepicker_watermark_enable']) && $form_state['values']['imagepicker_watermark_enable']) {
     if (! empty($form_state['values']['imagepicker_watermark_image'])) {
       $file = $form_state['values']['imagepicker_watermark_image'];
       if (! file_exists($file)) {
@@ -607,11 +605,11 @@ function imagepicker_settings_form_validate($form, &$form_state) {
       }
     }
   }
-  if ($form_state['values']['imagepicker_exifinfo_external'] != "" && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
+  if (! empty($form_state['values']['imagepicker_exifinfo_external']) && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
     form_set_error('imagepicker_exifinfo_external', t('file does not exist or is not executable'));
   }
 
-  if (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1)) {
+  if (isset($form_state['values']['imagepicker_lightbox2_enable']) && $form_state['values']['imagepicker_lightbox2_enable']) {
     if (! drupal_strlen($form_state['values']['imagepicker_lightbox2_insert'])) {
       form_set_error('imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
     }
@@ -633,7 +631,7 @@ function imagepicker_settings_form_validate($form, &$form_state) {
     $form_state['values']['imagepicker_quota_byrole'] = 0;
   }
   // gallery blocks
-  if (! module_exists('colorbox')) {
+  if (! isset($form_state['values']['imagepicker_galleryblocks_enabled'])) {
     imagepicker_variable_del('imagepicker_galleryblocks_enabled');
     imagepicker_variable_del('imagepicker_galleryblocks_howmany');
   }
@@ -670,14 +668,14 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_default_browser_order', $form_state['values']['imagepicker_default_browser_order']);
   imagepicker_variable_set('imagepicker_show_browse_search_form', $form_state['values']['imagepicker_show_browse_search_form']);
 
-  if (module_exists('lightbox2')) {
+  if (isset($form_state['values']['imagepicker_lightbox2_enable'])) {
     imagepicker_variable_set('imagepicker_lightbox2_enable', $form_state['values']['imagepicker_lightbox2_enable']);
     if (imagepicker_variable_get('imagepicker_lightbox2_enable', 0)) {
       imagepicker_variable_set('imagepicker_lightbox2_insert', $form_state['values']['imagepicker_lightbox2_insert']);
     }
   }
 
-  if (module_exists('colorbox')) {
+  if (isset($form_state['values']['imagepicker_colorbox_enable'])) {
     imagepicker_variable_set('imagepicker_colorbox_enable', $form_state['values']['imagepicker_colorbox_enable']);
     if (variable_get('colorbox_load', 0)) {
       imagepicker_variable_set('imagepicker_advanced_colorbox', $form_state['values']['imagepicker_advanced_colorbox']);
@@ -688,13 +686,17 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_quota_byrole', $form_state['values']['imagepicker_quota_byrole']);
   imagepicker_variable_set('imagepicker_quota_role', $form_state['values']['imagepicker_quota_role']);
   imagepicker_variable_set('imagepicker_quota_default', $form_state['values']['imagepicker_quota_default']);
-  imagepicker_variable_set('imagepicker_watermark_enable', $form_state['values']['imagepicker_watermark_enable']);
-  imagepicker_variable_set('imagepicker_watermark_image', $form_state['values']['imagepicker_watermark_image']);
-  imagepicker_variable_set('imagepicker_watermark_position', $form_state['values']['imagepicker_watermark_position']);
-  imagepicker_variable_set('imagepicker_watermark_scaling', $form_state['values']['imagepicker_watermark_scaling']);
-  imagepicker_variable_set('imagepicker_watermark_scaling_percentage', $form_state['values']['imagepicker_watermark_scaling_percentage']);
-  imagepicker_variable_set('imagepicker_watermark_min_width', $form_state['values']['imagepicker_watermark_min_width']);
-  imagepicker_variable_set('imagepicker_exifinfo_enable', $form_state['values']['imagepicker_exifinfo_enable']);
+  if (isset($form_state['values']['imagepicker_watermark_enable'])) {
+    imagepicker_variable_set('imagepicker_watermark_enable', $form_state['values']['imagepicker_watermark_enable']);
+    imagepicker_variable_set('imagepicker_watermark_image', $form_state['values']['imagepicker_watermark_image']);
+    imagepicker_variable_set('imagepicker_watermark_position', $form_state['values']['imagepicker_watermark_position']);
+    imagepicker_variable_set('imagepicker_watermark_scaling', $form_state['values']['imagepicker_watermark_scaling']);
+    imagepicker_variable_set('imagepicker_watermark_scaling_percentage', $form_state['values']['imagepicker_watermark_scaling_percentage']);
+    imagepicker_variable_set('imagepicker_watermark_min_width', $form_state['values']['imagepicker_watermark_min_width']);
+  }
+  if (isset($form_state['values']['imagepicker_exifinfo_enable'])) {
+    imagepicker_variable_set('imagepicker_exifinfo_enable', $form_state['values']['imagepicker_exifinfo_enable']);
+  }
   imagepicker_variable_set('imagepicker_exifinfo_external', $form_state['values']['imagepicker_exifinfo_external']);
   imagepicker_variable_set('imagepicker_advanced_iframe_width', $form_state['values']['imagepicker_advanced_iframe_width']);
   imagepicker_variable_set('imagepicker_advanced_iframe_height', $form_state['values']['imagepicker_advanced_iframe_height']);
@@ -715,14 +717,18 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_import_delete', $form_state['values']['imagepicker_import_delete']);
   imagepicker_variable_set('imagepicker_import_max', $form_state['values']['imagepicker_import_max']);
 
-  // gallery blocks
-  imagepicker_variable_set('imagepicker_galleryblocks_enabled', $form_state['values']['imagepicker_galleryblocks_enabled']);
-  imagepicker_variable_set('imagepicker_galleryblocks_howmany', $form_state['values']['imagepicker_galleryblocks_howmany']);
-  imagepicker_variable_set('imagepicker_galleryblocks_public', $form_state['values']['imagepicker_galleryblocks_public']);
-  $howmany = imagepicker_variable_get('imagepicker_galleryblocks_howmany', 1);
-  if ($howmany) {
-    for ($i = 1; $i <= $howmany; $i++) {
-      imagepicker_variable_set('imagepicker_galleryblocks_enable_' . $i, $form_state['values']['imagepicker_galleryblocks_enable_' . $i]);
+  if (isset($form_state['values']['imagepicker_galleryblocks_enabled'])) {
+    // gallery blocks
+    imagepicker_variable_set('imagepicker_galleryblocks_enabled', $form_state['values']['imagepicker_galleryblocks_enabled']);
+    imagepicker_variable_set('imagepicker_galleryblocks_howmany', $form_state['values']['imagepicker_galleryblocks_howmany']);
+    imagepicker_variable_set('imagepicker_galleryblocks_public', $form_state['values']['imagepicker_galleryblocks_public']);
+    $howmany = imagepicker_variable_get('imagepicker_galleryblocks_howmany', 1);
+    if ($howmany) {
+      for ($i = 1; $i <= $howmany; $i++) {
+        if (isset($form_state['values']['imagepicker_galleryblocks_enable_' . $i])) {
+          imagepicker_variable_set('imagepicker_galleryblocks_enable_' . $i, $form_state['values']['imagepicker_galleryblocks_enable_' . $i]);
+        }
+      }
     }
   }
 }

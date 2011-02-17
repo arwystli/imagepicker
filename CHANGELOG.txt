@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20011-02-17
+------------------------------------
+by hutch, reorganised functions for reduced footprint
+
 Image Picker  for D7 in DRUPAL-7--1, 20011-02-07
 ------------------------------------
 by hutch, block bug #1054056
