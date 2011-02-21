@@ -1,6 +1,10 @@
 // $Id$
 // $Name$
 
+Image Picker  for D7 in DRUPAL-7--1, 20011-02-21
+------------------------------------
+by hutch, fixed duplicate names bug #1068466 reported by codeforkjeff
+
 Image Picker  for D7 in DRUPAL-7--1, 20011-02-17
 ------------------------------------
 by hutch, reorganised functions for reduced footprint
