@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Contributed by RusRabbit, see http://drupal.org/comment/reply/568168

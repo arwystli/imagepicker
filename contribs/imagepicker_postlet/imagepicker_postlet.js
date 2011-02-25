@@ -1,4 +1,3 @@
-// $Id$
 /**
  * @file
  * Javascript functions for imagepicker_postlet module

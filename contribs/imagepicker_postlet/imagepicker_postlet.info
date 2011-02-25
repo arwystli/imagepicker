@@ -1,4 +1,3 @@
-; $Id$
 name = Imagepicker Postlet multi uploader
 description = Uploads images using Postlet java applet.
 package = Other
