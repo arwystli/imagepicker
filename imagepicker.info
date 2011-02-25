@@ -1,4 +1,3 @@
-; $Id$
 name = Imagepicker
 description = Upload, browse and add images to your nodes.
 package = Media
