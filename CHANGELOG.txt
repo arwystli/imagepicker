@@ -1,4 +1,3 @@
-// $Id$
 // $Name$
 
 Image Picker  for D6 in HEAD, 2009-06-16
