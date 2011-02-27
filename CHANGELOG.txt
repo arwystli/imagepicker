@@ -1,4 +1,8 @@
-// $Name$
+
+Image Picker for D6 in 6.x-2.x, 20011-02-27
+------------------------------------
+by hutch, changed InsertatCursor to imagepickerInsertatCursor
+  in imagepicker_iframe.js to avoid potential clashes with insert module
 
 Image Picker  for D6 in DRUPAL-6--2, 20011-02-17
 ------------------------------------

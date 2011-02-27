@@ -1,6 +1,5 @@
 <?php
-// $Name$
-// for D6. Version 2
+
 /**
  * @file
  * Image functions for imagepicker.

@@ -1,4 +1,3 @@
-//$Name$
 
 /**
  * @file
@@ -215,10 +214,10 @@ if (Drupal.jsEnabled) {
         var nodeBody = win.document.getElementById('edit-body');
         var commentBody = win.document.getElementById('edit-comment');
         if (nodeBody) {
-          insertAtCursor(nodeBody, imgpInsertion);
+          imagepicker_insertAtCursor(nodeBody, imgpInsertion);
         }
         if (commentBody) {
-          insertAtCursor(commentBody, imgpInsertion);
+          imagepicker_insertAtCursor(commentBody, imgpInsertion);
         }
       }
       if (! colorbox_iframe) {
@@ -228,7 +227,7 @@ if (Drupal.jsEnabled) {
   }
 
   // Copy pasted from internet but modified to detect browser
-  function insertAtCursor(myField, myValue) {
+  function imagepicker_insertAtCursor(myField, myValue) {
     browser = imagepicker_browser_detect();
     if (browser == 'msie') {
       if (document.selection) {
