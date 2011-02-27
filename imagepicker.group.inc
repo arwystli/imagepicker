@@ -1,6 +1,5 @@
 <?php
-// $Name$
-// for D7
+
 /**
  * @file
  * contains the functions for group management

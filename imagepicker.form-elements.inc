@@ -1,6 +1,5 @@
 <?php
-// $Name$
-// for D7
+
 /**
  * @file
  * Provides various form elements.

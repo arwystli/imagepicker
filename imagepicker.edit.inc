@@ -1,6 +1,5 @@
 <?php
-// $Name$
-// for D7
+
 /**
  * @file
  * Contains the functions pertaining to editing image information

@@ -1,6 +1,5 @@
 <?php
-// $Name$
-// for D7
+
 /**
  * @file
  * Enables permitted roles to upload images for insertion into configured nodes.
