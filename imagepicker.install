@@ -9,9 +9,9 @@
  * Implementation of hook_install().
  */
 function imagepicker_install() {
+  include_once('imagepicker.functions.inc');
   // Create a directory structure.
-  $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
-  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR .'imagepicker';
+  $dir = imagepicker_get_files_directory();
 
   if (file_check_directory($dir, TRUE)) {
     drupal_get_messages('status', TRUE);

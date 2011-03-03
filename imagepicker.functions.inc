@@ -212,82 +212,106 @@ function imagepicker_image_page($img_id) {
 /**
  * some common utilities
  */
-function imagepicker_get_path($url = FALSE, $userdir = FALSE) {
-  global $user, $base_url;
+function imagepicker_get_path($url = FALSE, $userdir = FALSE, $system = TRUE) {
+  global $base_url;
 
   $dirsep = !$url ? DIRECTORY_SEPARATOR : '/';
 
   if (!$url) {
-    $path = str_replace('/', DIRECTORY_SEPARATOR, getcwd());
-  }
-  elseif (variable_get('imagepicker_use_full_url', 0)) {
-    $path = $base_url;
+    $path = imagepicker_get_files_directory() . $dirsep;
   }
   else {
-    $path = base_path();
-    $path = preg_replace("/\/$/", "", $path);
-  }
-
-  $path .= $dirsep . file_directory_path() . $dirsep . IMAGEPICKER_FILES_DIR . $dirsep;
-
-  // old or new
-  $fstype = variable_get('imagepicker_fstype', '');
-
-  if ($userdir) {
-    if ($fstype == 'alpha') {
-      $username = !is_array($userdir) ? $user->name : $userdir['name'];
-      $firstletter = drupal_strtolower(drupal_substr($username, 0, 1));
-      $firstletter = preg_match('/^[a-z]$/', $firstletter) ? $firstletter : 'others';
-      $path .= $firstletter . $dirsep . $username . $dirsep;
+    if (variable_get('imagepicker_use_full_url', 0)) {
+      $path = $base_url;
     }
     else {
-      $useruid = !is_array($userdir) ? $user->uid : $userdir['uid'];
-      $path .= $useruid . $dirsep;
+      $path = base_path();
+      $path = preg_replace("/\/$/", "", $path);
     }
+    $path .= $dirsep . file_directory_path() . $dirsep . IMAGEPICKER_FILES_DIR . $dirsep;
+  }
+
+  if ($userdir) {
+    $path .= imagepicker_get_userpath($userdir, $dirsep);
+  }
+  return $path;
+}
+
+function imagepicker_get_userpath($userdir, $dirsep = '/') {
+  global $user;
+  $path = '';
+  // old or new
+  $fstype = variable_get('imagepicker_fstype', '');
+  if ($fstype == 'alpha') {
+    $username = !is_array($userdir) ? $user->name : $userdir['name'];
+    $firstletter = drupal_strtolower(drupal_substr($username, 0, 1));
+    $firstletter = preg_match('/^[a-z]$/', $firstletter) ? $firstletter : 'others';
+    $path .= $firstletter . $dirsep . $username . $dirsep;
+  }
+  else {
+    $useruid = !is_array($userdir) ? $user->uid : $userdir['uid'];
+    $path .= $useruid . $dirsep;
   }
 
   return $path;
 }
 
 function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE) {
-  $imgbasedir = imagepicker_get_path(FALSE, (is_array($public) ? $public : TRUE));
+  $userdir = is_array($public) ? $public : TRUE;
+  $imgbasedir = imagepicker_get_path(FALSE, $userdir);
+  $found = FALSE;
   switch ($type) {
     case 'browser':
       if (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_BROWSER_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_BROWSER_DIR;
+        $found = TRUE;
       }
       elseif (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_THUMBS_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_THUMBS_DIR;
+        $found = TRUE;
       }
       break;
 
     case 'full':
       if (file_exists($imgbasedir . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . $img['img_name'];
+        $suffix = NULL;
+        $found = TRUE;
       }
       break;
 
     case 'thumb':
     default:
       if (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_THUMBS_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_THUMBS_DIR;
+        $found = TRUE;
       }
       elseif (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_BROWSER_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_BROWSER_DIR;
+        $found = TRUE;
       }
       break;
 
     case 'watermarks':
       if (file_exists($imgbasedir . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_WATERMARK_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_WATERMARK_DIR;
+        $found = TRUE;
       }
       break;
 
     case 'orig':
       if (file_exists($imgbasedir . $img['img_name'])) {
-        $imgpath = imagepicker_get_path(TRUE, (is_array($public) ? $public : TRUE)) . IMAGEPICKER_ORIG_DIR .'/'. $img['img_name'];
+        $suffix = IMAGEPICKER_ORIG_DIR;
+        $found = TRUE;
       }
       break;
+  }
+  if ($found) {
+    if ($suffix) {
+      $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $suffix . '/' . $img['img_name']);
+    }
+    else {
+      $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $img['img_name']);
+    }
   }
 
   return $imgpath ? $imgpath : '';
@@ -1867,9 +1891,20 @@ function imagepicker_browse_order_form_submit($form, &$form_state) {
   }
 }
 
-function imagepicker_get_files_directory() {
-  $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR;
-  $dir = $drupaldir . file_directory_path() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR;
+function imagepicker_get_files_directory($system_only = FALSE) {
+  include_once(drupal_get_path('module', 'imagepicker') . '/imagepicker.module');
+  include_once('./includes/file.inc');
+  $drupal_path = file_directory_path();
+  if (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PRIVATE) {
+    $drupaldir = $drupal_path;
+  }
+  else {
+    $drupaldir = str_replace('/', DIRECTORY_SEPARATOR, getcwd()) . DIRECTORY_SEPARATOR . $drupal_path;
+  }
+  if ($system_only) {
+    return $drupaldir;
+  }
+  $dir = $drupaldir . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR;
   return $dir;
 }
 
@@ -2924,4 +2959,3 @@ function imagepicker_uploadprogress_callback($progress_key='') {
 
   exit;
 }
-

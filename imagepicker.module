@@ -567,7 +567,7 @@ function imagepicker_display_block($i) {
   $textarea = variable_get('imagepicker_galleryblocks_text_'. $i, '');
   $group = imagepicker_get_user_group($gid);
   $gal = $group->group_name;
-  $fpath .= file_directory_path() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
+  $fpath .= imagepicker_get_files_directory() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
   $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, img_description
   FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
   {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
@@ -806,4 +806,26 @@ function imagepicker_get_all_groups($override = NULL) {
     $data[$row['gid']] = $row['group_name'] .' - '. format_plural($totcount, '1 image', '@count images');
   }
   return $data;
+}
+
+/**
+ * Implementation of hook_file_download().
+ */
+function imagepicker_file_download($filepath) {
+  $imgbasedir = imagepicker_get_files_directory(TRUE);
+  $file = $imgbasedir . DIRECTORY_SEPARATOR . $filepath;
+  if (file_exists($file) & is_file($file)) {
+    // There is a file, and it's in our directory structure. So send it.
+    $mimetype = file_get_mimetype($filepath);
+    return array('Content-type:' . $mimetype);
+  }
+  else {
+    $path_parts = explode('/', $filepath);
+    if ($path_parts[0] == IMAGEPICKER_FILES_DIR) {
+      // The file is allegedly in our directory, but doesn't exist. 
+      return -1;
+    }
+  }
+  // Not our file; let someone else decide.
+  return NULL;
 }

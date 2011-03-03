@@ -1,4 +1,9 @@
 
+Image Picker for D6 in 6.x-2.x, 20011-03-03
+------------------------------------
+by hutch, added private download support,
+  #1079540 patch by klflote
+
 Image Picker for D6 in 6.x-2.x, 20011-02-27
 ------------------------------------
 by hutch, changed InsertatCursor to imagepickerInsertatCursor
