@@ -2782,7 +2782,7 @@ function imagepicker_get_exifinfo($image) {
       $exif = exif_read_data($image, 0, TRUE);
     }
     else {
-      $extprog = imagepicker_variable_get('imagepicker_exifinfo_external', '');
+      $extprog = variable_get('imagepicker_exifinfo_external', '');
       if ($extprog) {
         $exif = shell_exec("$extprog $image");
       }
