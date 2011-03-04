@@ -567,7 +567,6 @@ function imagepicker_display_block($i) {
   $textarea = variable_get('imagepicker_galleryblocks_text_'. $i, '');
   $group = imagepicker_get_user_group($gid);
   $gal = $group->group_name;
-  $fpath .= imagepicker_get_files_directory() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
   $sql = "SELECT DISTINCT i.img_id, i.uid, i.img_name, i.img_title, img_description
   FROM {imagepicker} AS i JOIN {users} AS n USING (uid),
   {imagepicker_user_groups} AS u JOIN {imagepicker_group_images} AS g USING (gid)
@@ -581,7 +580,12 @@ function imagepicker_display_block($i) {
     $t = $img->img_title;
     $d = $img->img_description;
     $title = ($d ? $d : $t);
-    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $name;
+    if ( variable_get('file_downloads', '1') == 2 ) {
+      $full = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
+    }
+    else {
+      $full = file_directory_path() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . $img->uid . DIRECTORY_SEPARATOR . $name;
+    }
     if ($ct) {
       $class = "js-hide";
       $content .= l($name, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
@@ -822,7 +826,7 @@ function imagepicker_file_download($filepath) {
   else {
     $path_parts = explode('/', $filepath);
     if ($path_parts[0] == IMAGEPICKER_FILES_DIR) {
-      // The file is allegedly in our directory, but doesn't exist. 
+      // The file is allegedly in our directory, but doesn't exist.
       return -1;
     }
   }

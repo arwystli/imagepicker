@@ -200,7 +200,13 @@ function imagepicker_image_page($img_id) {
     // js link
     $account = user_load(array('uid' => $img['uid']));
     $link = (isset($account->imagepicker_default_pagelink) ? $account->imagepicker_default_pagelink : variable_get('imagepicker_default_pagelink', 1));
-    $content = theme('imagepicker_fullpage', $img, imagepicker_get_path(TRUE, $img) . $img['img_name'], $link);
+    if ( variable_get('file_downloads', '1') == 2 ) {
+      $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img['uid']));
+    }
+    else {
+      $imgpath = imagepicker_get_path(TRUE, $img) . $img['img_name'];
+    }
+    $content = theme('imagepicker_fullpage', $img, $imgpath, $link);
   }
   else {
     drupal_set_message(t('Image not found in page.'), 'error');
@@ -212,7 +218,7 @@ function imagepicker_image_page($img_id) {
 /**
  * some common utilities
  */
-function imagepicker_get_path($url = FALSE, $userdir = FALSE, $system = TRUE) {
+function imagepicker_get_path($url = FALSE, $userdir = FALSE) {
   global $base_url;
 
   $dirsep = !$url ? DIRECTORY_SEPARATOR : '/';
@@ -260,20 +266,28 @@ function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE) {
   $userdir = is_array($public) ? $public : TRUE;
   $imgbasedir = imagepicker_get_path(FALSE, $userdir);
   $found = FALSE;
+
+  // $img is object or array
+  if (is_object($img)) {
+    $img_name = $img->img_name;
+  }
+  else {
+    $img_name = $img['img_name'];
+  }
   switch ($type) {
     case 'browser':
-      if (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
+      if (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img_name)) {
         $suffix = IMAGEPICKER_BROWSER_DIR;
         $found = TRUE;
       }
-      elseif (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
+      elseif (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img_name)) {
         $suffix = IMAGEPICKER_THUMBS_DIR;
         $found = TRUE;
       }
       break;
 
     case 'full':
-      if (file_exists($imgbasedir . $img['img_name'])) {
+      if (file_exists($imgbasedir . $img_name)) {
         $suffix = NULL;
         $found = TRUE;
       }
@@ -281,25 +295,25 @@ function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE) {
 
     case 'thumb':
     default:
-      if (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
+      if (file_exists($imgbasedir . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img_name)) {
         $suffix = IMAGEPICKER_THUMBS_DIR;
         $found = TRUE;
       }
-      elseif (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img['img_name'])) {
+      elseif (file_exists($imgbasedir . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img_name)) {
         $suffix = IMAGEPICKER_BROWSER_DIR;
         $found = TRUE;
       }
       break;
 
     case 'watermarks':
-      if (file_exists($imgbasedir . $img['img_name'])) {
+      if (file_exists($imgbasedir . $img_name)) {
         $suffix = IMAGEPICKER_WATERMARK_DIR;
         $found = TRUE;
       }
       break;
 
     case 'orig':
-      if (file_exists($imgbasedir . $img['img_name'])) {
+      if (file_exists($imgbasedir . $img_name)) {
         $suffix = IMAGEPICKER_ORIG_DIR;
         $found = TRUE;
       }
@@ -307,10 +321,20 @@ function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE) {
   }
   if ($found) {
     if ($suffix) {
-      $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $suffix . '/' . $img['img_name']);
+      if (variable_get('imagepicker_use_full_url', 0) || variable_get('file_downloads', '1') == 2) {
+        $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $suffix . '/' . $img_name);
+      }
+      else {
+        $imgpath = imagepicker_get_path(TRUE, $userdir) . $suffix . '/' . $img_name;
+      }
     }
     else {
-      $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $img['img_name']);
+      if (variable_get('imagepicker_use_full_url', 0) || variable_get('file_downloads', '1') == 2) {
+        $imgpath = file_create_url(IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $img_name);
+      }
+      else {
+        $imgpath = imagepicker_get_path(TRUE, $userdir) . $img_name;
+      }
     }
   }
 
