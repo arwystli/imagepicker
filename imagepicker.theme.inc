@@ -368,8 +368,7 @@ function theme_imagepicker_fullpage($variables) {
   $source = $variables['source'];
   $link = $variables['link'];
   $output = '<div id="imgp_page"><div id="imgp_page_img">';
-  $output .= '<a href="' . $source . '" alt="' . (isset($image->img_title) ? $image->img_title : '') . '" target="_blank">';
-  $output .= '<img src="' . $source . '" alt="' . (isset($image->img_title) ? $image->img_title : '') . '" /></a></div>';
+  $output .= '<img src="' . $source . '" alt="' . (isset($image->img_title) ? $image->img_title : '') . '" /></div>';
   $output .= (isset($image->img_description) ? '<div>' . nl2br($image->img_description) . '</div>' : '');
   $output .= ($link ? '<div><a href="#" onclick="history.back()">' . t('Return to page') . '</a></div>' : '');
   $output .= '</div>';

@@ -11,7 +11,7 @@ define('IMAGEPICKER_BROWSER_DIR', 'browser');
 define('IMAGEPICKER_ORIG_DIR', 'orig');
 define('IMAGEPICKER_WATERMARK_DIR', 'watermarks');
 define('IMAGEPICKER_DESC_LEN', 30);
-define('IMAGEPICKER_FILE_SCHEME', 'public://');
+define('IMAGEPICKER_FILE_SCHEME', file_default_scheme() . '://');
 define('IMAGEPICKER_ADMIN_PATH', 'admin/config/media/imagepicker');
 define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
 // Minimum PHP version for extension
@@ -628,7 +628,6 @@ function imagepicker_display_block($i) {
   else {
     return;
   }
-  $fpath = file_stream_wrapper_get_instance_by_scheme('public')->getDirectoryPath() . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR;
   $query = db_select('users', 'u');
   $query->fields('i', array('img_id', 'uid', 'img_name', 'img_title', 'img_description'));
   $query->join('imagepicker', 'i');
@@ -645,7 +644,12 @@ function imagepicker_display_block($i) {
     $t = $img->img_title;
     $d = $img->img_description;
     $title = ($d ? $d : $t);
-    $full = $fpath . $img->uid . DIRECTORY_SEPARATOR . $name;
+    if (variable_get('file_default_scheme', 'public') == 'private') {
+      $full = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
+    }
+    else {
+      $full = imagepicker_get_path(TRUE, $img) . $img->img_name;
+    }
     if ($ct) {
       $class = "js-hide";
       $content .= l($name, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
@@ -660,7 +664,6 @@ function imagepicker_display_block($i) {
         $content .= $textarea . $link;
       }
     }
-
     $ct++;
   }
   return $content;
@@ -910,3 +913,24 @@ function imagepicker_variable_del($varname, $uid = FALSE) {
   }
 }
 
+/**
+ * Implementation of hook_file_download().
+ */
+function imagepicker_file_download($filepath) {
+  $imgbasedir = imagepicker_get_files_directory(TRUE);
+  $file = $imgbasedir . DIRECTORY_SEPARATOR . file_uri_target($filepath);
+  if (file_exists($file) & is_file($file)) {
+    // There is a file, and it's in our directory structure. So send it.
+    $mimetype = file_get_mimetype($filepath);
+    return array('Content-type:' . $mimetype);
+  }
+  else {
+    $path_parts = explode('/', $filepath);
+    if ($path_parts[0] == IMAGEPICKER_FILES_DIR) {
+      // The file is allegedly in our directory, but doesn't exist.
+      return -1;
+    }
+  }
+  // Not our file; let someone else decide.
+  return NULL;
+}

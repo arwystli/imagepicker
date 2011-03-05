@@ -221,7 +221,14 @@ function imagepicker_get_show_opts($default = NULL) {
   );
 }
 function imagepicker_get_link_opts($default = NULL) {
-  $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
+
+  if (file_default_scheme() == 'private') {
+    $linkoptions = array('none' => t('None'), 'page' => t('Page'));
+  }
+  else {
+    $linkoptions = array('none' => t('None'), 'file' => t('File'), 'page' => t('Page') );
+  }
+
   if (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1) ) {
     $linkoptions['lightbox'] = t('Lightbox');
   }

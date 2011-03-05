@@ -441,7 +441,7 @@ function imagepicker_settings_form($form, &$form_state) {
   $form['imagepicker_import']['imagepicker_import_delete'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Bulk import deletion'),
-    '#description' => t('Delete uploaded source images after succesful import into imagepicker.<br />The image files should be writeable by the web server for this option to work.'),
+    '#description' => t('Delete uploaded source images after successful import into imagepicker.<br />The image files should be writeable by the web server for this option to work.'),
     '#return_value' => 1,
     '#default_value' => imagepicker_variable_get('imagepicker_import_delete', 0),
   );
