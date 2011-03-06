@@ -9,7 +9,7 @@
  * Implements hook_install().
  */
 function imagepicker_install() {
-  include_once('imagepicker.functions.inc');
+  include_once('imagepicker.module');
   // Create a directory structure.
   $dir = imagepicker_get_files_directory();
 

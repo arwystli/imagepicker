@@ -1,4 +1,8 @@
 
+Image Picker for D7 in 7.x-1.x, 20011-03-06
+------------------------------------
+by hutch, moved some functions back to imagepicker.module
+
 Image Picker for D7 in 7.x-1.x, 20011-03-05
 ------------------------------------
 by hutch, added private download support
