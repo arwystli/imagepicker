@@ -1,4 +1,9 @@
 
+Image Picker for D7 in 7.x-1.x, 20011-03-17
+------------------------------------
+by hutch, fixed postgres bug, #1083064
+  fixed wysiwyg bug in iframe js
+
 Image Picker for D7 in 7.x-1.x, 20011-03-06
 ------------------------------------
 by hutch, moved some functions back to imagepicker.module

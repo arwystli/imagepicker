@@ -165,7 +165,7 @@ function imagepickerInsert(button) {
     else if (win.oFCKeditor) {
       inst = win.oFCKeditor.InstanceName;
     }
-    else if (isWysiwyg == 'yes') {
+    else if (isWysiwyg == 'yes' && win.Drupal.wysiwyg) {
       //inst = 'edit-body';
       inst = win.Drupal.wysiwyg.activeId;
     }

@@ -759,7 +759,7 @@ function imagepicker_admin_users_list($dir, $label) {
   $query->distinct();
   $query->leftjoin('imagepicker', 'i', 'i.uid = u.uid');
   $query->condition('u.status', 1)
-    ->groupBy('u.uid');
+    ->groupBy('u.uid')->groupBy('u.name');
   $records = $query->execute();
 
   foreach ($records AS $row) {
