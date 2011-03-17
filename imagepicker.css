@@ -139,20 +139,7 @@
 .imgp_img {
 
 }
-
-.imgp_progress {
-  background: #fff url('images/progress.gif');
-  border: 1px solid #000080;
-  height: 1.5em;
-  margin: 0 0.2em;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-}
-.imgp_status {
-  font-weight: bold;
+.imagepicker_upload_link {
+  margin: 4px 0 8px 0;
 }
 
-.container-inline {
-  padding-top: 1em;
-}

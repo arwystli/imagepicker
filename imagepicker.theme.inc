@@ -383,10 +383,10 @@ function theme_imagepicker_quota_message($variables) {
   $label = $variables['label'];
   $help = $variables['help'];
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
-  $output .= ($message1 ? '<p class="messages">' . $message1 . '</p>' : '') ;
+  $output .= ($message1 ? '<div class="messages">' . $message1 . '</div>' : '') ;
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
   $output .= $form;
-  $output .= ($message2 ? '<p class="messages">' . $message2 . '</p>' : '') ;
+  $output .= ($message2 ? '<div class="messages">' . $message2 . '</div>' : '') ;
   $output .= ($label ? '</fieldset>' : '');
 
   return $output;
@@ -458,7 +458,7 @@ function theme_imagepicker_quota($variables) {
   $message = $variables['message'];
   $label = $variables['label'];
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
-  $output .= ($message ? '<p class="messages">' . $message . '</p>' : '') ;
+  $output .= ($message ? '<div class="messages">' . $message . '</div>' : '') ;
   $output .= $form;
   $output .= ($label ? '</fieldset>' : '');
   return $output;
@@ -474,9 +474,9 @@ function theme_imagepicker_user_config($variables) {
 
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
-  $output .= ($message1 ? '<p class="messages">' . $message1 . '</p>' : '') ;
+  $output .= ($message1 ? '<div class="messages">' . $message1 . '</div>' : '') ;
   $output .= $form;
-  $output .= ($message2 ? '<p class="messages">' . $message2 . '</p>' : '') ;
+  $output .= ($message2 ? '<div class="messages">' . $message2 . '</div>' : '') ;
   $output .= ($label ? '</fieldset>' : '');
   return $output;
 }
@@ -545,6 +545,22 @@ function theme_imagepicker_upload_form($variables) {
 
   $form = $variables['form'];
   $output = '';
+  $max_uploads = imagepicker_variable_get('imagepicker_max_uploads', 1);
+  $max_filesize = ini_get('upload_max_filesize');
+
+  $form['maxmsg']['#markup'] = '<div class="messages">' . t('Browse your computer for up to !c, Max %max Total', array('!c' => format_plural($max_uploads, '1 Image', '@count Images'), '%max' => $max_filesize) ) . '</div>';
+  for ($ct = 1; $ct <= $max_uploads; $ct++) {
+    $form['file_upload_'. $ct]['#prefix'] = "<div id='imagepicker_upload_link_wrapper_$ct'>";
+    $form['description_'. $ct]['#suffix'] = '</div>';
+    if (isset($form['link_' . $ct])) {
+      $form['link_' . $ct]['#markup'] = "<div class='imagepicker_upload_link' id='imagepicker_upload_link_$ct' style='display:none'>" . l(t('Upload another'), '', array(
+        'attributes' => array(
+          'onClick' => "Drupal.imagepicker_upload_link_click($ct); return false;"
+        )
+      )) . '</div>';
+    }
+  }
+
   $output .= drupal_render_children($form);
   return $output;
 }

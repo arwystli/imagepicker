@@ -125,8 +125,8 @@ function imagepicker_user_view_public($img_id) {
 
   $img = _imagepicker_get_img($img_id, FALSE);
   if ($img) {
-    $imgpath = imagepicker_get_image_path($img, 'full', array('name' => $img->name , 'uid' => $img->uid ));
-    $info = image_get_info(imagepicker_get_path(FALSE, array('name' => $img->name , 'uid' => $img->uid)) . $img->img_name);
+    $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid ));
+    $info = image_get_info(imagepicker_get_path(FALSE, array('uid' => $img->uid)) . $img->img_name);
     $content = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info));
   }
   else {

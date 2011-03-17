@@ -994,6 +994,7 @@ function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE) {
   $userdir = is_array($public) ? $public : TRUE;
   $imgbasedir = imagepicker_get_path(FALSE, $userdir);
   $found = FALSE;
+  $imgpath = '';
 
   // $img is object or array
   if (is_object($img)) {
