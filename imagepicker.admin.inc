@@ -97,6 +97,22 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_use_icons', 1),
     '#description' => t('Setting this option enables icons in tables.'),
   );
+  $max_uploads = range(0, 6);
+  unset($max_uploads[0]);
+  $form['imagepicker_settings']['imagepicker_max_uploads'] = array(
+    '#type' => 'select',
+    '#title' => t('Multiple Uploads'),
+    '#description' => t('The maximum number of uploads at a time.'),
+    '#default_value' => variable_get('imagepicker_max_uploads', 1),
+    '#options' => $max_uploads,
+  );
+  $form['imagepicker_settings']['imagepicker_invoke_extra'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Invoke external imagepicker hook'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_invoke_extra', 0),
+    '#description' => t("Invoke the 'imagepicker_upload_extra' external hook. Do not enable this unless you are using this hook."),
+  );
 
   // default options
   $form['imagepicker_defaults'] = array(
