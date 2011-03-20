@@ -1,3 +1,7 @@
+Image Picker for D7 in 7.x-1.x, 20011-03-20
+------------------------------------
+by hutch, fixed bug in gallery block paths
+  added Total users to stats
 
 Image Picker for D7 in 7.x-1.x, 20011-03-17
 ------------------------------------
@@ -99,7 +103,7 @@ by hutch, fixed colorbox integration
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-10-21
 ------------------------------------
-by hutch, fixed imports, added bulk operations, 
+by hutch, fixed imports, added bulk operations,
 reworked theming, many bugfixes.
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-30
@@ -112,7 +116,7 @@ by hutch, fixed datetime bug
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-08
 ------------------------------------
-by hutch, improved iframe integration 
+by hutch, improved iframe integration
 
 Image Picker  for D7 in DRUPAL-7--1, 20010-09-03
 ------------------------------------

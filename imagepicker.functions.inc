@@ -1868,6 +1868,7 @@ function _imagepicker_get_img($img_id, $checkuser=TRUE, $account = FALSE) {
 function imagepicker_group_stats($account = FALSE, $label = '') {
 
   // stats
+  $groupusercount = FALSE;
   $usercount = FALSE;
   $bytecount = 0;
   if ($account) {
@@ -1895,6 +1896,10 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
   else {
     // imagepicker users
     $query = db_select('imagepicker_user_groups');
+    $query->addExpression('COUNT(DISTINCT uid)', 'ct');
+    $row = $query->execute()->fetchAssoc();
+    $groupusercount = $row['ct'];
+    $query = db_select('imagepicker');
     $query->addExpression('COUNT(DISTINCT uid)', 'ct');
     $row = $query->execute()->fetchAssoc();
     $usercount = $row['ct'];
@@ -1960,17 +1965,22 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
       array(t('Private groups') . ": ", $nopublicgroupcount, t('Private images') . ": ", $nopubliccount),
       array( '', '', t('Grouped images') . ": ", $totcount),
       array( '', '', t('Ungrouped images') . ": ", $allcount-$totcount),
-      array(($usercount ? t('Users') . ": " : ''), ($usercount ? $usercount : ''), t('Space used') . ": ", $bytecount),
+      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
     );
-
+    if (!$account) {
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+    }
   }
   else {
     $rows = array(
       array(t('Groups') . ": ", $groupcount, t('Images') . ": ", $allcount),
       array( '', '', t('Grouped images') . ": ", $totcount),
       array( '', '', t('Ungrouped images') . ": ", $allcount-$totcount),
-      array(($usercount ? t('Users') . ": " : ''), ($usercount ? $usercount : ''), t('Space used') . ": ", $bytecount),
+      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
     );
+    if (!$account) {
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+    }
   }
   return theme('imagepicker_stats', array('header' => $header, 'rows' => $rows, 'message' => t('No Stats found'), 'pref' => '<div class="imgp_groups_info">', 'suff' => '</div>', 'label' => $label));
 }

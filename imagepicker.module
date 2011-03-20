@@ -644,12 +644,9 @@ function imagepicker_display_block($i) {
     $t = $img->img_title;
     $d = $img->img_description;
     $title = ($d ? $d : $t);
-    if (variable_get('file_default_scheme', 'public') == 'private') {
-      $full = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
-    }
-    else {
-      $full = imagepicker_get_path(TRUE, $img) . $img->img_name;
-    }
+    $full = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
+    // munge this so that it can go through l() when using relative url setting
+    $full = preg_replace("#^" . base_path() . "#", '', $full);
     if ($ct) {
       $class = "js-hide";
       $content .= l($name, $full, array('html' => ($ct ? FALSE : TRUE), 'attributes' => array('class' => "$boxtype $class", 'rel' => $gal, 'title' => $title)));
