@@ -1436,28 +1436,24 @@ function imagepicker_files_validate($dir) {
   return $result;
 }
 
-function imagepicker_admin_groups() {
+function imagepicker_admin_groups($mode="", $u=0, $gidaction = '', $gid =0) {
   drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
   module_load_include('inc', 'imagepicker', 'imagepicker.group');
-  if (! arg(4) ) {
+  if (empty($mode)) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
     $action = 'users';
   }
   $uid = variable_get('imagepicker_currentuser', '');
-  if ( arg(4) == 'user' && is_numeric(arg(5))) {
-    $uid = arg(5);
+  if ( $mode == 'user' && $u > 0) {
+    $uid = $u;
   }
-  elseif (arg(4) == 'stats' || arg(4) == 'users') {
-    $action = arg(4);
+  elseif ($mode == 'stats' || $mode == 'users') {
+    $action = $mode;
   }
-  $gidaction = '';
-  $gid = 0;
-  if ( (arg(6) == 'browse' || arg(6) == 'edit' || arg(6) == 'delete') && is_numeric(arg(7)) ) {
-    $gidaction = arg(6);
-    $gid = arg(7);
-    if (arg(6) == 'browse') {
+  if (($gidaction == 'browse' || $gidaction == 'edit' || $gidaction == 'delete') && $gid > 0) {
+    if ($gidaction == 'browse') {
       variable_set('imagepicker_currentgroup', $gid);
       drupal_goto(IMAGEPICKER_ADMIN_PATH .'/images/user/'. $uid .'/browse');
     }
@@ -1482,7 +1478,7 @@ function imagepicker_admin_groups() {
           $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
         }
       }
-      elseif (arg(6) == 'stats') {
+      elseif ($gidaction == 'stats') {
         $content .= imagepicker_group_stats($account, t('Statistics for %name', array('%name' => $name)));
       }
       else {
@@ -1502,42 +1498,31 @@ function imagepicker_admin_groups() {
   return $content;
 }
 
-function imagepicker_admin_images() {
+function imagepicker_admin_images($mode = '', $u = 0, $imgaction = '', $img_id = 0) {
   drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
-  if (! arg(4) ) {
+  if (empty($mode)) {
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
     $action = 'users';
   }
   $uid = variable_get('imagepicker_currentuser', '');
-  if ( arg(4) == 'user' && is_numeric(arg(5))) {
-    $uid = arg(5);
+  if ( $mode == 'user' && $u > 0 ) {
+    $uid = $u;
   }
-  elseif (arg(4) == 'browse_all' || arg(4) == 'stats' || arg(4) == 'users' || arg(4) == 'list_all') {
-    $action = arg(4);
+  elseif ($mode == 'browse_all' || $mode == 'stats' || $mode == 'users' || $mode == 'list_all') {
+    $action = $mode;
     variable_del('imagepicker_currentuser');
     variable_set('imagepicker_currentgroup', 0);
     $uid = variable_get('imagepicker_currentuser', '');
   }
-  $imgaction = '';
-  if ( arg(6) == 'browse_all'
-    || arg(6) == 'browse'
-    || arg(6) == 'edit'
-    || arg(6) == 'delete'
-    || arg(6) == 'browseadmin'
-    || arg(6) == 'upload'
-    || arg(6) == 'stats'
-    || arg(6) == 'groups'
-    || arg(6) == 'quota') {
-    $imgaction = arg(6);
+  // sanity check
+  if ($imgaction && ! in_array($imgaction, array('browse_all', 'browse', 'edit', 'delete', 'browseadmin', 'upload', 'groups', 'quota'))) {
+    $imgaction = '';
   }
-  $img_id = 0;
-  if ( is_numeric(arg(7))) {
-    $img_id = arg(7);
-  }
+
   $content = '';
-  if (arg(6) == 'upload' ) {
+  if ($imgaction == 'upload' ) {
     module_load_include('inc', 'imagepicker', 'imagepicker.upload');
     if (variable_get('imagepicker_upload_progress_enabled', 1)) {
       $content .= imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
@@ -1716,15 +1701,15 @@ function imagepicker_quota_form_submit($form, &$form_state) {
     }
 }
 
-function imagepicker_admin_import() {
+function imagepicker_admin_import($mode='', $u=0) {
   drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   module_load_include('inc', 'imagepicker', 'imagepicker.import');
-  if (! arg(4) ) {
+  if (empty($mode)) {
     variable_del('imagepicker_currentuser');
   }
   $uid = variable_get('imagepicker_currentuser', '');
-  if ( arg(4) == 'user' && is_numeric(arg(5))) {
-    $uid = arg(5);
+  if ($mode == 'user' && $u > 0) {
+    $uid = $u;
   }
   $content = "";
   if (! $importdir = variable_get('imagepicker_import_dir', '')) {
@@ -1752,25 +1737,15 @@ function imagepicker_admin_import() {
 }
 
 /**
- * Retrieve a pipe delimited string of autocomplete suggestions for existing users
+ * Retrieve an array of autocomplete suggestions for existing users with imagepicker perms.
  */
 function imagepicker_user_autocomplete($string = '') {
   $matches = array();
   if ($string) {
-    if (arg(3) == 'import') {
-      $result = db_query_range("SELECT u.uid, u.name FROM {users} u WHERE LOWER(u.name) LIKE LOWER('%s%%')", $string, 0, 10);
-    }
-    else {
-      $result = db_query_range("SELECT DISTINCT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
-    }
+    $result = db_query_range("SELECT u.uid, u.name FROM {users} u WHERE LOWER(u.name) LIKE LOWER('%s%%')", $string, 0, 10);
     while ($account = db_fetch_object($result)) {
-      if (arg(3) == 'import') {
-        $user = user_load(array('uid' => $account->uid));
-        if (user_access('use imagepicker', $user)) {
-          $matches[$account->name] = check_plain($account->name);
-        }
-      }
-      else {
+      $user = user_load(array('uid' => $account->uid));
+      if (user_access('use imagepicker', $user)) {
         $matches[$account->name] = check_plain($account->name);
       }
     }
@@ -1780,7 +1755,22 @@ function imagepicker_user_autocomplete($string = '') {
 }
 
 /**
- * Retrieve a pipe delimited string of autocomplete suggestions for existing groups
+ * Retrieve an array of autocomplete suggestions for existing users who already have images.
+ */
+function imagepicker_image_user_autocomplete($string = '') {
+  $matches = array();
+  if ($string) {
+    $result = db_query_range("SELECT DISTINCT u.name FROM {users} u, {imagepicker} i WHERE LOWER(u.name) LIKE LOWER('%s%%') AND u.uid=i.uid", $string, 0, 10);
+    while ($account = db_fetch_object($result)) {
+      $matches[$account->name] = check_plain($account->name);
+    }
+  }
+  print drupal_to_js($matches);
+  exit();
+}
+
+/**
+ * Retrieve an array of autocomplete suggestions for existing groups
  */
 function imagepicker_group_search_autocomplete($string = '') {
   $matches = array();

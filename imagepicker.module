@@ -68,6 +68,7 @@ function imagepicker_menu() {
   $items['imagepicker/browse'] = array(
     'title'            => 'Browse',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1),
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2,
@@ -75,6 +76,7 @@ function imagepicker_menu() {
   $items['imagepicker/browse_public'] = array(
     'title'            => 'Browse Public',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1),
     'access callback'  => 'imagepicker_access_use_public',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 3
@@ -82,6 +84,7 @@ function imagepicker_menu() {
   $items['imagepicker/groups'] = array(
     'title'            => 'Groups',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1),
     'access callback'  => 'imagepicker_access_use_group',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.group.inc',
@@ -90,6 +93,7 @@ function imagepicker_menu() {
   $items['imagepicker/browse/%imagepicker_id'] = array(
     'title'            => 'Browse',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1, 2),
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2
@@ -97,6 +101,7 @@ function imagepicker_menu() {
   $items['imagepicker/edit/%imagepicker_id'] = array(
     'title'            => 'Edit image',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1, 2),
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.edit.inc'
@@ -104,6 +109,7 @@ function imagepicker_menu() {
   $items['imagepicker/image/%imagepicker_id'] = array(
     'title'            => 'Imagepicker',
     'page callback'    => 'imagepicker_box',
+    'page arguments'   => array(1, 2),
     'access arguments' => array('access content'),
     'type'             => MENU_CALLBACK
   );
@@ -148,6 +154,7 @@ function imagepicker_menu() {
     'description'      => 'Show user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_groups',
+    'page arguments'   => array(4),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -10
@@ -157,6 +164,7 @@ function imagepicker_menu() {
     'description'      => 'Show user group stats.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_groups',
+    'page arguments'   => array(4),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
@@ -166,15 +174,24 @@ function imagepicker_menu() {
     'description'      => 'Show user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_groups',
+    'page arguments'   => array(4, 5),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -7
+  );
+  $items[IMAGEPICKER_ADMIN_PATH .'/groups/user/%imagepicker_id/%/%imagepicker_id'] = array(
+    'access callback'  => 'imagepicker_access_admin_group',
+    'page callback'    => 'imagepicker_admin_groups',
+    'page arguments'   => array(4, 5, 6, 7),
+    'type'             => MENU_CALLBACK,
+    'file'             => 'imagepicker.admin.inc',
   );
   $items[IMAGEPICKER_ADMIN_PATH .'/groups/user/%imagepicker_id/stats'] = array(
     'title'            => 'Stats',
     'description'      => 'Show user stats.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_groups',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
@@ -209,6 +226,7 @@ function imagepicker_menu() {
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -9
@@ -218,6 +236,7 @@ function imagepicker_menu() {
     'description'      => 'List user images.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -8
@@ -227,6 +246,7 @@ function imagepicker_menu() {
     'description'      => 'List users.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -10
@@ -236,6 +256,7 @@ function imagepicker_menu() {
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -4
@@ -245,6 +266,7 @@ function imagepicker_menu() {
     'description'      => 'List user images.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -3
@@ -254,6 +276,7 @@ function imagepicker_menu() {
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -6
@@ -263,6 +286,7 @@ function imagepicker_menu() {
     'description'      => 'Browse user images.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -2
@@ -272,13 +296,21 @@ function imagepicker_menu() {
     'description'      => 'List user groups.',
     'access callback'  => 'imagepicker_access_admin_group',
     'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6),
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.admin.inc',
     'weight'           => -1
   );
+  $items[IMAGEPICKER_ADMIN_PATH .'/images/user/%imagepicker_id/%/%'] = array(
+    'access callback'  => 'imagepicker_access_admin_group',
+    'page callback'    => 'imagepicker_admin_images',
+    'page arguments'   => array(4, 5, 6, 7),
+    'type'             => MENU_CALLBACK,
+    'file'             => 'imagepicker.admin.inc',
+  );
   $items[IMAGEPICKER_ADMIN_PATH .'/images/autocomplete'] = array(
     'access callback'  => 'imagepicker_access_admin',
-    'page callback'    => 'imagepicker_user_autocomplete',
+    'page callback'    => 'imagepicker_image_user_autocomplete',
     'type'             => MENU_CALLBACK,
     'file'             => 'imagepicker.admin.inc'
   );

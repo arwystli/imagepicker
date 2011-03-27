@@ -1,3 +1,8 @@
+Image Picker for D6 in 6.x-2.x, 20011-03-27
+------------------------------------
+by hutch, removed all arg(), fixed bug in public_roles
+  fixed bug in iframe js for tinymce
+
 Image Picker for D6 in 6.x-2.x, 20011-03-17
 ------------------------------------
 by hutch, added multiple uploads

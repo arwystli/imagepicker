@@ -206,8 +206,9 @@ if (Drupal.jsEnabled) {
       //var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
       // tinyMCE v2
       if (! jobdone && win.tinyMCE) {
-        win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
-        jobdone = true;
+        if (win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion)) {
+          jobdone = true;
+        }
       }
 
       if (! jobdone) {

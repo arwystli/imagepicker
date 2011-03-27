@@ -1398,7 +1398,7 @@ function imagepicker_get_public_grouplist($account = FALSE, $admin = FALSE) {
   if (is_array($tmp)) {
     for ($ct = 0; $ct < $rowct; $ct++) {
       if (! $admin) {
-        if ($tmp[$ct]['avail_roles'] != 'all') {
+        if ($tmp[$ct]['avail_roles'] != 'all' && variable_get('imagepicker_publicroles_enabled', 0)) {
           $role = $tmp[$ct]['avail_roles'];
           if (imagepicker_user_has_role($role, $user)) {
             $grouplist[$tmp[$ct]['gid']] = $tmp[$ct]['group_name'];
@@ -1816,6 +1816,7 @@ function _imagepicker_get_img($img_id, $checkuser=TRUE, $account = FALSE) {
  */
 function imagepicker_group_stats($account = FALSE, $label = '') {
   // stats
+  $groupusercount = FALSE;
   $usercount = FALSE;
   $bytecount = 0;
   if ($account) {
@@ -1843,6 +1844,9 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
   else {
     // imagepicker users
     $result = db_query("SELECT count(DISTINCT uid) AS ct FROM {imagepicker_user_groups}");
+    $row = db_fetch_array($result);
+    $groupusercount = $row['ct'];
+    $result = db_query("SELECT count(DISTINCT uid) AS ct FROM {imagepicker}");
     $row = db_fetch_array($result);
     $usercount = $row['ct'];
     // all groups
@@ -1890,8 +1894,11 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
       array(t('Private groups') .": ", $nopublicgroupcount, t('Private images') .": ", $nopubliccount),
       array( '', '',                                        t('Grouped images') .": ", $totcount),
       array( '', '',                                        t('Ungrouped images') .": ", $allcount-$totcount),
-      array(($usercount ? t('Users') .": " : ''), ($usercount ? $usercount : ''), t('Space used')  .": ", $bytecount),
+      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
     );
+    if (!$account) {
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+    }
 
   }
   else {
@@ -1899,8 +1906,11 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
       array(t('Groups') .": ", $groupcount, t('Images') .": ", $allcount),
       array( '', '',                        t('Grouped images') .": ", $totcount),
       array( '', '',                        t('Ungrouped images') .": ", $allcount-$totcount),
-      array(($usercount ? t('Users') .": " : ''), ($usercount ? $usercount : ''), t('Space used')  .": ", $bytecount),
+      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
     );
+    if (!$account) {
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+    }
   }
   return theme('imagepicker_stats', $header, $rows, '<div class="imgp_groups_info">', '</div>', $label);
 }
@@ -2771,16 +2781,7 @@ function imagepicker_group_images_count($gid) {
 /**
  * all iframe links pass through here
  */
-function imagepicker_box() {
-  $a1 = FALSE;
-  $a2 = 0;
-
-  if (arg(1)) {
-    $a1 = arg(1);
-  }
-  if (arg(2) && is_numeric(arg(2))) {
-    $a2 = arg(2);
-  }
+function imagepicker_box($a1 = FALSE, $a2 = 0) {
 
   if ($a1 == 'browse') {
     $content = imagepicker_browse($a2);
@@ -2789,7 +2790,7 @@ function imagepicker_box() {
     $content = imagepicker_browse_public($a2);
   }
   elseif ($a1 == 'groups') {
-    $content = imagepicker_groups();
+    $content = imagepicker_groups($a2);
   }
   elseif ($a1 == 'edit') {
     $content = imagepicker_image_edit($a2);

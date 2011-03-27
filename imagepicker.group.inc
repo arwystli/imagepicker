@@ -5,23 +5,23 @@
  * contains the functions for group management
  */
 
-function imagepicker_groups() {
+function imagepicker_groups($mode="", $gid=0) {
   drupal_add_js(IMAGEPICKER_PATH .'/imagepicker.js');
 
   // from iframe
-  if (! arg(2)) {
+  if ( empty($mode)) {
     $content = imagepicker_groups_list();
     $content .= drupal_get_form('imagepicker_groups_form');
   }
-  elseif ( arg(2) == 'edit') {
-    $record = imagepicker_get_user_group(arg(3));
+  elseif ( $mode == 'edit') {
+    $record = imagepicker_get_user_group($gid);
     $content .= drupal_get_form('imagepicker_groups_form', $record);
   }
-  elseif (arg(2) == 'delete') {
-    $content .= drupal_get_form('imagepicker_group_delete_form', arg(3));
+  elseif ($mode == 'delete') {
+    $content .= drupal_get_form('imagepicker_group_delete_form', $gid);
   }
-  elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
-    imagepicker_set_user_group_state(1, arg(2));
+  elseif ( is_numeric($mode) && $mode > 0 ) {
+    imagepicker_set_user_group_state(1, $mode);
     drupal_goto('imagepicker/browse');
   }
   return theme('imagepicker_iframe', $content);
