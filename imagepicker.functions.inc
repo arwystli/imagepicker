@@ -2781,7 +2781,16 @@ function imagepicker_group_images_count($gid) {
 /**
  * all iframe links pass through here
  */
-function imagepicker_box($a1 = FALSE, $a2 = 0) {
+function imagepicker_box() {
+  $a1 = FALSE;
+  $a2 = 0;
+
+  if (arg(1)) {
+    $a1 = arg(1);
+  }
+  if (arg(2) && is_numeric(arg(2))) {
+    $a2 = arg(2);
+  }
 
   if ($a1 == 'browse') {
     $content = imagepicker_browse($a2);
@@ -2790,7 +2799,7 @@ function imagepicker_box($a1 = FALSE, $a2 = 0) {
     $content = imagepicker_browse_public($a2);
   }
   elseif ($a1 == 'groups') {
-    $content = imagepicker_groups($a2);
+    $content = imagepicker_groups();
   }
   elseif ($a1 == 'edit') {
     $content = imagepicker_image_edit($a2);
