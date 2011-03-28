@@ -1407,7 +1407,7 @@ function imagepicker_get_public_grouplist($account = FALSE, $admin = FALSE) {
   if (is_array($tmp)) {
     for ($ct = 0; $ct < $rowct; $ct++) {
       if (! $admin) {
-        if ($tmp[$ct]['avail_roles'] != 'all') {
+        if ($tmp[$ct]['avail_roles'] != 'all' && imagepicker_variable_get('imagepicker_publicroles_enabled', 0)) {
           $role = $tmp[$ct]['avail_roles'];
           if (imagepicker_user_has_role($role, $user)) {
             $grouplist[$tmp[$ct]['gid']] = $tmp[$ct]['group_name'];

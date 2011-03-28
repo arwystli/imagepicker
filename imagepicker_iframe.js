@@ -202,8 +202,7 @@ function imagepickerInsert(button) {
 
     //var isTinyMCE = win.document.getElementById('mce_editor_0'); // buggy
     //var isTinyMCE = win.tinyMCE; // Will be undefined if tinyMCE isn't loaded. This isn't a sure-proof way of knowing if tinyMCE is loaded into a field, but it works.
-    if (! jobdone && win.tinyMCE) {
-      win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion);
+    if (! jobdone && win.tinyMCE && win.tinyMCE.execCommand('mceInsertContent', false, imgpInsertion)) {
       jobdone = true;
     }
 
