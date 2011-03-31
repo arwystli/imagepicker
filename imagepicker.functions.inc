@@ -320,7 +320,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
   }
 
   $use_icons = imagepicker_variable_get('imagepicker_use_icons', 1);
-  #if ($account && $src == 'admin') {
+
   if ($src == 'admin') {
     $max = imagepicker_variable_get('imagepicker_rows_per_page', 25);
     $searchs = imagepicker_variable_get('imagepicker_browser_search', '');
@@ -477,7 +477,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
       $imglink = l($img_name, $imgpath . $img_id);
       $editlink = ($use_icons ? _imagepicker_get_icon('edit', $editpath . $img_id, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $img_id));
       $deletelink = ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $img_id, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $img_id));
-      #$returnpath = 'u';
+
       $options[$img_id] = array(
         'img_name' => $imglink,
         'img_title' => check_plain($row->img_title),
@@ -1338,7 +1338,6 @@ function imagepicker_set_user_group_state($state, $gid, $account = FALSE) {
     ->condition('gid', $gid)
     ->execute();
 }
-
 
 // for dropdown
 function imagepicker_get_grouplist($account = FALSE) {
