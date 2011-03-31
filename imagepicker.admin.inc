@@ -221,6 +221,7 @@ function imagepicker_settings_form($form_state) {
       );
     }
   }
+
   // quota
   $form['imagepicker_quotas'] = array(
     '#type' => 'fieldset',
@@ -257,8 +258,10 @@ function imagepicker_settings_form($form_state) {
     '#default_value' => variable_get('imagepicker_quota_default', 0),
     '#options' => imagepicker_get_quota_list(),
   );
+
+  // watermark settings
   if ( imagepicker_image_check_functions()) {
-    // watermark settings
+
     $form['imagepicker_watermark'] = array(
       '#type' => 'fieldset',
       '#title' => t('Image watermark settings'),
@@ -301,6 +304,7 @@ function imagepicker_settings_form($form_state) {
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['imagepicker_watermark_min_width'] = imagepicker_watermark_min_width_elem(variable_get('imagepicker_watermark_min_width', 0));
   }
 
+  // Exif
   $form['imagepicker_exif'] = array(
     '#type' => 'fieldset',
     '#title' => t('Imagepicker Exif settings'),
@@ -327,6 +331,7 @@ function imagepicker_settings_form($form_state) {
     '#required' => FALSE,
     '#default_value' => variable_get('imagepicker_exifinfo_external', ''),
   );
+
   // Iframe
   $form['imagepicker_iframe'] = array(
     '#type' => 'fieldset',
@@ -346,7 +351,6 @@ function imagepicker_settings_form($form_state) {
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(variable_get('imagepicker_advanced_iframe_height', "500"));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(variable_get('imagepicker_advanced_iframe_border', "0"));
   $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem(variable_get('imagepicker_advanced_collapsed', 0));
-
 
   // progress bar
   $form['imagepicker_progress'] = array(
