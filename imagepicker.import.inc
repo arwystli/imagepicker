@@ -290,7 +290,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
       if (! count($err)) {
         $source = $source_filepath;
         // copy original
-        if (file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['origdirscheme'], FILE_EXISTS_RENAME)) {
+        if (imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['origdirscheme'])) {
           $file = basename($source);
           $orig = $options['origdir'] . $file;
           $scaleto = ($form_state['values']['scale'] !="" ? $form_state['values']['scale'] : FALSE );
@@ -299,7 +299,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
           }
           else {
             // no scaling, save direct from $origdir to $destdir
-            file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme'] , FILE_EXISTS_RENAME);
+            imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $options['destdirscheme']);
             $file = basename($source);
           }
           // if watermark is enabled just apply to destdir image, not orig or the thumbs

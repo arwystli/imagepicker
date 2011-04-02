@@ -2706,20 +2706,20 @@ function imagepicker_copy_form_submit($form, &$form_state) {
       else {
         // no scaling, copy direct from $destdir to $destdir
         $source = $destdir . $img->img_name;
-        file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
+        imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
       }
 
       $source = $thumbsdir . $img->img_name;
       $dest = $thumbsdirscheme . $newname;
-      file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
+      imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
 
       $source = $browserdir . $img->img_name;
       $dest = $browserdirscheme . $newname;
-      file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
+      imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
 
       $source = $origdir . $img->img_name;
       $dest = $origdirscheme . $newname;
-      file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
+      imagepicker_file_unmanaged_copy($source, IMAGEPICKER_FILE_SCHEME . $dest, FILE_EXISTS_REPLACE);
 
       if ($doinsert) {
         $nextimgid = imagepicker_insert_image($user->uid, $newname, $img->img_title, $img->img_description);
@@ -2930,3 +2930,25 @@ function imagepicker_uploadprogress_callback($progress_key='') {
 
   exit;
 }
+
+function imagepicker_file_unmanaged_copy($s, $d, $r = FILE_EXISTS_RENAME) {
+  // file_unmanaged_copy does not check for trailing slashes
+  $d = rtrim($d, DIRECTORY_SEPARATOR);
+  $n = file_unmanaged_copy($s, $d, $r);
+  // Fix bug in drupal's file_copy function which uses '/' instead of
+  // DIRECTORY_SEPARATOR for making directories. This causes problems on
+  // Windows machines. still true in D7
+  $n = str_replace('/', DIRECTORY_SEPARATOR, $n);
+  return $n;
+}
+
+function imagepicker_file_unmanaged_move($s, $d, $r = FILE_EXISTS_RENAME) {
+  $d = rtrim($d, DIRECTORY_SEPARATOR);
+  $n = file_unmanaged_move($s, $d, $r);
+  // Fix bug in drupal's file_copy function which uses '/' instead of
+  // DIRECTORY_SEPARATOR for making directories. This causes problems on
+  // Windows machines. still true in D7
+  $n = str_replace('/', DIRECTORY_SEPARATOR, $n);
+  return $n;
+}
+
