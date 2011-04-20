@@ -1,3 +1,7 @@
+Image Picker for D7 in 7.x-1.x, 20011-04-20
+------------------------------------
+by hutch, fixed bug in imagepicker_file_unmanaged_copy, #1111184
+
 Image Picker for D7 in 7.x-1.x, 20011-04-02
 ------------------------------------
 by hutch, fixed doubleslash bug, #1111184

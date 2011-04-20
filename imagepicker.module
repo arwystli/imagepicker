@@ -674,6 +674,7 @@ function imagepicker_block_form($i) {
     '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_link_'. $i, t('Photo Gallery !i', array('!i' => $i))),
     '#required' => TRUE,
     '#description' => t('Set the link text for this block. Can contain html.'),
+    '#maxlength' => 255,
   );
   $form['imagepicker_galleryblocks_group_'. $i] = array(
     '#type' => 'select',

@@ -2938,7 +2938,10 @@ function imagepicker_file_unmanaged_copy($s, $d, $r = FILE_EXISTS_RENAME) {
   // Fix bug in drupal's file_copy function which uses '/' instead of
   // DIRECTORY_SEPARATOR for making directories. This causes problems on
   // Windows machines. still true in D7
-  $n = str_replace('/', DIRECTORY_SEPARATOR, $n);
+  $scheme = file_default_scheme() . '://';
+  $n2 = preg_replace("#^$scheme#", '', $n);
+  $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
+  $n = $scheme . $n2;
   return $n;
 }
 
@@ -2948,7 +2951,9 @@ function imagepicker_file_unmanaged_move($s, $d, $r = FILE_EXISTS_RENAME) {
   // Fix bug in drupal's file_copy function which uses '/' instead of
   // DIRECTORY_SEPARATOR for making directories. This causes problems on
   // Windows machines. still true in D7
-  $n = str_replace('/', DIRECTORY_SEPARATOR, $n);
+  $scheme = file_default_scheme() . '://';
+  $n2 = preg_replace("#^$scheme#", '', $n);
+  $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
+  $n = $scheme . $n2;
   return $n;
 }
-
