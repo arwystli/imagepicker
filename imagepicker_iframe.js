@@ -44,6 +44,7 @@ function imagepickerInsert(button) {
     var imgpFileLink = Drupal.settings.imagepicker_iframe.imgpFileLink;
     var imgpThumbLink = Drupal.settings.imagepicker_iframe.imgpThumbLink;
     var imgpPageLink = Drupal.settings.imagepicker_iframe.imgpPageLink;
+    var imgpTemplate = Drupal.settings.imagepicker_iframe.imgpTemplate;
     var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
     var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
     var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
@@ -142,7 +143,9 @@ function imagepickerInsert(button) {
     }
     // wrap title and description if requested
     if (imgpForm.desc.checked) {
-      imgpInsertion = "<div class='imgp_title'>" + imgpImageTitle + "</div>" + imgpInsertion + "<div class='imgp_desc'>" + imgpImageDesc + "</div>";
+      imgpTemplate = imgpTemplate.replace("__TITLE__", imgpImageTitle);
+      imgpTemplate = imgpTemplate.replace("__INSERT__", imgpInsertion);
+      imgpInsertion = imgpTemplate.replace("__DESC__", imgpImageDesc);
     }
 
     // Get the parent window of imagepicker iframe

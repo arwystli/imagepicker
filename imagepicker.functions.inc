@@ -2938,10 +2938,9 @@ function imagepicker_file_unmanaged_copy($s, $d, $r = FILE_EXISTS_RENAME) {
   // Fix bug in drupal's file_copy function which uses '/' instead of
   // DIRECTORY_SEPARATOR for making directories. This causes problems on
   // Windows machines. still true in D7
-  $scheme = file_default_scheme() . '://';
-  $n2 = preg_replace("#^$scheme#", '', $n);
+  $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
   $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
-  $n = $scheme . $n2;
+  $n = IMAGEPICKER_FILE_SCHEME . $n2;
   return $n;
 }
 
@@ -2951,9 +2950,21 @@ function imagepicker_file_unmanaged_move($s, $d, $r = FILE_EXISTS_RENAME) {
   // Fix bug in drupal's file_copy function which uses '/' instead of
   // DIRECTORY_SEPARATOR for making directories. This causes problems on
   // Windows machines. still true in D7
-  $scheme = file_default_scheme() . '://';
-  $n2 = preg_replace("#^$scheme#", '', $n);
+  $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
   $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
-  $n = $scheme . $n2;
+  $n = IMAGEPICKER_FILE_SCHEME . $n2;
   return $n;
+}
+
+function imagepicker_get_insert_template() {
+  $file = IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . IMAGEPICKER_INSERT_TEMPLATE;
+  $t = "<div class='imgp_title'>__TITLE__</div>__INSERT__<div class='imgp_desc'>__DESC__</div>";
+  $template = '';
+  if ( file_exists($file) ) {
+    $template = file_get_contents($file);
+  }
+  if ($template) {
+    return $template;
+  }
+  return $t;
 }

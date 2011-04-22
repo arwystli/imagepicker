@@ -14,6 +14,7 @@ define('IMAGEPICKER_DESC_LEN', 30);
 define('IMAGEPICKER_FILE_SCHEME', file_default_scheme() . '://');
 define('IMAGEPICKER_ADMIN_PATH', 'admin/config/media/imagepicker');
 define('IMAGEPICKER_PATH', drupal_get_path('module', 'imagepicker'));
+define('IMAGEPICKER_INSERT_TEMPLATE', 'imagepicker_insert_template.txt');
 // Minimum PHP version for extension
 define('IMAGEPICKER_UPLOAD_STATUS_MIN_PHP', '5.2.1');
 define('IMAGEPICKER_UPLOAD_ID', 'UPLOAD_IDENTIFIER');

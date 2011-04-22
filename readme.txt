@@ -91,7 +91,12 @@ up a collection of images. Here you can create Groups and add images to one or
 more groups. There is also an Admin mode where your images are listed.
 
 	Imagepicker Administrator
-In the 2 series there is the ability for an administrator to
-view/add/edit/delete anything.
-The directories under files/imagepicker are now stored under uid. Older systems
-should still run. See the configuration tab 'Validate Files'
+An administrator to can view/add/edit/delete anything.
+
+	Templating
+To tweak Imagepicker to suit your needs, copy imagepicker.tpl.php over to your
+theme and modify it there. You can also copy any function from
+imagepicker.theme.inc to your theme's template.php, renaming accordingly.
+To change the insert layout, copy imagepicker_insert_template.txt.example
+to imagepicker_insert_template.txt in the same directory and modify it to suit.
+
