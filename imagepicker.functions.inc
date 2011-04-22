@@ -2851,3 +2851,20 @@ function imagepicker_uploadprogress_callback($progress_key='') {
 
   exit;
 }
+
+function imagepicker_get_insert_template() {
+  $file = IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . IMAGEPICKER_INSERT_TEMPLATE;
+  $t = "<div class='imgp_title'>__TITLE__</div>__INSERT__<div class='imgp_desc'>__DESC__</div>";
+  $template = '';
+  if ( file_exists($file) ) {
+    // for php 4
+    $handle = fopen($file, "r");
+    $template = fread($handle, filesize($file));
+    fclose($handle);
+    //$template = file_get_contents($file);
+  }
+  if ($template) {
+    return $template;
+  }
+  return $t;
+}
