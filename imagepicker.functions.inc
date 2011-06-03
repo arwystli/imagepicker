@@ -150,7 +150,7 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
   drupal_goto($outpath);
 }
 
-function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
+function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe', $suppress = FALSE) {
   if ($account) {
     $user = $account;
     $userdir = array('name' => $user->name, 'uid' => $user->uid);
@@ -172,7 +172,9 @@ function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
     if (db_query("DELETE FROM {imagepicker} WHERE uid = %d AND img_id = %d", array($user->uid, $img_id))) {
       // groups entries
       db_query("DELETE FROM {imagepicker_group_images} WHERE img_id = %d", array($img_id));
-      drupal_set_message(t('Image was successfully deleted'));
+      if (! $suppress) {
+        drupal_set_message(t('Image was successfully deleted'));
+      }
     }
     else {
       drupal_set_message(t('Error while trying to delete your image from database.'), 'error');
@@ -586,7 +588,7 @@ function imagepicker_multitask_delete_form_submit($form, &$form_state) {
 
   $img_ids = explode('-', $simg_ids);
   foreach ($img_ids AS $img_id) {
-    _imagepicker_image_delete($img_id, FALSE, 'admin');
+    _imagepicker_image_delete($img_id, FALSE, 'admin', TRUE);
   }
 
   drupal_set_message(t('%c deleted', array('%c' => format_plural( count($img_ids), '1 image', '@count images'))));
@@ -2868,3 +2870,4 @@ function imagepicker_get_insert_template() {
   }
   return $t;
 }
+
