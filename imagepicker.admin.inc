@@ -9,9 +9,20 @@
  * Menu callback; presents the settings form for imagepicker
  */
 function imagepicker_settings_page($op = NULL) {
-
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
-  $content = drupal_get_form('imagepicker_settings_form');
+  $info = '';
+  $dir = imagepicker_get_files_directory();
+  $orphan_status = imagepicker_check_orphans($dir);
+  if ($orphan_status) {
+    // we have orphans
+    $info .= '<ul class="item-list">';
+    foreach ($orphan_status AS $user_uid) {
+      $info .= '<li>' . t("Nonexistent user %u has orphan files. Click <b>!h</b> to fix.", array('%u' => $user_uid, '!h' => l( t('Here'), IMAGEPICKER_ADMIN_PATH . '/orphans'))) . '</li>';
+    }
+    $info .= '</ul>';
+  }
+
+  $content = drupal_get_form('imagepicker_settings_form', $info);
   return $content;
 }
 
@@ -20,7 +31,7 @@ function imagepicker_settings_page($op = NULL) {
  * @return
  *   Returns the form.
  */
-function imagepicker_settings_form($form, &$form_state) {
+function imagepicker_settings_form($form, &$form_state, $info) {
 
   drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
@@ -34,6 +45,11 @@ function imagepicker_settings_form($form, &$form_state) {
     '#collapsed' => FALSE,
     '#weight' => -40,
   );
+  if ($info) {
+    $form['imagepicker_settings']['imagepicker_admin_message'] = array(
+      '#markup' => $info,
+    );
+  }
   $node_types = node_type_get_names();
   $form['imagepicker_settings']['imagepicker_node_types_enabled'] = array(
     '#type' => 'checkboxes',
@@ -754,7 +770,7 @@ function imagepicker_settings_form_submit($form, &$form_state) {
  */
 function imagepicker_admin_users_list($dir, $label) {
 
-  $max = imagepicker_variable_get('imagepicker_advanced_browser_page', 25);
+  $max = imagepicker_variable_get('imagepicker_rows_per_page', 25);
   $header = array(
     array('data' => t('Name'), 'field' => 'u.name'),
     array('data' => t('Images'), 'field' => 'ct'),
@@ -766,19 +782,20 @@ function imagepicker_admin_users_list($dir, $label) {
   $rows = NULL;
   $countquery = db_select('users', 'u');
   $countquery->addExpression('COUNT(DISTINCT u.uid)', 'ct');
-  $countquery->join('imagepicker', 'i', 'i.uid = u.uid');
+  $countquery->join('imagepicker', 'i', 'i.uid=u.uid');
   $countquery->condition('u.status', 1);
 
   $query = db_select('users', 'u')
     ->extend('PagerDefault')->limit($max)
     ->extend('TableSort')->orderByHeader($header);
   $query->setCountQuery($countquery);
-  $query->fields('u', array('uid', 'name'))
+  $query->distinct()
+    ->fields('u', array('uid', 'name'))
     ->addExpression('COUNT( i.img_id)', 'ct');
-  $query->distinct();
-  $query->leftjoin('imagepicker', 'i', 'i.uid = u.uid');
+  $query->join('imagepicker', 'i', 'i.uid=u.uid');
   $query->condition('u.status', 1)
-    ->groupBy('u.uid')->groupBy('u.name');
+    ->groupBy('u.uid')
+    ->groupBy('u.name');
   $records = $query->execute();
 
   foreach ($records AS $row) {
@@ -996,6 +1013,224 @@ function imagepicker_user_search_form_submit($form, &$form_state) {
   else {
     imagepicker_variable_del('imagepicker_currentuser');
   }
+}
+
+function imagepicker_check_orphans($dir) {
+  $output = array();
+
+  $numericdirlist = file_scan_directory($dir, "/.*/", array('recurse' => FALSE));
+  foreach ( $numericdirlist AS $k => $v ) {
+    if (is_numeric($numericdirlist[$k]->filename)) {
+      $numericdir = $numericdirlist[$k]->filename;
+      $query = db_select('users', 'u');
+      $query->fields('u', array('uid'));
+      $query->condition('u.uid', $numericdir);
+      $row = $query->execute()->fetchAssoc();
+      if (! $row) {
+        $query = db_select('imagepicker');
+        $query->addExpression('COUNT(img_id)', 'ct');
+        $query->condition('uid', $numericdir);
+        $row2 = $query->execute()->fetchAssoc();
+        if ($row2) {
+          if ($row2['ct'] > 0) {
+            $output[] = $numericdir;
+          }
+        }
+      }
+    }
+  }
+
+  if (count($output)) {
+    return $output;
+  }
+  return FALSE;
+}
+
+function imagepicker_admin_orphans() {
+  // show a form if applicable
+
+  $content = drupal_get_form('imagepicker_admin_orphans_form');
+  return $content;
+
+}
+
+function imagepicker_admin_orphans_form($form_state) {
+
+  // show a dropdown of nonexistent user ids
+  // two choices:
+  // reallocate to another user
+  // delete the images
+
+  $dir = imagepicker_get_files_directory();
+  $orphanids = imagepicker_check_orphans($dir);
+  if ($orphanids) {
+    foreach ($orphanids AS $v) {
+      $opt[$v] = $v;
+    }
+    $form['orphanids'] = array(
+      '#type' => 'select',
+      '#options' => $opt,
+      '#title' => t('Nonexistent user ids'),
+      '#description' => t('These ids no longer exist but still have images. Choose what to do below'),
+    );
+    $form['reallocate_to_user'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Reallocate to'),
+      '#description' => t('Select a user who will own these images.'),
+      '#autocomplete_path' => IMAGEPICKER_ADMIN_PATH .'/orphans/autocomplete',
+      '#default_value' => '',
+      '#maxlength' => 30,
+      '#size' => 25,
+    );
+    $form['orphans_delete'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Delete the images'),
+      '#return_value' => 1,
+    );
+    $form['msg'] = array(
+      '#markup' => t("Any content using these images will be broken unless removed or edited."),
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Go'),
+    );
+  }
+  else {
+    $form['orphans_message'] = array(
+      '#markup' => t('No orphans found'),
+    );
+  }
+  return $form;
+}
+
+function imagepicker_admin_orphans_form_submit($form, &$form_state) {
+
+  $result = imagepicker_admin_orphans_do($form_state['values']['orphanids'], $form_state['values']['orphans_delete'], $form_state['values']['reallocate_to_user']);
+  if (is_array($result)) {
+    $message = $result[0];
+    $status = $result[1];
+    drupal_set_message($message, ($status ? 'status' : 'error'));
+  }
+  drupal_goto(IMAGEPICKER_ADMIN_PATH);
+
+}
+
+function imagepicker_admin_orphans_do($orphanid, $orphans_delete=FALSE, $reallocate_to_user='') {
+
+  $OK = FALSE;
+  $message = '';
+  $return = '';
+  // check that the incoming user id is nonexistent
+  $dir = imagepicker_get_files_directory();
+  $orphanids = imagepicker_check_orphans($dir);
+  // sanity check
+  if (in_array($orphanid, $orphanids)) {
+    // delete images
+    if ($orphans_delete == 1) {
+      // create 'phony' user object
+      $user_obj = new stdClass;
+      $user_obj->uid = $orphanid;
+      // get all image ids belonging to orphanids
+      $ct = 0;
+      $result = db_query('SELECT img_id FROM {imagepicker} WHERE uid=:uid', array(':uid' => $user_obj->uid));
+      while ($row = $result->fetchAssoc()) {
+        _imagepicker_image_delete($row['img_id'], $user_obj, 'admin', TRUE);
+        imagepicker_delete_group_image($row['img_id']);
+        $ct++;
+      }
+      $OK = imagepicker_delete_olduser_dirs($user_obj->uid);
+      if ($OK) {
+        $message = t('!ct Files deleted.', array('!ct' => $ct));
+      }
+      else {
+        $message = t('There was an error in deleting files');
+      }
+    }
+    elseif ($reallocate_to_user != '') {
+      // reallocate to new user
+      $result = db_query("SELECT uid FROM {users} WHERE name=:s", array(':s' => trim($reallocate_to_user)));
+      if ($row = $result->fetchAssoc()) {
+        $new_uid = $row['uid'];
+        $ct = 0;
+        $result2 = db_query('SELECT img_id FROM {imagepicker} WHERE uid=:uid', array(':uid' => $orphanid));
+        while ($row2 = $result2->fetchAssoc()) {
+          $newf = imagepicker_reallocate_image($row2['img_id'], $orphanid, $new_uid);
+          if ($newf) {
+            // move this entry in imagepicker to $new_uid
+            $img_name = basename($newf);
+            db_update('imagepicker')
+              ->fields(array('uid' => $new_uid, 'img_name' => $img_name))
+              ->condition('img_id', $row2['img_id'])
+              ->execute();
+            $ct++;
+          }
+        }
+        // give the new user the groups if any
+        db_update('imagepicker_user_groups')
+          ->fields(array('uid' => $new_uid))
+          ->condition('uid', $orphanid)
+          ->execute();
+        $OK = imagepicker_delete_olduser_dirs($orphanid);
+        if ($OK) {
+          $message = t('!ct Files moved.', array('!ct' => $ct));
+        }
+        else {
+          $message = t('There was an error in moving files.');
+        }
+      }
+    }
+    if ($message) {
+      $return = array($message, $OK);
+    }
+  }
+  return $return;
+}
+
+function imagepicker_reallocate_image($img_id, $old_uid, $new_uid) {
+
+  $OK = FALSE;
+  // $old_uid might not exist in users table but still have images
+  $old_user_obj = new stdClass;
+  $old_user_obj->uid = $old_uid;
+  $img = _imagepicker_get_img($img_id, FALSE, $old_user_obj);
+  if ($img) {
+    $old_userdir = array('uid' => $old_user_obj->uid);
+    $source = imagepicker_get_path(FALSE, $old_userdir);
+    $source_thumbsdir = $source . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img->img_name;
+    $source_browserdir = $source . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img->img_name;
+    $source_origdir = $source . IMAGEPICKER_ORIG_DIR . DIRECTORY_SEPARATOR . $img->img_name;
+    $source = $source  . $img->img_name;
+
+    $new_user_obj = user_load($new_uid);
+    $new_userdir = array('uid' => $new_user_obj->uid);
+    $dest = imagepicker_get_path(FALSE, $new_userdir);
+    $dest_thumbsdir = $dest . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR;
+    $dest_browserdir = $dest . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR;
+    $dest_origdir = $dest . IMAGEPICKER_ORIG_DIR . DIRECTORY_SEPARATOR;
+    $OK = imagepicker_file_unmanaged_move($source_thumbsdir, $dest_thumbsdir);
+    $OK = imagepicker_file_unmanaged_move($source_browserdir, $dest_browserdir);
+    $OK = imagepicker_file_unmanaged_move($source_origdir, $dest_origdir);
+    $OK = imagepicker_file_unmanaged_move($source, $dest);
+  }
+
+  return $OK;
+}
+
+function imagepicker_delete_olduser_dirs($old_uid) {
+
+  $OK = FALSE;
+  // $old_uid might not exist in users table but still have images
+  $old_userdir = array('uid' => $old_uid);
+  $source = imagepicker_get_path(FALSE, $old_userdir);
+  $source_thumbsdir = $source . IMAGEPICKER_THUMBS_DIR;
+  $source_browserdir = $source . IMAGEPICKER_BROWSER_DIR;
+  $source_origdir = $source . IMAGEPICKER_ORIG_DIR;
+  $OK = drupal_rmdir($source_origdir);
+  $OK = drupal_rmdir($source_browserdir);
+  $OK = drupal_rmdir($source_thumbsdir);
+  $OK = drupal_rmdir($source);
+
+  return $OK;
 }
 
 function imagepicker_admin_groups() {
@@ -1259,7 +1494,7 @@ function imagepicker_quota_form($form, &$form_state, $account=FALSE) {
   $title = t('Set default quota');
   if ($account) {
     $title = t('Set user quota');
-    $quota = imagepicker_variable_get('imagepicker_quota_default', imagepicker_variable_get('imagepicker_quota_default', 0), $account->uid);
+    $quota = (imagepicker_variable_get('imagepicker_quota_default', 0, $account->uid) ? imagepicker_variable_get('imagepicker_quota_default', 0, $account->uid) : 0);
     if (! $quota) {
       $quota = $default;
     }
@@ -1336,7 +1571,7 @@ function imagepicker_user_autocomplete($string = '') {
 
   $matches = array();
   if ($string) {
-    if (arg(4) == 'import') {
+    if ((arg(4) == 'import') OR (arg(4) == 'orphans')) {
       $query = db_select('users', 'u');
       $query->fields('u', array('uid', 'name'));
       $query->where("LOWER(u.name) LIKE LOWER(:st)", array(':st' => $string . '%') );
@@ -1354,7 +1589,7 @@ function imagepicker_user_autocomplete($string = '') {
     }
     $result = $query->execute();
     foreach ($result as $account) {
-      if (arg(4) == 'import') {
+      if ((arg(4) == 'import') OR (arg(4) == 'orphans')) {
         $user = user_load($account->uid);
         if (user_access('use imagepicker', $user)) {
           $matches[$account->name] = check_plain($account->name);

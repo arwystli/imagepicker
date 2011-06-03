@@ -157,7 +157,7 @@ function imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
   drupal_goto($outpath);
 }
 
-function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
+function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe', $suppress = FALSE) {
   if ($account) {
     $user = $account;
     $userdir = array('name' => $user->name, 'uid' => $user->uid);
@@ -180,7 +180,9 @@ function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe') {
     if ( db_delete('imagepicker')->condition('uid', $user->uid)->condition('img_id', $img_id)->execute() ) {
       // groups entries
       db_delete('imagepicker_group_images')->condition('img_id', $img_id)->execute();
-      drupal_set_message(t('Image was successfully deleted'));
+      if (! $suppress) {
+        drupal_set_message(t('Image was successfully deleted'));
+      }
     }
     else {
       drupal_set_message(t('Error while trying to delete your image from database.'), 'error');
@@ -2935,24 +2937,29 @@ function imagepicker_file_unmanaged_copy($s, $d, $r = FILE_EXISTS_RENAME) {
   // file_unmanaged_copy does not check for trailing slashes
   $d = rtrim($d, DIRECTORY_SEPARATOR);
   $n = file_unmanaged_copy($s, $d, $r);
-  // Fix bug in drupal's file_copy function which uses '/' instead of
-  // DIRECTORY_SEPARATOR for making directories. This causes problems on
-  // Windows machines. still true in D7
-  $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
-  $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
-  $n = IMAGEPICKER_FILE_SCHEME . $n2;
+  if ($n) {
+    // Fix bug in drupal's file_copy function which uses '/' instead of
+    // DIRECTORY_SEPARATOR for making directories. This causes problems on
+    // Windows machines. still true in D7
+    $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
+    $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
+    $n = IMAGEPICKER_FILE_SCHEME . $n2;
+  }
   return $n;
 }
 
 function imagepicker_file_unmanaged_move($s, $d, $r = FILE_EXISTS_RENAME) {
+  // file_unmanaged_move does not check for trailing slashes
   $d = rtrim($d, DIRECTORY_SEPARATOR);
   $n = file_unmanaged_move($s, $d, $r);
-  // Fix bug in drupal's file_copy function which uses '/' instead of
-  // DIRECTORY_SEPARATOR for making directories. This causes problems on
-  // Windows machines. still true in D7
-  $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
-  $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
-  $n = IMAGEPICKER_FILE_SCHEME . $n2;
+  if ($n) {
+    // Fix bug in drupal's file_copy function which uses '/' instead of
+    // DIRECTORY_SEPARATOR for making directories. This causes problems on
+    // Windows machines. still true in D7
+    $n2 = preg_replace("#^" . IMAGEPICKER_FILE_SCHEME . "#", '', $n);
+    $n2 = str_replace('/', DIRECTORY_SEPARATOR, $n2);
+    $n = IMAGEPICKER_FILE_SCHEME . $n2;
+  }
   return $n;
 }
 

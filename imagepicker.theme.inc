@@ -209,6 +209,10 @@ function imagepicker_theme() {
     'imagepicker_import_dir_form' => array(
       'render element' => 'form',
     ),
+    'imagepicker_admin_orphans_form' => array(
+      'render element' => 'form',
+    ),
+
   );
 }
 
@@ -773,6 +777,10 @@ function theme_imagepicker_settings_form($variables) {
     $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div id="wrap-imagepicker-watermark"'. $jshide .'>';
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['#suffix'] = '</div>';
   }
+  if (isset($form['imagepicker_settings']['imagepicker_admin_message'])) {
+    $form['imagepicker_settings']['imagepicker_admin_message']['#prefix'] = '<div class="messages">';
+    $form['imagepicker_settings']['imagepicker_admin_message']['#suffix'] = '</div>';
+  }
 
   $output .= drupal_render_children($form);
   return $output;
@@ -855,3 +863,12 @@ function theme_imagepicker_import_dir_form($variables) {
   return $output;
 }
 
+function theme_imagepicker_admin_orphans_form($variables) {
+
+  $form = $variables['form'];
+  $output = '';
+  $form['msg']['#prefix'] = '<div class="messages">';
+  $form['msg']['#suffix'] = '</div>';
+  $output .= drupal_render_children($form);
+  return $output;
+}

@@ -386,8 +386,8 @@ function imagepicker_get_uploaded_file_name($destination, $name) {
   $file = $filename . $fileext;
   $i = 0;
   while (file_exists($destination . $file)) {
-    $i++;
     $file = $filename . '_' . $i . $fileext;
+    $i++;
   }
   return $file;
 }
