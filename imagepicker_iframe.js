@@ -42,7 +42,9 @@ function imagepickerInsert(button) {
     var imgpImageTitle = Drupal.settings.imagepicker_iframe.imgpImageTitle;
     var imgpImageDesc = Drupal.settings.imagepicker_iframe.imgpImageDesc;
     var imgpFileLink = Drupal.settings.imagepicker_iframe.imgpFileLink;
+    var imgpPresetFileLink = Drupal.settings.imagepicker_iframe.imgpPresetFileLink;
     var imgpThumbLink = Drupal.settings.imagepicker_iframe.imgpThumbLink;
+    var imgpPresetThumbLink = Drupal.settings.imagepicker_iframe.imgpPresetThumbLink;
     var imgpPageLink = Drupal.settings.imagepicker_iframe.imgpPageLink;
     var imgpTemplate = Drupal.settings.imagepicker_iframe.imgpTemplate;
     var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
@@ -100,17 +102,40 @@ function imagepickerInsert(button) {
     else {
       imgpImageStyle = '';
     }
+    // imagecache
+    var presetFileLink = false;
+    if (imgpForm.presets_show) {
+      if (imgpForm.presets_show.value && imgpPresetFileLink) {
+        presetFileLink = imgpPresetFileLink.replace('__PRESET__', imgpForm.presets_show.value);
+      }
+    }
+    var presetThumbLink = false;
+    if (imgpForm.presets_show) {
+      if (imgpForm.presets_show.value && imgpPresetThumbLink) {
+        presetThumbLink = imgpPresetThumbLink.replace('__PRESET__', imgpForm.presets_show.value);
+      }
+    }
 
     switch (imgpShow) {
       case 'full':
-        imgpImagePath = imgpFileLink;
+        if (presetFileLink) {
+          imgpImagePath = presetFileLink;
+        }
+        else {
+          imgpImagePath = imgpFileLink;
+        }
         break;
       case 'title':
         imgpImagePath = '';
         break;
       case 'thumb':
       default:
-        imgpImagePath = imgpThumbLink;
+        if (presetThumbLink) {
+          imgpImagePath = presetThumbLink;
+        }
+        else {
+          imgpImagePath = imgpThumbLink;
+        }
         break;
     }
 
@@ -120,6 +145,14 @@ function imagepickerInsert(button) {
     }
     else {
       imgpImageElement = "<span>" + imgpImageTitle + "</span>";
+    }
+
+    // imagecache
+    if (imgpForm.presets_link) {
+      if (imgpForm.presets_link.value) {
+        imgpFileLink = imgpPresetFileLink.replace('__PRESET__', imgpForm.presets_link.value);
+        imgpPageLink = imgpPageLink + '/' + imgpForm.presets_link.value;
+      }
     }
 
     // Create a link HTML string

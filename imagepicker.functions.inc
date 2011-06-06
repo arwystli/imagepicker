@@ -79,6 +79,21 @@ function imagepicker_image_form($form, &$form_state, $img_id, $public = FALSE) {
   }
   $form['show'] = imagepicker_get_show_opts(imagepicker_variable_get('imagepicker_insert_defaults_show', imagepicker_variable_get('imagepicker_insert_defaults_show', 'full'), $user->uid));
   $form['link'] = imagepicker_get_link_opts(imagepicker_variable_get('imagepicker_insert_defaults_link', imagepicker_variable_get('imagepicker_insert_defaults_link', 'none'), $user->uid));
+
+  if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0)) {
+    $opts = image_style_options();
+    $form['presets_show'] = array(
+      '#type' => 'select',
+      '#title' => t('Presets for Show'),
+      '#options' => $opts,
+    );
+    $form['presets_link'] = array(
+      '#type' => 'select',
+      '#title' => t('Presets for Link'),
+      '#options' => $opts,
+    );
+  }
+
   $form['desc'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Description'),
@@ -199,7 +214,7 @@ function _imagepicker_image_delete($img_id, $account=FALSE, $src='iframe', $supp
  * @param numeric $img_id
  * @return string
  */
-function imagepicker_image_page($img_id) {
+function imagepicker_image_page($img_id, $preset = FALSE) {
 
   global $base_url;
   $content = '';
@@ -221,10 +236,22 @@ function imagepicker_image_page($img_id) {
     $account = user_load($img->uid);
     $link = imagepicker_variable_get('imagepicker_default_pagelink', imagepicker_variable_get('imagepicker_default_pagelink', 1), $account->uid);
     if ( variable_get('file_default_scheme', 'public') == 'private' ) {
-      $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
+      if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset) {
+        $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid), TRUE);
+        $imgpath = preg_replace("~__PRESET__~", $preset, $imgpath);
+      }
+      else {
+        $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid));
+      }
     }
     else {
-      $imgpath = imagepicker_get_path(TRUE, $img) . $img->img_name;
+      if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset) {
+        $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid), TRUE);
+        $imgpath = preg_replace("~__PRESET__~", $preset, $imgpath);
+      }
+      else {
+        $imgpath = imagepicker_get_path(TRUE, $img) . $img->img_name;
+      }
     }
     $content = theme('imagepicker_fullpage', array('img' => $img, 'source' => $imgpath , 'link' => $link));
   }
@@ -2865,12 +2892,16 @@ function _imagepicker_get_icon($name, $url = NULL, $attributes = array(), $exten
 function imagepicker_box() {
   $a1 = FALSE;
   $a2 = 0;
+  $a3 = FALSE;
 
   if (arg(1)) {
     $a1 = arg(1);
   }
   if (arg(2) && is_numeric(arg(2))) {
     $a2 = arg(2);
+  }
+  if (arg(3) && $a2) {
+    $a3 = arg(3);
   }
 
   if ($a1 == 'browse') {
@@ -2886,7 +2917,7 @@ function imagepicker_box() {
     $content = imagepicker_image_edit($a2);
   }
   elseif ($a1 == 'image') {
-    $content = imagepicker_image_page($a2);
+    $content = imagepicker_image_page($a2, $a3);
   }
   elseif ($a1 == 'upload_postlet') {
     $content = imagepicker_postlet_page();

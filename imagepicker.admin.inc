@@ -201,7 +201,7 @@ function imagepicker_settings_form($form, &$form_state, $info) {
   $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(imagepicker_variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem(imagepicker_variable_get('imagepicker_show_browse_search_form', 1));
 
-  if (module_exists('lightbox2') || module_exists('colorbox')) {
+  if (module_exists('lightbox2') || module_exists('colorbox') || module_exists('image')) {
     $form['imagepicker_module'] = array(
       '#type' => 'fieldset',
       '#title' => t('Module integration'),
@@ -226,6 +226,15 @@ function imagepicker_settings_form($form, &$form_state, $info) {
         '#description' => t('Setting this option will enable Colorbox in Imagepicker.'),
         '#return_value' => 1,
         '#default_value' => imagepicker_variable_get('imagepicker_colorbox_enable', 1),
+      );
+    }
+    if (module_exists('image')) {
+      $form['imagepicker_module']['imagepicker_image_enable'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable Image styles in Imagepicker'),
+        '#description' => t('Setting this option will enable Image styles in Imagepicker.'),
+        '#return_value' => 1,
+        '#default_value' => imagepicker_variable_get('imagepicker_image_enable', 0),
       );
     }
   }
@@ -665,6 +674,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
     imagepicker_variable_del('imagepicker_galleryblocks_enabled');
     imagepicker_variable_del('imagepicker_galleryblocks_howmany');
   }
+  if (! module_exists('image')) {
+    imagepicker_variable_del('imagepicker_image_enable');
+  }
 }
 
 function imagepicker_settings_form_submit($form, &$form_state) {
@@ -712,6 +724,9 @@ function imagepicker_settings_form_submit($form, &$form_state) {
     if (variable_get('colorbox_load', 0)) {
       imagepicker_variable_set('imagepicker_advanced_colorbox', $form_state['values']['imagepicker_advanced_colorbox']);
     }
+  }
+  if (isset($form_state['values']['imagepicker_image_enable'])) {
+    imagepicker_variable_set('imagepicker_image_enable', $form_state['values']['imagepicker_image_enable']);
   }
 
   imagepicker_variable_set('imagepicker_quota_enable', $form_state['values']['imagepicker_quota_enable']);

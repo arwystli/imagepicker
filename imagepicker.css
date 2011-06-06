@@ -143,3 +143,16 @@
   margin: 4px 0 8px 0;
 }
 
+#imgp_presets_control {
+  clear: both;
+}
+
+#imgp_presets_show_control {
+  width: 180px;
+  float: left;
+}
+
+#imgp_presets_link_control {
+  width: 180px;
+  float: left;
+}

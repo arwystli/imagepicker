@@ -246,6 +246,14 @@ function theme_imagepicker_iframe($variables) {
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
   if ($img) {
     global $user;
+
+    $presetfilelink = '';
+    $presetthumblink = '';
+    if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0)) {
+      $presetfilelink = imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img->name, 'uid' => $img->uid) : FALSE), TRUE);
+      $presetthumblink = imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img->name, 'uid' => $img->uid) : FALSE), TRUE);
+    }
+
     $img_title = check_plain($img->img_title);
     $settings = array(
       'imagepicker_iframe' => array(
@@ -253,7 +261,9 @@ function theme_imagepicker_iframe($variables) {
         'imgpImageTitle' => ($img_title ? addslashes($img_title) : ''),
         'imgpImageDesc' => preg_replace("/(\n|\r)/", '', nl2br($img->img_description)),
         'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img->name, 'uid' => $img->uid ) : FALSE) ),
+        'imgpPresetFileLink' => $presetfilelink,
         'imgpThumbLink' => imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img->name, 'uid' => $img->uid ) : FALSE)),
+        'imgpPresetThumbLink' => $presetthumblink,
         'imgpPageLink' => url('imagepicker/image/' . $img->img_id),
         'imgpTemplate' => imagepicker_get_insert_template(),
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
@@ -262,7 +272,7 @@ function theme_imagepicker_iframe($variables) {
         'default_align_show' => imagepicker_variable_get('imagepicker_default_align_show', imagepicker_variable_get('imagepicker_default_align_show', 1), $user->uid),
         'default_fleft' => imagepicker_variable_get('imagepicker_default_fleft', imagepicker_variable_get('imagepicker_default_fleft', 'style="float: left"'), $user->uid),
         'default_fright' => imagepicker_variable_get('imagepicker_default_fright', imagepicker_variable_get('imagepicker_default_fright', 'style="float: right"'), $user->uid),
-        'lightbox2_enable' => (module_exists('lightbox2') && variable_get('imagepicker_lightbox2_enable', 1)),
+        'lightbox2_enable' => (module_exists('lightbox2') && imagepicker_variable_get('imagepicker_lightbox2_enable', 1)),
         'lightbox2_insert' => imagepicker_variable_get('imagepicker_lightbox2_insert', imagepicker_variable_get('imagepicker_lightbox2_insert', 'lightbox'), $user->uid),
         'colorbox_enable' => (module_exists('colorbox') && imagepicker_variable_get('imagepicker_colorbox_enable', 0)),
         'colorbox_iframe' => (imagepicker_get_colorbox_perms()),
@@ -677,6 +687,12 @@ function theme_imagepicker_image_form($variables) {
   $form['desc']['#suffix'] = '</div>';
   $form['insert']['#prefix'] = '<div id="imgp_controls">';
   $form['delete']['#suffix'] = '</div>';
+  if (isset($form['presets_show'])) {
+    $form['presets_show']['#prefix'] = '<div id="imgp_presets_control"><div id="imgp_presets_show_control">';
+    $form['presets_show']['#suffix'] = '</div>';
+    $form['presets_link']['#prefix'] = '<div id="imgp_presets_link_control">';
+    $form['presets_link']['#suffix'] = '</div></div>';
+  }
   $output .= drupal_render_children($form);
   return $output;
 }
