@@ -285,13 +285,21 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
   drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
   if ($img) {
     global $user;
+    $presetfilelink = '';
+    $presetthumblink = '';
+    if (module_exists('imagecache') && variable_get('imagepicker_imagecache_enable', 0)) {
+      $presetfilelink = imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE), TRUE);
+      $presetthumblink = imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE), TRUE);
+    }
     $settings = array(
       'imagepicker_iframe' => array(
         'imgpImageAlt' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ),
         'imgpImageTitle' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : ''),
         'imgpImageDesc' => preg_replace("/(\n|\r)/", '', nl2br($img['img_description'])),
-        'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE) ),
+        'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)),
+        'imgpPresetFileLink' => $presetfilelink,
         'imgpThumbLink' => imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)),
+        'imgpPresetThumbLink' => $presetthumblink,
         'imgpPageLink' => url('imagepicker/image/'. $img['img_id']),
         'imgpTemplate' => imagepicker_get_insert_template(),
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
@@ -626,6 +634,12 @@ function theme_imagepicker_image_form($form) {
   $form['desc']['#suffix'] = '</div>';
   $form['insert']['#prefix'] = '<div id="imgp_controls">';
   $form['delete']['#suffix'] = '</div>';
+  if (isset($form['presets_show'])) {
+    $form['presets_show']['#prefix'] = '<div id="imgp_presets_control"><div id="imgp_presets_show_control">';
+    $form['presets_show']['#suffix'] = '</div>';
+    $form['presets_link']['#prefix'] = '<div id="imgp_presets_link_control">';
+    $form['presets_link']['#suffix'] = '</div></div>';
+  }
   $output .= drupal_render($form);
   return $output;
 }

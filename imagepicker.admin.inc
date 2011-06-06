@@ -202,7 +202,7 @@ function imagepicker_settings_form($form_state, $info) {
   $form['imagepicker_browser']['imagepicker_default_browser_order'] = imagepicker_browser_order_elem(variable_get('imagepicker_default_browser_order', 'img_id DESC'));
   $form['imagepicker_browser']['imagepicker_show_browse_search_form'] = imagepicker_show_browse_search_form_elem(variable_get('imagepicker_show_browse_search_form', 1));
 
-  if (module_exists('lightbox2') || module_exists('thickbox') || module_exists('colorbox')) {
+  if (module_exists('lightbox2') || module_exists('thickbox') || module_exists('colorbox') || module_exists('imagecache')) {
     $form['imagepicker_module'] = array(
       '#type' => 'fieldset',
       '#title' => t('Module integration'),
@@ -236,6 +236,15 @@ function imagepicker_settings_form($form_state, $info) {
         '#description' => t('Setting this option will enable Colorbox in Imagepicker.'),
         '#return_value' => 1,
         '#default_value' => variable_get('imagepicker_colorbox_enable', 0),
+      );
+    }
+    if (module_exists('imagecache')) {
+      $form['imagepicker_module']['imagepicker_imagecache_enable'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable Imagecache in Imagepicker'),
+        '#description' => t('Setting this option will enable Imagecache in Imagepicker.'),
+        '#return_value' => 1,
+        '#default_value' => variable_get('imagepicker_imagecache_enable', 0),
       );
     }
   }
@@ -678,6 +687,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! module_exists('colorbox')) {
     variable_del('imagepicker_galleryblocks_enabled');
     variable_del('imagepicker_galleryblocks_howmany');
+  }
+  if (! module_exists('imagecache')) {
+    variable_del('imagepicker_imagecache_enable');
   }
 }
 
