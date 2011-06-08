@@ -37,6 +37,8 @@ if (Drupal.jsEnabled) {
       var imgpImageElement;
       var imgpImageStyle;
       var imgpImageCss = 'class="imgp_img"';
+      var imgpLinkRel = '';
+      var imgpLinkHide = '';
       var imgpInsertion;
       var imgpImageAlt = Drupal.settings.imagepicker_iframe.imgpImageAlt;
       var imgpImageTitle = Drupal.settings.imagepicker_iframe.imgpImageTitle;
@@ -50,6 +52,7 @@ if (Drupal.jsEnabled) {
       var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
       var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
       var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
+      var use_relbox = Drupal.settings.imagepicker_iframe.use_relbox;
       var default_align_show = Drupal.settings.imagepicker_iframe.default_align_show;
       var lightbox2_insert = Drupal.settings.imagepicker_iframe.lightbox2_insert;
       var fleft = Drupal.settings.imagepicker_iframe.default_fleft;
@@ -59,21 +62,31 @@ if (Drupal.jsEnabled) {
 
       // Get show value
       for (i = 0; i < imgpForm.show.length; i++) {
-        if(imgpForm.show[i].checked) {
+        if (imgpForm.show[i].checked) {
           imgpShow = imgpForm.show[i].value;
         }
       }
       // Get link value
       for (i = 0; i < imgpForm.link.length; i++) {
-        if(imgpForm.link[i].checked) {
+        if (imgpForm.link[i].checked) {
           imgpLink = imgpForm.link[i].value;
         }
       }
-
+      // cssbox
       if (use_cssbox) {
         // get css value
-        if(imgpForm.cssbox.value) {
+        if (imgpForm.cssbox.value) {
           imgpImageCss = imgpForm.cssbox.value;
+        }
+      }
+      // relbox
+      if (use_relbox) {
+        // get rel value
+        if (imgpForm.relbox.value) {
+          imgpLinkRel = "rel='" + imgpForm.relbox.value + "'";
+          if (imgpForm.linkhide.checked) {
+            imgpLinkHide = "js-hide";
+          }
         }
       }
       // alignment settings
@@ -169,7 +182,7 @@ if (Drupal.jsEnabled) {
           imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='thickbox' >" + imgpImageElement + "</a>";
           break;
         case 'colorbox':
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='colorbox' >" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
           break;
         case 'file':
         default:

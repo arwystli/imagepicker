@@ -113,6 +113,25 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
       '#description' => t('You can add additional css here, eg. class="myclass". This will be inserted into the image tag'),
     );
   }
+  // rel
+  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)) {
+    if ((variable_get('imagepicker_use_relbox', 0)
+      && ! isset($user->imagepicker_use_relbox))
+      || ((variable_get('imagepicker_use_relbox', 0)
+      && isset($user->imagepicker_use_relbox) && $user->imagepicker_use_relbox))) {
+      $form['relbox'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Add rel attribute'),
+        '#size' => 20,
+        '#description' => t('You can add a rel tag here, it will be added to the link when colorbox is selected. Useful for creating galleries. No spaces.'),
+      );
+      $form['linkhide'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide this link'),
+      '#description' => t('Use this on subsequent links added to a gallery.'),
+      );
+    }
+  }
 
   $form['insert'] = array(
     '#type' => 'button',

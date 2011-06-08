@@ -108,6 +108,16 @@ function imagepicker_settings_form($form_state, $info) {
     '#return_value' => 1,
     '#default_value' => variable_get('imagepicker_use_cssbox', 0),
   );
+  // rel
+  if (module_exists('colorbox') && variable_get('imagepicker_colorbox_enable', 0)) {
+    $form['imagepicker_settings']['imagepicker_use_relbox'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Provide a rel textfield'),
+      '#description' => t('Setting this option will provide a textfield where a rel attribute can be added. Useful for creating galleries.'),
+      '#return_value' => 1,
+      '#default_value' => variable_get('imagepicker_use_relbox', 0),
+    );
+  }
   $form['imagepicker_settings']['imagepicker_use_icons'] = array(
     '#type' => 'checkbox',
     '#title' => t('Icons in tables'),
