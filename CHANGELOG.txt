@@ -1,3 +1,7 @@
+Image Picker for D7 in 7.x-1.x, 20011-06-08
+------------------------------------
+by hutch, added rel for colorbox support
+
 Image Picker for D7 in 7.x-1.x, 20011-06-06
 ------------------------------------
 by hutch, added image styles support

@@ -109,6 +109,16 @@ function imagepicker_settings_form($form, &$form_state, $info) {
     '#return_value' => 1,
     '#default_value' => imagepicker_variable_get('imagepicker_use_cssbox', 0),
   );
+  // rel
+  if (module_exists('colorbox') && imagepicker_variable_get('imagepicker_colorbox_enable', 0)) {
+    $form['imagepicker_settings']['imagepicker_use_relbox'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Provide a rel textfield'),
+      '#description' => t('Setting this option will provide a textfield where a rel attribute can be added. Useful for creating galleries.'),
+      '#return_value' => 1,
+      '#default_value' => imagepicker_variable_get('imagepicker_use_relbox', 0),
+    );
+  }
   $form['imagepicker_settings']['imagepicker_use_icons'] = array(
     '#type' => 'checkbox',
     '#title' => t('Icons in tables'),
@@ -724,7 +734,9 @@ function imagepicker_settings_form_submit($form, &$form_state) {
     if (variable_get('colorbox_load', 0)) {
       imagepicker_variable_set('imagepicker_advanced_colorbox', $form_state['values']['imagepicker_advanced_colorbox']);
     }
+    imagepicker_variable_set('imagepicker_use_relbox', $form_state['values']['imagepicker_use_relbox']);
   }
+
   if (isset($form_state['values']['imagepicker_image_enable'])) {
     imagepicker_variable_set('imagepicker_image_enable', $form_state['values']['imagepicker_image_enable']);
   }

@@ -269,6 +269,7 @@ function theme_imagepicker_iframe($variables) {
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => imagepicker_variable_get('imagepicker_use_cssbox', imagepicker_variable_get('imagepicker_use_cssbox', 0), $user->uid),
+        'use_relbox' => imagepicker_variable_get('imagepicker_use_relbox', imagepicker_variable_get('imagepicker_use_relbox', 0), $user->uid),
         'default_align_show' => imagepicker_variable_get('imagepicker_default_align_show', imagepicker_variable_get('imagepicker_default_align_show', 1), $user->uid),
         'default_fleft' => imagepicker_variable_get('imagepicker_default_fleft', imagepicker_variable_get('imagepicker_default_fleft', 'style="float: left"'), $user->uid),
         'default_fright' => imagepicker_variable_get('imagepicker_default_fright', imagepicker_variable_get('imagepicker_default_fright', 'style="float: right"'), $user->uid),
@@ -693,6 +694,13 @@ function theme_imagepicker_image_form($variables) {
     $form['presets_link']['#prefix'] = '<div id="imgp_presets_link_control">';
     $form['presets_link']['#suffix'] = '</div></div>';
   }
+  if (isset($form['relbox'])) {
+    $form['relbox']['#prefix'] = '<div id="imgp_relbox_control"><div id="imgp_relbox_show_control">';
+    $form['relbox']['#suffix'] = '</div>';
+    $form['linkhide']['#prefix'] = '<div id="imgp_relbox_link_control">';
+    $form['linkhide']['#suffix'] = '</div></div>';
+  }
+
   $output .= drupal_render_children($form);
   return $output;
 }
