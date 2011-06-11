@@ -1538,6 +1538,16 @@ function imagepicker_get_enabled_group($account = FALSE) {
   return FALSE;
 }
 
+function imagepicker_group_exists($gid) {
+  $result = db_query("SELECT gid FROM {imagepicker_user_groups} WHERE gid = :gid", array(':gid' => $gid));
+  if ($row = $result->fetchAssoc()) {
+    if ($row['gid']) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 function imagepicker_browse_groups_form($form, &$form_state, $account = FALSE) {
 
   if ($account) {
@@ -1551,9 +1561,19 @@ function imagepicker_browse_groups_form($form, &$form_state, $account = FALSE) {
   $grouplist = imagepicker_get_grouplist($user);
   if ($account) {
     $enabledlist = imagepicker_variable_get('imagepicker_currentgroup', 0);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      imagepicker_variable_del("imagepicker_currentgroup");
+      $enabledlist = '';
+    }
   }
   else {
     $enabledlist = imagepicker_get_enabled_group($user);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      imagepicker_variable_del("imagepicker_currentgroup", $user->uid);
+      $enabledlist = '';
+    }
   }
 
   $form['gid'] = array(
@@ -1631,9 +1651,19 @@ function imagepicker_browse_public_groups_form($form, &$form_state, $account = F
   $grouplist = imagepicker_get_public_grouplist($user, $admin);
   if ($admin) {
     $enabledlist = imagepicker_variable_get('imagepicker_public_currentgroup', 0);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      imagepicker_variable_del("imagepicker_public_currentgroup");
+      $enabledlist = '';
+    }
   }
   else {
     $enabledlist = imagepicker_variable_get('imagepicker_public_currentgroup', 0, $user->uid);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      imagepicker_variable_del("imagepicker_public_currentgroup", $user->uid);
+      $enabledlist = '';
+    }
   }
 
   $form['gid'] = array(

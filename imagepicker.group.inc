@@ -224,6 +224,14 @@ function imagepicker_delete_user_group($gid) {
   if ( db_delete('imagepicker_user_groups')->condition('gid', $gid)->execute()
     && db_delete('imagepicker_group_images')->condition('gid', $gid)->execute() ) {
     drupal_set_message(t('Group was successfully deleted'));
+    $pgid = imagepicker_variable_get('imagepicker_public_currentgroup', 0);
+    if($pgid == $gid) {
+      imagepicker_variable_del("imagepicker_public_currentgroup");
+    }
+    $pgid = imagepicker_variable_get('imagepicker_currentgroup', 0);
+    if($pgid == $gid) {
+      imagepicker_variable_del("imagepicker_currentgroup");
+    }
   }
   else {
     drupal_set_message(t('Error while trying to delete group.'));
