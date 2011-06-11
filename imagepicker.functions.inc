@@ -918,10 +918,18 @@ function _imagepicker_browse_public($src="iframe", $range=1, $label="") {
   if (_imagepicker_has_public_groups($user, ($src=='admin' ? TRUE : FALSE))) {
     if ($src == 'admin') {
       $gid = variable_get('imagepicker_public_currentgroup', 0);
+      if (! imagepicker_group_exists($gid)) {
+        variable_del("imagepicker_public_currentgroup");
+        $gid = 0;
+      }
     }
     else {
       // get the current users setting
       $gid = (isset($user->imagepicker_public_currentgroup) ? $user->imagepicker_public_currentgroup : 0);
+      if (! imagepicker_group_exists($gid)) {
+        $user->imagepicker_public_currentgroup = NULL;
+        $gid = 0;
+      }
     }
   }
 
@@ -1536,8 +1544,14 @@ function imagepicker_get_enabled_group($account = FALSE) {
   return FALSE;
 }
 
-
-
+function imagepicker_group_exists($gid) {
+  $result = db_query("SELECT gid FROM {imagepicker_user_groups} WHERE gid = %d", array($gid));
+  $row = db_fetch_array($result);
+  if ($row['gid']) {
+    return TRUE;
+  }
+  return FALSE;
+}
 
 /**
  * all the groups for the current user which have images attached
@@ -1553,9 +1567,19 @@ function imagepicker_browse_groups_form(&$form_state, $account = FALSE) {
   $grouplist = imagepicker_get_grouplist($user);
   if ($account) {
     $enabledlist = variable_get('imagepicker_currentgroup', 0);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      variable_del("imagepicker_currentgroup");
+      $enabledlist = '';
+    }
   }
   else {
     $enabledlist = imagepicker_get_enabled_group($user);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      $user->imagepicker_currentgroup = NULL;
+      $enabledlist = '';
+    }
   }
 
   $form['gid'] = array(
@@ -1628,9 +1652,19 @@ function imagepicker_browse_public_groups_form(&$form_state, $account = FALSE, $
   $grouplist = imagepicker_get_public_grouplist($user, $admin);
   if ($admin) {
     $enabledlist = variable_get('imagepicker_public_currentgroup', 0);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      variable_del("imagepicker_public_currentgroup");
+      $enabledlist = '';
+    }
   }
   else {
     $enabledlist = (isset($user->imagepicker_public_currentgroup) ? $user->imagepicker_public_currentgroup : 0);
+    // check it
+    if (! imagepicker_group_exists($enabledlist)) {
+      $user->imagepicker_public_currentgroup = NULL;
+      $enabledlist = '';
+    }
   }
 
   $form['gid'] = array(
