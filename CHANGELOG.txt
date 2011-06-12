@@ -1,3 +1,7 @@
+Image Picker for D7 in 7.x-1.x, 20011-06-12
+------------------------------------
+by hutch, fixed jpeg quality bug, #1036216
+
 Image Picker for D7 in 7.x-1.x, 20011-06-11
 ------------------------------------
 by hutch, fixed currentgroup bug, #1185406
