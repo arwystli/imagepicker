@@ -543,7 +543,7 @@ function imagepicker_access_use_group() {
  */
 function imagepicker_block($op = 'list', $delta = 0, $edit = array()) {
 
-  if(variable_get('imagepicker_galleryblocks_enabled', 0) && module_exists('colorbox')) {
+  if (variable_get('imagepicker_galleryblocks_enabled', 0) && module_exists('colorbox')) {
     $howmany = variable_get('imagepicker_galleryblocks_howmany', 1);
     switch ($op) {
       case 'list':
@@ -812,12 +812,12 @@ function imagepicker_get_user_group($gid, $obj=TRUE) {
 // for blocks
 function imagepicker_get_all_groups($override = NULL) {
   $public = FALSE;
-   if ($override == NULL) {
+  if ($override == NULL) {
     $public = variable_get('imagepicker_galleryblocks_public', 0);
-   }
-   else {
+  }
+  else {
     $public = $override;
-   }
+  }
   $data = FALSE;
   $sql = "SELECT gid, group_name FROM {imagepicker_user_groups}";
   if ($public) {
