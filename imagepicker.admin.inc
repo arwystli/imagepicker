@@ -540,14 +540,14 @@ function imagepicker_settings_form($form, &$form_state, $info) {
         '#options' => $level_options,
         '#description' => t('Select how many blocks you need and click on the Save Configuration button to make the form available.'),
       );
-      $form['imagepicker_blocks']['message'] = array('#markup' => t('You have %c available.', array('%c' => format_plural($totgroups, '1 group', '@count groups'))),);
+      $form['imagepicker_blocks']['message'] = array('#markup' => t('You have %c available.', array('%c' => format_plural($totgroups, '1 group', '@count groups'))));
     }
     else {
       $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany'] = array(
         '#type' => 'value',
         '#value' => 0,
       );
-      $form['imagepicker_blocks']['message'] = array('#markup' => t('You need to add some groups.'),);
+      $form['imagepicker_blocks']['message'] = array('#markup' => t('You need to add some groups.'));
     }
     $form['imagepicker_blocks']['imagepicker_galleryblocks_public'] = array(
       '#type' => 'checkbox',
@@ -565,15 +565,15 @@ function imagepicker_settings_form($form, &$form_state, $info) {
         '#description' => t('Blocks should be configured under Structure > Blocks.'),
       );
       for ($i = 1; $i <= imagepicker_variable_get('imagepicker_galleryblocks_howmany', 1); $i++) {
-        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset']['imagepicker_galleryblocks_enable_'. $i] = array(
+        $form['imagepicker_blocks']['imagepicker_galleryblocks_fieldset']['imagepicker_galleryblocks_enable_' . $i] = array(
           '#type' => 'checkbox',
           '#title' => t('Enable Gallery block !i', array('!i' => $i)),
           '#return_value' => 1,
-          '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_enable_'. $i, 1),
+          '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_enable_' . $i, 1),
         );
       }
     }
-    $form['imagepicker_blocks']['close'] = array('#markup' => '',);
+    $form['imagepicker_blocks']['close'] = array('#markup' => '');
   }
 
   $form = system_settings_form($form);
@@ -646,14 +646,29 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
     form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
-  if (isset($form_state['values']['imagepicker_watermark_enable']) && $form_state['values']['imagepicker_watermark_enable']) {
-    if (! empty($form_state['values']['imagepicker_watermark_image'])) {
-      $file = $form_state['values']['imagepicker_watermark_image'];
-      if (! file_exists($file)) {
-        form_set_error('imagepicker_watermark_image', t('This file does not exist or has invalid path: %file.', array('%file' => $file)));
+
+  // watermark settings
+  if (imagepicker_image_check_functions()) {
+    if (isset($form_state['values']['imagepicker_watermark_enable']) && $form_state['values']['imagepicker_watermark_enable']) {
+      if (! empty($form_state['values']['imagepicker_watermark_image']) && ! file_exists($form_state['values']['imagepicker_watermark_image'])) {
+        form_set_error('imagepicker_watermark_image', t('This file does not exist or has invalid path: %file.', array('%file' => $form_state['values']['imagepicker_watermark_image'])));
+      }
+      if ($form_state['values']['imagepicker_watermark_scaling']) {
+        if (! is_numeric($form_state['values']['imagepicker_watermark_scaling_percentage']) || $form_state['values']['imagepicker_watermark_scaling_percentage'] <= 0 || $form_state['values']['imagepicker_watermark_scaling_percentage'] >= 100) {
+          form_set_error('imagepicker_watermark_scaling_percentage', t('Please enter a number between 1 and 100 for scaling percentage.'));
+        }
+        elseif ($form_state['values']['imagepicker_watermark_scaling_percentage'] < 10 || ($form_state['values']['imagepicker_watermark_min_width'] < 50 && $form_state['values']['imagepicker_watermark_min_width'] > 0)) {
+          // we do not disable scaling for low values, e.g. if the user chooses to scale down to 1%, we just warn
+          drupal_set_message(t('Warning: Scaling is set to @percentage%, minimum width is only @min_width px. This may result in very small or almost invisible watermarks. It is recommended to check twice that an adequate minimum width has been set.',
+            array('@percentage' => $form_state['values']['imagepicker_watermark_scaling_percentage'], '@min_width' => $form_state['values']['imagepicker_watermark_min_width'])));
+        }
+        if (intval($form_state['values']['imagepicker_watermark_min_width']) < 0) {
+          form_set_error('imagepicker_watermark_min_width', t('Please enter a positive number for minimum width.'));
+        }
       }
     }
   }
+
   if (! empty($form_state['values']['imagepicker_exifinfo_external']) && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
     form_set_error('imagepicker_exifinfo_external', t('file does not exist or is not executable'));
   }
@@ -1104,7 +1119,7 @@ function imagepicker_admin_orphans_form($form_state) {
       '#type' => 'textfield',
       '#title' => t('Reallocate to'),
       '#description' => t('Select a user who will own these images.'),
-      '#autocomplete_path' => IMAGEPICKER_ADMIN_PATH .'/orphans/autocomplete',
+      '#autocomplete_path' => IMAGEPICKER_ADMIN_PATH . '/orphans/autocomplete',
       '#default_value' => '',
       '#maxlength' => 30,
       '#size' => 25,
@@ -1226,7 +1241,7 @@ function imagepicker_reallocate_image($img_id, $old_uid, $new_uid) {
     $source_thumbsdir = $source . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img->img_name;
     $source_browserdir = $source . IMAGEPICKER_BROWSER_DIR . DIRECTORY_SEPARATOR . $img->img_name;
     $source_origdir = $source . IMAGEPICKER_ORIG_DIR . DIRECTORY_SEPARATOR . $img->img_name;
-    $source = $source  . $img->img_name;
+    $source = $source . $img->img_name;
 
     $new_user_obj = user_load($new_uid);
     $new_userdir = array('uid' => $new_user_obj->uid);

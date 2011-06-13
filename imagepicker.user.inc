@@ -306,6 +306,14 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
       '#options' =>  imagepicker_watermark_opts(),
       '#title' => t('Select watermark position'),
     );
+    $form['imagepicker_watermark']['imagepicker_watermark_perc'] = array(
+      '#type' => 'textfield',
+      '#title' => t('JPEG quality'),
+      '#size' => 10,
+      '#maxlength' => 3,
+      '#default_value' => (imagepicker_variable_get('imagepicker_watermark_perc', variable_get('image_jpeg_quality', 75), $user->uid)),
+      '#description' => t('Define the image quality for JPEG manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
+    );
     $form['imagepicker_watermark']['imagepicker_watermark_use'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use watermark by default'),
@@ -426,7 +434,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
       form_set_error('imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
     }
   }
-  // also used by the imagepicker admin form
+
   if ( isset($form_state['values']['imagepicker_watermark_image']) && $form_state['values']['imagepicker_watermark_image'] ) {
     $wdir = imagepicker_get_watermarks_dir($user);
     $file = $wdir . DIRECTORY_SEPARATOR . $form_state['values']['imagepicker_watermark_image'];
@@ -437,7 +445,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
       if (! is_numeric($form_state['values']['imagepicker_watermark_scaling_percentage']) || $form_state['values']['imagepicker_watermark_scaling_percentage'] <= 0 || $form_state['values']['imagepicker_watermark_scaling_percentage'] >= 100) {
         form_set_error('imagepicker_watermark_scaling_percentage', t('Please enter a number between 1 and 100 for scaling percentage.'));
       }
-      elseif ($form_state['values']['imagepicker_watermark_scaling_percentage'] < 10 || $form_state['values']['imagepicker_watermark_min_width'] < 50) {
+      elseif ($form_state['values']['imagepicker_watermark_scaling_percentage'] < 10 || ($form_state['values']['imagepicker_watermark_min_width'] < 50 && $form_state['values']['imagepicker_watermark_min_width'] > 0)) {
         // we do not disable scaling for low values, e.g. if the user chooses to scale down to 1%, we just warn
         drupal_set_message(t('Warning: Scaling is set to @percentage%, minimum width is only @min_width px. This may result in very small or almost invisible watermarks. It is recommended to check twice that an adequate minimum width has been set.',
           array('@percentage' => $form_state['values']['imagepicker_watermark_scaling_percentage'], '@min_width' => $form_state['values']['imagepicker_watermark_min_width'])));
@@ -445,6 +453,9 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
       if (intval($form_state['values']['imagepicker_watermark_min_width']) < 0) {
         form_set_error('imagepicker_watermark_min_width', t('Please enter a positive number for minimum width.'));
       }
+    }
+    if (! is_numeric($form_state['values']['imagepicker_watermark_perc']) || $form_state['values']['imagepicker_watermark_perc'] < 0 || $form_state['values']['imagepicker_watermark_perc'] > 100) {
+      form_set_error('imagepicker_watermark_perc', t("JPEG quality value should be an integer between 0 and 100."));
     }
   }
 
@@ -488,18 +499,18 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   if ($file) {
     $form_state['values']['imagepicker_watermark_image'] = $file;
   }
-###
+
   if (isset($form_state['values']['imagepicker_watermark_image'])) {
     imagepicker_variable_set('imagepicker_watermark_enable', $form_state['values']['imagepicker_watermark_enable'], $user->uid);
     imagepicker_variable_set('imagepicker_watermark_image', $form_state['values']['imagepicker_watermark_image'], $user->uid);
     imagepicker_variable_set('imagepicker_watermark_position', $form_state['values']['imagepicker_watermark_position'], $user->uid);
     imagepicker_variable_set('imagepicker_watermark_use', $form_state['values']['imagepicker_watermark_use'], $user->uid);
+    imagepicker_variable_set('imagepicker_watermark_perc', $form_state['values']['imagepicker_watermark_perc'], $user->uid);
     if ($form_state['values']['imagepicker_watermark_scaling']) {
       imagepicker_variable_set('imagepicker_watermark_scaling', $form_state['values']['imagepicker_watermark_scaling'], $user->uid);
       imagepicker_variable_set('imagepicker_watermark_scaling_percentage', $form_state['values']['imagepicker_watermark_scaling_percentage'], $user->uid);
       imagepicker_variable_set('imagepicker_watermark_min_width', $form_state['values']['imagepicker_watermark_min_width'], $user->uid);
     }
-
   }
   else {
     imagepicker_variable_del('imagepicker_watermark_image', $user->uid);
@@ -549,6 +560,7 @@ function imagepicker_user_config_form_reset($form, &$form_state) {
   imagepicker_variable_del('imagepicker_watermark_image', $user->uid);
   imagepicker_variable_del('imagepicker_watermark_position', $user->uid);
   imagepicker_variable_del('imagepicker_watermark_use', $user->uid);
+  imagepicker_variable_del('imagepicker_watermark_perc', $user->uid);
   imagepicker_variable_del('imagepicker_watermark_scaling', $user->uid);
   imagepicker_variable_del('imagepicker_watermark_scaling_percentage', $user->uid);
   imagepicker_variable_del('imagepicker_watermark_min_width', $user->uid);

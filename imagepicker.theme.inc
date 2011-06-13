@@ -566,8 +566,8 @@ function theme_imagepicker_upload_form($variables) {
 
   $form['maxmsg']['#markup'] = '<div class="messages">' . t('Browse your computer for up to !c, Max %max Total', array('!c' => format_plural($max_uploads, '1 Image', '@count Images'), '%max' => $max_filesize) ) . '</div>';
   for ($ct = 1; $ct <= $max_uploads; $ct++) {
-    $form['file_upload_'. $ct]['#prefix'] = "<div id='imagepicker_upload_link_wrapper_$ct'>";
-    $form['description_'. $ct]['#suffix'] = '</div>';
+    $form['file_upload_' . $ct]['#prefix'] = "<div id='imagepicker_upload_link_wrapper_$ct'>";
+    $form['description_' . $ct]['#suffix'] = '</div>';
     if (isset($form['link_' . $ct])) {
       $form['link_' . $ct]['#markup'] = "<div class='imagepicker_upload_link' id='imagepicker_upload_link_$ct' style='display:none'>" . l(t('Upload another'), '', array(
         'attributes' => array(
@@ -769,21 +769,21 @@ function theme_imagepicker_settings_form($variables) {
   $output = '';
 
   $jshide = ($form['imagepicker_import']['imagepicker_import_enabled']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';
+  $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"' . $jshide . '>';
   $form['imagepicker_import']['imagepicker_import_max']['#suffix'] = '</div>';
 
   if (isset($form['imagepicker_blocks'])) {
     $jshide = ($form['imagepicker_blocks']['imagepicker_galleryblocks_enabled']['#default_value'] ? '' : ' class="js-hide"');
-    $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany']['#prefix'] = '<div id="wrap-imagepicker-blocks"'. $jshide .'>';
+    $form['imagepicker_blocks']['imagepicker_galleryblocks_howmany']['#prefix'] = '<div id="wrap-imagepicker-blocks"' . $jshide . '>';
     $form['imagepicker_blocks']['close']['#suffix'] = '</div>';
   }
 
   $jshide = ($form['imagepicker_groups']['imagepicker_groups_enabled']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"'. $jshide .'>';
+  $form['imagepicker_groups']['imagepicker_public_enabled']['#prefix'] = '<div id="wrap-imagepicker-groups"' . $jshide . '>';
   $form['imagepicker_groups']['imagepicker_groups_in_upload_enabled']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_progress']['imagepicker_upload_progress_enabled']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress"'. $jshide .'>';
+  $form['imagepicker_progress']['imagepicker_upload_progress_delay']['#prefix'] = '<div id="wrap-imagepicker-upload-progress"' . $jshide . '>';
 
   if (isset($form['imagepicker_progress']['imagepicker_uploadprogress'])) {
     $form['imagepicker_progress']['imagepicker_uploadprogress']['#suffix'] = '</div>';
@@ -793,12 +793,12 @@ function theme_imagepicker_settings_form($variables) {
   }
 
   $jshide = ($form['imagepicker_quotas']['imagepicker_quota_byrole']['#default_value'] ? '' : ' class="js-hide"');
-  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role"'. $jshide .'>';
+  $form['imagepicker_quotas']['imagepicker_quota_role']['#prefix'] = '<div id="wrap-imagepicker-quota-role"' . $jshide . '>';
   $form['imagepicker_quotas']['imagepicker_quota_role']['#suffix'] = '</div>';
 
   if (isset($form['imagepicker_watermark'])) {
     $jshide = ($form['imagepicker_watermark']['imagepicker_watermark_enable']['#default_value'] ? '' : ' class="js-hide"');
-    $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div id="wrap-imagepicker-watermark"'. $jshide .'>';
+    $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div id="wrap-imagepicker-watermark"' . $jshide . '>';
     $form['imagepicker_watermark']['imagepicker_watermark_scale']['#suffix'] = '</div>';
   }
   if (isset($form['imagepicker_settings']['imagepicker_admin_message'])) {

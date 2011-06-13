@@ -2044,10 +2044,10 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
       array(t('Private groups') . ": ", $nopublicgroupcount, t('Private images') . ": ", $nopubliccount),
       array( '', '', t('Grouped images') . ": ", $totcount),
       array( '', '', t('Ungrouped images') . ": ", $allcount-$totcount),
-      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
+      array(($groupusercount ? t('Group Users') . ": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used') . ": ", $bytecount),
     );
     if (!$account) {
-      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') . ": " : ''), ($usercount ? $usercount : ''), '', '')));
     }
   }
   else {
@@ -2055,10 +2055,10 @@ function imagepicker_group_stats($account = FALSE, $label = '') {
       array(t('Groups') . ": ", $groupcount, t('Images') . ": ", $allcount),
       array( '', '', t('Grouped images') . ": ", $totcount),
       array( '', '', t('Ungrouped images') . ": ", $allcount-$totcount),
-      array(($groupusercount ? t('Group Users') .": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used')  .": ", $bytecount),
+      array(($groupusercount ? t('Group Users') . ": " : ''), ($groupusercount ? $groupusercount : ''), t('Space used') . ": ", $bytecount),
     );
     if (!$account) {
-      $rows = array_merge($rows, array(array(($usercount ? t('All Users') .": " : ''), ($usercount ? $usercount : ''), '', '')));
+      $rows = array_merge($rows, array(array(($usercount ? t('All Users') . ": " : ''), ($usercount ? $usercount : ''), '', '')));
     }
   }
   return theme('imagepicker_stats', array('header' => $header, 'rows' => $rows, 'message' => t('No Stats found'), 'pref' => '<div class="imgp_groups_info">', 'suff' => '</div>', 'label' => $label));

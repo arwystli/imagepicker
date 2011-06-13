@@ -36,7 +36,7 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
   // multiple uploads
   $max_uploads = imagepicker_variable_get('imagepicker_max_uploads', 1);
   $settings = array('imagepicker_upload_link' => array('max_uploads' => $max_uploads));
-  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_upload_link.js');
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_upload_link.js');
   drupal_add_js($settings, 'setting');
 
   if ($account) {
@@ -88,6 +88,14 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
           '#title' => t('Use watermark'),
           '#description' => ($max_uploads == 1 ? t('Use watermark on this image.') : t('Use watermark on Image file %ct', array('%ct' => $ct))),
           '#default_value' => imagepicker_variable_get('imagepicker_watermark_use', 0, $user->uid),
+        );
+        $form['watermark_perc_' . $ct] = array(
+          '#type' => 'textfield',
+          '#title' => t('JPEG quality'),
+          '#size' => 10,
+          '#maxlength' => 3,
+          '#default_value' => (imagepicker_variable_get('imagepicker_watermark_perc', variable_get('image_jpeg_quality', 75), $user->uid)),
+          '#description' => t('Define the image quality for JPEG manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
         );
       }
       elseif (imagepicker_variable_get('imagepicker_watermark_image', '')) {
@@ -191,6 +199,11 @@ function imagepicker_upload_form_validate($form, &$form_state) {
           form_set_error($name, t("Scale value should be an integer between 1 and 999 or leave it empty if you don't want to scale your image."));
         }
       }
+      if ($name == 'watermark_perc_' . $ct) {
+        if (! is_numeric($value) || $value < 0 || $value > 100) {
+          form_set_error($name, t("JPEG quality value should be an integer between 0 and 100."));
+        }
+      }
     }
   }
 }
@@ -256,7 +269,8 @@ function imagepicker_upload_form_submit($form, &$form_state) {
             if (!$scaleto && $imagemoved || $scaleto && $imagescaled) {
               // if watermark is enabled just apply to destdir image, not orig or the thumbs
               if ( isset($form_state['values']['watermark_' . $ct]) && $form_state['values']['watermark_' . $ct] ) {
-                if (! imagepicker_watermark_process($destdir . $file, $user)) {
+                $perc = (isset($form_state['values']['watermark_perc' . $ct]) ? $form_state['values']['watermark_perc' . $ct] : variable_get('image_jpeg_quality', 75));
+                if (! imagepicker_watermark_process($destdir . $file, $user, $perc)) {
                   drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
                 }
               }
@@ -288,7 +302,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
                   file_unmanaged_delete($origdir . $file);
                   file_unmanaged_delete($destdir . $file);
                   $errormsg = t('Error while saving information to database for uploaded image.');
-               }
+                }
               }
               else {
                 $errormsg = t('Error while creating a thumbnail for uploaded image.');
@@ -314,13 +328,13 @@ function imagepicker_upload_form_submit($form, &$form_state) {
   if ($success) {
     drupal_set_message(t('%c successfully uploaded.', array('%c' => format_plural($success, '1 image', '@count images'))));
     if (isset($form_state['values']['admin'])) {
-      $outpath = IMAGEPICKER_ADMIN_PATH .'/images/user/'. $user->uid .'/browse';
+      $outpath = IMAGEPICKER_ADMIN_PATH . '/images/user/' . $user->uid . '/browse';
     }
     elseif (isset($form_state['values']['account'])) {
-      $outpath = 'user/'. $user->uid .'/imagepicker/images/browse';
+      $outpath = 'user/' . $user->uid . '/imagepicker/images/browse';
     }
     else {
-      $outpath = 'imagepicker/browse'. ($success == 1 ? '/' . $nextimgid : '');
+      $outpath = 'imagepicker/browse' . ($success == 1 ? '/' . $nextimgid : '');
     }
     drupal_goto($outpath);
   }
@@ -344,7 +358,7 @@ function imagepicker_copy_uploaded_file($destination, $name) {
       $destination .= $file;
       $file_moved = imagepicker_file_unmanaged_move($newsrc, IMAGEPICKER_FILE_SCHEME . $destination);
       // might be renamed if a file of same name already exists
-      $file_moved = substr($file_moved, strrpos($file_moved, DIRECTORY_SEPARATOR)+1);
+      $file_moved = drupal_substr($file_moved, strrpos($file_moved, DIRECTORY_SEPARATOR)+1);
       return $file_moved;
     }
   }
@@ -423,7 +437,7 @@ function imagepicker_upload_progress_get_script($delay) {
     );
   }
 
-  drupal_add_js(IMAGEPICKER_PATH .'/imagepicker_upload.js');
+  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_upload.js');
   drupal_add_js($settings, 'setting');
 }
 
