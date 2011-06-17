@@ -238,6 +238,7 @@ function imagepicker_settings_form($form, &$form_state, $info) {
         '#default_value' => imagepicker_variable_get('imagepicker_colorbox_enable', 1),
       );
     }
+    // image module support
     if (module_exists('image')) {
       $form['imagepicker_module']['imagepicker_image_enable'] = array(
         '#type' => 'checkbox',
@@ -245,6 +246,19 @@ function imagepicker_settings_form($form, &$form_state, $info) {
         '#description' => t('Setting this option will enable Image styles in Imagepicker.'),
         '#return_value' => 1,
         '#default_value' => imagepicker_variable_get('imagepicker_image_enable', 0),
+      );
+      $opts = image_style_options();
+      $form['imagepicker_module']['imagepicker_image_default_show'] = array(
+        '#type' => 'select',
+        '#title' => t('Default Image Style for show'),
+        '#options' => $opts,
+        '#default_value' => imagepicker_variable_get('imagepicker_image_default_show', ''),
+      );
+      $form['imagepicker_module']['imagepicker_image_default_link'] = array(
+        '#type' => 'select',
+        '#title' => t('Default Image Style for link'),
+        '#options' => $opts,
+        '#default_value' => imagepicker_variable_get('imagepicker_image_default_link', ''),
       );
     }
   }
@@ -701,6 +715,8 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   }
   if (! module_exists('image')) {
     imagepicker_variable_del('imagepicker_image_enable');
+    imagepicker_variable_del('imagepicker_image_default_link');
+    imagepicker_variable_del('imagepicker_image_default_show');
   }
 }
 
@@ -754,6 +770,8 @@ function imagepicker_settings_form_submit($form, &$form_state) {
 
   if (isset($form_state['values']['imagepicker_image_enable'])) {
     imagepicker_variable_set('imagepicker_image_enable', $form_state['values']['imagepicker_image_enable']);
+    imagepicker_variable_set('imagepicker_image_default_link', $form_state['values']['imagepicker_image_default_link']);
+    imagepicker_variable_set('imagepicker_image_default_show', $form_state['values']['imagepicker_image_default_show']);
   }
 
   imagepicker_variable_set('imagepicker_quota_enable', $form_state['values']['imagepicker_quota_enable']);
