@@ -87,11 +87,13 @@ function imagepicker_image_form($form_state, $img_id, $public = FALSE) {
         '#type' => 'select',
         '#title' => t('Presets for Show'),
         '#options' => $opts,
+        '#default_value' => variable_get('imagepicker_imagecache_default_show', ''),
       );
       $form['presets_link'] = array(
         '#type' => 'select',
         '#title' => t('Presets for Link'),
         '#options' => $opts,
+        '#default_value' => variable_get('imagepicker_imagecache_default_link', ''),
       );
     }
   }

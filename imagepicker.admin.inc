@@ -256,6 +256,25 @@ function imagepicker_settings_form($form_state, $info) {
         '#return_value' => 1,
         '#default_value' => variable_get('imagepicker_imagecache_enable', 0),
       );
+      $presets = imagecache_presets();
+      $opts = array('' => t('None'));
+      if (count($presets)) {
+        foreach ($presets AS $preset) {
+          $opts[$preset['presetname']] = $preset['presetname'];
+        }
+        $form['imagepicker_module']['imagepicker_imagecache_default_show'] = array(
+          '#type' => 'select',
+          '#title' => t('Default Imagecache Preset for show'),
+          '#options' => $opts,
+          '#default_value' => variable_get('imagepicker_imagecache_default_show', ''),
+        );
+        $form['imagepicker_module']['imagepicker_imagecache_default_link'] = array(
+          '#type' => 'select',
+          '#title' => t('Default Imagecache Preset for link'),
+          '#options' => $opts,
+          '#default_value' => variable_get('imagepicker_imagecache_default_link', ''),
+        );
+      }
     }
   }
 
@@ -723,6 +742,8 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   }
   if (! module_exists('imagecache')) {
     variable_del('imagepicker_imagecache_enable');
+    variable_del('imagepicker_imagecache_default_show');
+    variable_del('imagepicker_imagecache_default_link');
   }
 }
 
