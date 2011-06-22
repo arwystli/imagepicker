@@ -385,6 +385,7 @@ function imagepicker_settings_form($form, &$form_state, $info) {
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_height'] = imagepicker_iframe_height_elem(imagepicker_variable_get('imagepicker_advanced_iframe_height', "500"));
   $form['imagepicker_iframe']['imagepicker_advanced_iframe_border'] = imagepicker_iframe_border_elem(imagepicker_variable_get('imagepicker_advanced_iframe_border', "0"));
   $form['imagepicker_iframe']['imagepicker_advanced_collapsed'] = imagepicker_collapsed_elem(imagepicker_variable_get('imagepicker_advanced_collapsed', 0));
+  $form['imagepicker_iframe']['imagepicker_use_admin_theme'] = imagepicker_use_admin_theme_elem(imagepicker_variable_get('imagepicker_use_admin_theme', 0));
 
   // progress bar
   $form['imagepicker_progress'] = array(
@@ -794,6 +795,7 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_advanced_iframe_height', $form_state['values']['imagepicker_advanced_iframe_height']);
   imagepicker_variable_set('imagepicker_advanced_iframe_border', $form_state['values']['imagepicker_advanced_iframe_border']);
   imagepicker_variable_set('imagepicker_advanced_collapsed', $form_state['values']['imagepicker_advanced_collapsed']);
+  imagepicker_variable_set('imagepicker_use_admin_theme', $form_state['values']['imagepicker_use_admin_theme']);
   imagepicker_variable_set('imagepicker_upload_progress_enabled', $form_state['values']['imagepicker_upload_progress_enabled']);
   imagepicker_variable_set('imagepicker_upload_progress_delay', $form_state['values']['imagepicker_upload_progress_delay']);
   imagepicker_variable_set('imagepicker_upload_progress_message', $form_state['values']['imagepicker_upload_progress_message']);

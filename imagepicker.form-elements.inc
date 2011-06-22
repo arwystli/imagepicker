@@ -245,7 +245,6 @@ function imagepicker_get_link_opts($default = NULL) {
     '#suffix' => '</div>'
   );
 }
-
 function imagepicker_lightbox2_insert_elem($default = NULL) {
   return array(
     '#type' => 'textfield',
@@ -257,8 +256,6 @@ function imagepicker_lightbox2_insert_elem($default = NULL) {
     '#default_value' => ($default != NULL ? $default : imagepicker_variable_get('imagepicker_lightbox2_insert', 'lightbox')),
   );
 }
-
-
 function imagepicker_rows_per_page_elem($default = NULL) {
   return array(
     '#type' => 'textfield',
@@ -266,5 +263,13 @@ function imagepicker_rows_per_page_elem($default = NULL) {
     '#size' => 5,
     '#required' => TRUE,
     '#default_value' => ($default != NULL ? $default : imagepicker_variable_get('imagepicker_rows_per_page', 25)),
+  );
+}
+function imagepicker_use_admin_theme_elem($default = NULL) {
+  return array(
+    '#type' => 'checkbox',
+    '#title' => t('Use the administration theme for Imagepicker Iframe'),
+    '#return_value' => 1,
+    '#default_value' => (is_numeric($default) ? $default : imagepicker_variable_get('imagepicker_use_admin_theme', 0)),
   );
 }

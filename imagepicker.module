@@ -83,7 +83,8 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
-    'file'             => 'imagepicker.upload.inc'
+    'file'             => 'imagepicker.upload.inc',
+    'theme callback'   => 'imagepicker_access_theme',
   );
   $items['imagepicker/upload'] = array(
     'title'            => 'Upload',
@@ -103,7 +104,7 @@ function imagepicker_menu() {
     'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use_public',
     'type'             => MENU_LOCAL_TASK,
-    'weight'           => 3
+    'weight'           => 3,
   );
   $items['imagepicker/groups'] = array(
     'title'            => 'Groups',
@@ -111,27 +112,27 @@ function imagepicker_menu() {
     'access callback'  => 'imagepicker_access_use_group',
     'type'             => MENU_LOCAL_TASK,
     'file'             => 'imagepicker.group.inc',
-    'weight'           => 4
+    'weight'           => 4,
   );
   $items['imagepicker/browse/%imagepicker_id'] = array(
     'title'            => 'Browse',
     'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_LOCAL_TASK,
-    'weight'           => 2
+    'weight'           => 2,
   );
   $items['imagepicker/edit'] = array(
     'title'            => 'Edit image',
     'page callback'    => 'imagepicker_box',
     'access callback'  => 'imagepicker_access_use',
     'type'             => MENU_CALLBACK,
-    'file'             => 'imagepicker.edit.inc'
+    'file'             => 'imagepicker.edit.inc',
   );
   $items['imagepicker/image'] = array(
     'title'            => 'Imagepicker',
     'page callback'    => 'imagepicker_box',
     'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK
+    'type'             => MENU_CALLBACK,
   );
   // uploadprogress callback
   $items['imagepicker/progress'] = array(
@@ -567,6 +568,18 @@ function imagepicker_access_use_group() {
     return TRUE;
   }
   return FALSE;
+}
+
+function imagepicker_access_theme() {
+  global $custom_theme;
+  if (imagepicker_variable_get('imagepicker_use_admin_theme', 0)) {
+    $theme = variable_get('admin_theme');
+    $custom_theme = $theme;
+  }
+  else {
+    $custom_theme = '';
+  }
+  return $custom_theme;
 }
 
 /**
