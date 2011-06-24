@@ -2271,7 +2271,7 @@ function _imagepicker_quota_check($src, $account = FALSE) {
       }
     }
     else {
-      $quota = imagepicker_variable_get('imagepicker_quota', imagepicker_variable_get('imagepicker_quota_default', 0), $user->uid);
+      $quota = imagepicker_variable_get('imagepicker_quota_default', imagepicker_variable_get('imagepicker_quota_default', 0), $user->uid);
     }
     if ($quota > 0) {
       $quota_ok = (( ($quota*1000000) >  $usedbytes) ? TRUE : FALSE );
