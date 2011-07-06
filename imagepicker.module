@@ -1076,27 +1076,37 @@ function imagepicker_get_image_path($img, $type = 'browser', $public = FALSE, $p
     if ($suffix) {
       if (imagepicker_variable_get('imagepicker_use_full_url', 0) || variable_get('file_default_scheme', 'public') == 'private') {
         if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset && $suffix == IMAGEPICKER_THUMBS_DIR) {
-          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $suffix . '/' . $img_name);
+          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $suffix . DIRECTORY_SEPARATOR . $img_name);
         }
         else {
-          $imgpath = file_create_url(IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $suffix . '/' . $img_name);
+          $imgpath = file_create_url(IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $suffix . DIRECTORY_SEPARATOR . $img_name);
         }
       }
       else {
-        $imgpath = imagepicker_get_path(TRUE, $userdir) . $suffix . '/' . $img_name;
+        if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset && $suffix == IMAGEPICKER_THUMBS_DIR) {
+          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $suffix . DIRECTORY_SEPARATOR . $img_name);
+        }
+        else {
+          $imgpath = imagepicker_get_path(TRUE, $userdir) . $suffix . DIRECTORY_SEPARATOR . $img_name;
+        }
       }
     }
     else {
       if (imagepicker_variable_get('imagepicker_use_full_url', 0) || variable_get('file_default_scheme', 'public') == 'private') {
         if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset) {
-          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $img_name);
+          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $img_name);
         }
         else {
-          $imgpath = file_create_url(IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . '/' . imagepicker_get_userpath($userdir) . $img_name);
+          $imgpath = file_create_url(IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $img_name);
         }
       }
       else {
-        $imgpath = imagepicker_get_path(TRUE, $userdir) . $img_name;
+        if (module_exists('image') && imagepicker_variable_get('imagepicker_image_enable', 0) && $preset) {
+          $imgpath = image_style_url('__PRESET__', IMAGEPICKER_FILE_SCHEME . IMAGEPICKER_FILES_DIR . DIRECTORY_SEPARATOR . imagepicker_get_userpath($userdir) . $img_name);
+        }
+        else {
+          $imgpath = imagepicker_get_path(TRUE, $userdir) . $img_name;
+        }
       }
     }
   }
