@@ -2708,7 +2708,7 @@ function imagepicker_copy_form_submit($form, &$form_state) {
 
         // if watermark is enabled just apply to destdir image, not orig or the thumbs
         if ( $form_state['values']['watermark'] ) {
-          if (! imagepicker_watermark_process($dest, $user)) {
+          if (! imagepicker_watermark_do($dest, $user)) {
             drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
           }
         }

@@ -267,7 +267,7 @@ function imagepicker_upload_form_submit($form, &$form_state) {
               // if watermark is enabled just apply to destdir image, not orig or the thumbs
               if ( isset($form_state['values']['watermark_' . $ct]) && $form_state['values']['watermark_' . $ct] ) {
                 $perc = (isset($form_state['values']['watermark_perc' . $ct]) ? $form_state['values']['watermark_perc' . $ct] : variable_get('image_jpeg_quality', 75));
-                if (! imagepicker_watermark_process($destdir . $file, $user, $perc)) {
+                if (! imagepicker_watermark_do($destdir . $file, $user, $perc)) {
                   drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
                 }
               }

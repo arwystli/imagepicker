@@ -286,7 +286,7 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
         }
         // if watermark is enabled just apply to destdir image, not orig or the thumbs
         if ( $form_state['values']['watermark'] ) {
-          if (! imagepicker_watermark_process($options['destdir'] . $file, $user)) {
+          if (! imagepicker_watermark_do($options['destdir'] . $file, $user)) {
             $_SESSION['imagepicker_import_status'] = t('Error while watermarking imported image %im.', array('%im' => $file));
           }
         }

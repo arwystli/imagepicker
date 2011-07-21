@@ -48,7 +48,7 @@ function imagepicker_postlet_menu() {
   //callback from postlet in admin
   $items['imagepicker_postlet/admin/%imagepicker_id/process'] = array(
     'title'            => 'Multi Upload process',
-    'page callback'    => 'imagepicker_postlet_process',
+    'page callback'    => 'imagepicker_postlet_do',
     'page arguments'   => array(1, 2),
     'access arguments' => array('administer imagepicker'),
     'type'             => MENU_CALLBACK,
@@ -69,7 +69,7 @@ function imagepicker_postlet_menu() {
       //callback from postlet in user
       $items['imagepicker_postlet/user/%imagepicker_uid/process'] = array(
         'title'            => 'Multi Upload process',
-        'page callback'    => 'imagepicker_postlet_process',
+        'page callback'    => 'imagepicker_postlet_do',
         'page arguments'   => array(1, 2),
         'access arguments' => array('access own imagepicker'),
         'type'             => MENU_CALLBACK,
@@ -87,7 +87,7 @@ function imagepicker_postlet_menu() {
     //callback from postlet in iframe
     $items['imagepicker_postlet/iframe/%imagepicker_uid/process'] = array(
       'title'            => 'Multi Upload process',
-      'page callback'    => 'imagepicker_postlet_process',
+      'page callback'    => 'imagepicker_postlet_do',
       'page arguments'   => array(1, 2),
       'access arguments' => array('use imagepicker'),
       'type'             => MENU_CALLBACK,
@@ -203,7 +203,7 @@ function imagepicker_postlet_upload($path, $account = FALSE) {
  * @return
  *   None.
  */
-function imagepicker_postlet_process($path, $account = FALSE) {
+function imagepicker_postlet_do($path, $account = FALSE) {
   if ($path == 'admin' && $account) {
     $user = user_load(array('uid' => $account));
     $userdir = array('uid' => $user->uid, 'name' => $user->name);
@@ -265,7 +265,7 @@ function imagepicker_postlet_process($path, $account = FALSE) {
     }
 
     // if watermark is enabled just apply to destdir image, not orig or the thumbs
-    if ($watermark && ! imagepicker_watermark_process($destdir . $file, $user)) {
+    if ($watermark && ! imagepicker_watermark_do($destdir . $file, $user)) {
       watchdog('imagepicker_postlet', 'Error while watermarking an uploaded image.', WATCHDOG_ERROR);
     }
 

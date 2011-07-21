@@ -30,7 +30,7 @@ function imagepicker_scale_image($source, $destination, $maxsize) {
  * Adapted from watermark module.
  *
  */
-function imagepicker_watermark_process($image_path, $account=FALSE, $perc = '') {
+function imagepicker_watermark_do($image_path, $account=FALSE, $perc = '') {
   if ($account) {
     $user = $account;
   }
