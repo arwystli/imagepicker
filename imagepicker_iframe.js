@@ -49,6 +49,8 @@ function imagepickerInsert(button) {
     var imgpPresetThumbLink = Drupal.settings.imagepicker_iframe.imgpPresetThumbLink;
     var imgpPageLink = Drupal.settings.imagepicker_iframe.imgpPageLink;
     var imgpTemplate = Drupal.settings.imagepicker_iframe.imgpTemplate;
+    var imgpWidth = Drupal.settings.imagepicker_iframe.imgpWidth;
+    var imgpHeight = Drupal.settings.imagepicker_iframe.imgpHeight;
     var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
     var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
     var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
@@ -154,7 +156,7 @@ function imagepickerInsert(button) {
 
     // Create an image or span (containing title) HTML string
     if (imgpImagePath) {
-      imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + imgpImageStyle + " " + imgpImageCss + " />";
+      imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth ? "width='" + imgpWidth + "'" : "") + (imgpHeight ? " height='" + imgpHeight + "'" : "") + " />";
     }
     else {
       imgpImageElement = "<span>" + imgpImageTitle + "</span>";

@@ -254,6 +254,8 @@ function theme_imagepicker_iframe($variables) {
       $presetthumblink = imagepicker_get_image_path($img, 'thumb', ($public ? array('name' => $img->name, 'uid' => $img->uid) : FALSE), TRUE);
     }
 
+    $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img->img_name);
+
     $img_title = check_plain($img->img_title);
     $settings = array(
       'imagepicker_iframe' => array(
@@ -266,6 +268,8 @@ function theme_imagepicker_iframe($variables) {
         'imgpPresetThumbLink' => $presetthumblink,
         'imgpPageLink' => url('imagepicker/image/' . $img->img_id),
         'imgpTemplate' => imagepicker_get_insert_template(),
+        'imgpWidth' => $info['width'],
+        'imgpHeight' => $info['height'],
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => imagepicker_variable_get('imagepicker_use_cssbox', imagepicker_variable_get('imagepicker_use_cssbox', 0), $user->uid),
