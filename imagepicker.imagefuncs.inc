@@ -41,7 +41,7 @@ function imagepicker_scale_image($source, $destination, $maxsize) {
  * @param user object $account
  * @return string|string|string|string
  */
-function imagepicker_watermark_process($image_path, $account=FALSE, $perc = '') {
+function imagepicker_watermark_do($image_path, $account=FALSE, $perc = '') {
 
   if ($account) {
     $user = $account;

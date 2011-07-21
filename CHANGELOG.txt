@@ -1,10 +1,14 @@
+Image Picker for D7 in 7.x-1.x, 20011-07-21
+------------------------------------
+by hutch, changed function names containing '_process'
+
 Image Picker for D7 in 7.x-1.x, 20011-07-06
 ------------------------------------
 by hutch, fixed imagepicker_get_image_path bug
 
 Image Picker for D7 in 7.x-1.x, 20011-06-24
 ------------------------------------
-by hutch, fixed quota bug, #1198990 
+by hutch, fixed quota bug, #1198990
 
 Image Picker for D7 in 7.x-1.x, 20011-06-22
 ------------------------------------

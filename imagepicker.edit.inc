@@ -55,7 +55,7 @@ function imagepicker_edit_form($form, &$form_state, $img, $src='iframe', $accoun
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-    '#submit' => array('imagepicker_edit_form_process'),
+    '#submit' => array('imagepicker_edit_form_do'),
   );
   $form['cancel'] = array(
     '#type' => 'submit',
@@ -93,7 +93,7 @@ function imagepicker_edit_form_cancel($form, &$form_state) {
 }
 
 
-function imagepicker_edit_form_process($form, &$form_state) {
+function imagepicker_edit_form_do($form, &$form_state) {
 
   $img_id = $form_state['values']['img_id'];
   $src = $form_state['values']['src'];
