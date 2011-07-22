@@ -176,6 +176,7 @@ function imagepicker_settings_form($form, &$form_state, $info) {
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts(imagepicker_variable_get('imagepicker_insert_defaults_align', 'none'));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(imagepicker_variable_get('imagepicker_insert_defaults_show', 'full'));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(imagepicker_variable_get('imagepicker_insert_defaults_link', 'none'));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title'] = imagepicker_insert_image_title_elem(imagepicker_variable_get('imagepicker_insert_image_title', 0));
 
   // alignment settings
   $form['imagepicker_align'] = array(
@@ -745,6 +746,7 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_insert_defaults_show', $form_state['values']['imagepicker_insert_defaults_show']);
   imagepicker_variable_set('imagepicker_insert_defaults_link', $form_state['values']['imagepicker_insert_defaults_link']);
   imagepicker_variable_set('imagepicker_default_align_show', $form_state['values']['imagepicker_default_align_show']);
+  imagepicker_variable_set('imagepicker_insert_image_title', $form_state['values']['imagepicker_insert_image_title']);
   imagepicker_variable_set('imagepicker_default_fleft', $form_state['values']['imagepicker_default_fleft']);
   imagepicker_variable_set('imagepicker_default_fright', $form_state['values']['imagepicker_default_fright']);
   imagepicker_variable_set('imagepicker_default_browser_thumbnail_size', $form_state['values']['imagepicker_default_browser_thumbnail_size']);

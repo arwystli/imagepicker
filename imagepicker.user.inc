@@ -215,6 +215,7 @@ function imagepicker_user_config_admin_form($form, &$form_state, $account = FALS
   }
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(imagepicker_variable_get('imagepicker_insert_defaults_show', NULL, $user->uid));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(imagepicker_variable_get('imagepicker_insert_defaults_link', NULL, $user->uid));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title'] = imagepicker_insert_image_title_elem(imagepicker_variable_get('imagepicker_insert_image_title', NULL, $user->uid));
 
   if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
     // alignment settings
@@ -524,6 +525,7 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   }
   imagepicker_variable_set('imagepicker_insert_defaults_show', $form_state['values']['imagepicker_insert_defaults_show'], $user->uid);
   imagepicker_variable_set('imagepicker_insert_defaults_link', $form_state['values']['imagepicker_insert_defaults_link'], $user->uid);
+  imagepicker_variable_set('imagepicker_insert_image_title', $form_state['values']['imagepicker_insert_image_title'], $user->uid);
   if (imagepicker_variable_get('imagepicker_default_align_show', 1)) {
     imagepicker_variable_set('imagepicker_default_fleft', $form_state['values']['imagepicker_default_fleft'], $user->uid);
     imagepicker_variable_set('imagepicker_default_fright', $form_state['values']['imagepicker_default_fright'], $user->uid);
@@ -570,6 +572,7 @@ function imagepicker_user_config_form_reset($form, &$form_state) {
   imagepicker_variable_del('imagepicker_insert_defaults_align', $user->uid);
   imagepicker_variable_del('imagepicker_insert_defaults_show', $user->uid);
   imagepicker_variable_del('imagepicker_insert_defaults_link', $user->uid);
+  imagepicker_variable_del('imagepicker_insert_image_title', $user->uid);
   imagepicker_variable_del('imagepicker_default_fleft', $user->uid);
   imagepicker_variable_del('imagepicker_default_fright', $user->uid);
   imagepicker_variable_del('imagepicker_default_browser_thumbnail_size', $user->uid);

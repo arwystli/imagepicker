@@ -273,3 +273,12 @@ function imagepicker_use_admin_theme_elem($default = NULL) {
     '#default_value' => (is_numeric($default) ? $default : imagepicker_variable_get('imagepicker_use_admin_theme', 0)),
   );
 }
+
+function imagepicker_insert_image_title_elem($default = NULL) {
+  return array(
+    '#type' => 'checkbox',
+    '#title' => t('Insert image title into title attribute'),
+    '#return_value' => 1,
+    '#default_value' => (is_numeric($default) ? $default : imagepicker_variable_get('imagepicker_insert_image_title', 0)),
+  );
+}
