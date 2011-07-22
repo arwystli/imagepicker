@@ -294,10 +294,11 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
 
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
 
+    $img_title = check_plain($img['img_title']);
     $settings = array(
       'imagepicker_iframe' => array(
-        'imgpImageAlt' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : t('Image') ),
-        'imgpImageTitle' => ($img['img_title'] ? addslashes(check_plain($img['img_title'])) : ''),
+        'imgpImageAlt' => ($img['img_title'] ? addslashes($img_title) : t('Image') ),
+        'imgpImageTitle' => ($img['img_title'] ? addslashes($img_title) : ''),
         'imgpImageDesc' => preg_replace("/(\n|\r)/", '', nl2br($img['img_description'])),
         'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)),
         'imgpPresetFileLink' => $presetfilelink,
@@ -311,6 +312,7 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->imagepicker_use_cssbox) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox) ? 1 : 0),
         'use_relbox' => ((variable_get('imagepicker_use_relbox', 0) && ! isset($user->imagepicker_use_relbox) ) ? 1 : (variable_get('imagepicker_use_relbox', 0) && isset($user->imagepicker_use_relbox) && $user->imagepicker_use_relbox) ? 1 : 0),
+        'insert_image_title' => ((variable_get('imagepicker_insert_image_title', 0) && ! isset($user->imagepicker_insert_image_title) ) ? 1 : (isset($user->imagepicker_insert_image_title) && $user->imagepicker_insert_image_title) ? 1 : 0),
         'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->imagepicker_default_align_show) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->imagepicker_default_align_show) && $user->imagepicker_default_align_show) ? 1 : 0),
         'default_fleft' => (isset($user->imagepicker_default_fleft) ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
         'default_fright' => (isset($user->imagepicker_default_fright) ? $user->imagepicker_default_fright : variable_get('imagepicker_default_fright', 'style="float: right"')),
@@ -565,6 +567,10 @@ function theme_imagepicker_user_config_admin_form($form) {
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show']['#suffix'] = '</div>';
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#prefix'] = '<div class="imgp_img_options">';
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#suffix'] = '</div>';
+
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title']['#prefix'] = '<div id="imgp_insert_image_title">';
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title']['#suffix'] = '</div>';
+
   $form['imagepicker_watermark']['imagepicker_watermark_image']['#prefix'] = '<div class="container-inline">';
   $form['imagepicker_watermark']['imagepicker_watermark_image_delete']['#suffix'] = '</div>';
   $form['submit']['#prefix'] = '<div class="container-inline">';
@@ -717,6 +723,9 @@ function theme_imagepicker_settings_form($form) {
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show']['#suffix'] = '</div>';
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#prefix'] = '<div class="imgp_img_options">';
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link']['#suffix'] = '</div>';
+
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title']['#prefix'] = '<div id="imgp_insert_image_title">';
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title']['#suffix'] = '</div>';
 
   $jshide = ($form['imagepicker_import']['imagepicker_import_enabled']['#default_value'] ? '' : ' class="js-hide"');
   $form['imagepicker_import']['imagepicker_import_delete']['#prefix'] = '<div id="wrap-imagepicker-import"'. $jshide .'>';

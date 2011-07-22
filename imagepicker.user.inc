@@ -208,6 +208,7 @@ function imagepicker_user_config_admin_form(&$form_state, $account = FALSE) {
   }
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts((isset($user->imagepicker_insert_defaults_show) ? $user->imagepicker_insert_defaults_show : NULL));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts((isset($user->imagepicker_insert_defaults_link) ? $user->imagepicker_insert_defaults_link : NULL));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title'] = imagepicker_insert_image_title_elem((isset($user->imagepicker_insert_image_title) ? $user->imagepicker_insert_image_title : NULL));
 
   if (variable_get('imagepicker_default_align_show', 1)) {
     // alignment settings
@@ -528,6 +529,8 @@ function imagepicker_user_config_admin_form_submit($form, &$form_state) {
   }
   user_save($user, array('imagepicker_insert_defaults_show' => $form_state['values']['imagepicker_insert_defaults_show']));
   user_save($user, array('imagepicker_insert_defaults_link' => $form_state['values']['imagepicker_insert_defaults_link']));
+  user_save($user, array('imagepicker_insert_image_title' => $form_state['values']['imagepicker_insert_image_title']));
+
   if (variable_get('imagepicker_default_align_show', 1)) {
     user_save($user, array('imagepicker_default_fleft' => $form_state['values']['imagepicker_default_fleft']));
     user_save($user, array('imagepicker_default_fright' => $form_state['values']['imagepicker_default_fright']));
@@ -576,6 +579,7 @@ function imagepicker_user_config_form_reset($form, &$form_state) {
   user_save($user, array('imagepicker_insert_defaults_align' => NULL));
   user_save($user, array('imagepicker_insert_defaults_show' => NULL));
   user_save($user, array('imagepicker_insert_defaults_link' => NULL));
+  user_save($user, array('imagepicker_insert_image_title' => NULL));
   user_save($user, array('imagepicker_default_fleft' => NULL));
   user_save($user, array('imagepicker_default_fright' => NULL));
   user_save($user, array('imagepicker_default_browser_thumbnail_size' => NULL));

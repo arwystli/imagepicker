@@ -266,3 +266,12 @@ function imagepicker_rows_per_page_elem($default = NULL) {
     '#default_value' => ($default != NULL ? $default : variable_get('imagepicker_rows_per_page', 25)),
   );
 }
+
+function imagepicker_insert_image_title_elem($default = NULL) {
+  return array(
+    '#type' => 'checkbox',
+    '#title' => t('Insert image title into title attribute'),
+    '#return_value' => 1,
+    '#default_value' => (is_numeric($default) ? $default : variable_get('imagepicker_insert_image_title', 0)),
+  );
+}

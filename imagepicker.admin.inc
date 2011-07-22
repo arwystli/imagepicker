@@ -176,6 +176,7 @@ function imagepicker_settings_form($form_state, $info) {
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_align'] = imagepicker_get_align_opts(variable_get('imagepicker_insert_defaults_align', 'none'));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_show'] = imagepicker_get_show_opts(variable_get('imagepicker_insert_defaults_show', 'full'));
   $form['imagepicker_insert_defaults']['imagepicker_insert_defaults_link'] = imagepicker_get_link_opts(variable_get('imagepicker_insert_defaults_link', 'none'));
+  $form['imagepicker_insert_defaults']['imagepicker_insert_image_title'] = imagepicker_insert_image_title_elem(variable_get('imagepicker_insert_image_title', 0));
 
   // alignment settings
   $form['imagepicker_align'] = array(

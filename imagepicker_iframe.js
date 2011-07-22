@@ -36,7 +36,7 @@ if (Drupal.jsEnabled) {
       var imgpImagePath;
       var imgpImageElement;
       var imgpImageStyle;
-      var imgpImageCss = 'class="imgp_img"';
+      var imgpImageCss = "class='imgp_img'";
       var imgpLinkRel = '';
       var imgpLinkHide = '';
       var imgpInsertion;
@@ -56,6 +56,7 @@ if (Drupal.jsEnabled) {
       var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
       var use_relbox = Drupal.settings.imagepicker_iframe.use_relbox;
       var default_align_show = Drupal.settings.imagepicker_iframe.default_align_show;
+      var insert_image_title = Drupal.settings.imagepicker_iframe.insert_image_title;
       var lightbox2_insert = Drupal.settings.imagepicker_iframe.lightbox2_insert;
       var fleft = Drupal.settings.imagepicker_iframe.default_fleft;
       var fright = Drupal.settings.imagepicker_iframe.default_fright;
@@ -155,7 +156,7 @@ if (Drupal.jsEnabled) {
 
       // Create an image or span (containing title) HTML string
       if (imgpImagePath) {
-        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth ? "width='" + imgpWidth + "'" : "") + (imgpHeight ? " height='" + imgpHeight + "'" : "") + " />";
+        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth ? "width='" + imgpWidth + "'" : "") + (imgpHeight ? " height='" + imgpHeight + "'" : "") + " />";
       }
       else {
         imgpImageElement = "<span>" + imgpImageTitle + "</span>";
@@ -175,20 +176,20 @@ if (Drupal.jsEnabled) {
           imgpInsertion = imgpImageElement;
           break;
         case 'page':
-          imgpInsertion = "<a href='" + imgpPageLink + "' title='" + imgpImageTitle + "' >" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpPageLink + "' " + ">" + imgpImageElement + "</a>";
           break;
         case 'lightbox':
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' rel= '" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpFileLink + "' " + "rel='" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
           break;
         case 'thickbox':
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='thickbox' >" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpFileLink + "' " + "class='thickbox' >" + imgpImageElement + "</a>";
           break;
         case 'colorbox':
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpFileLink + "' " + "class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
           break;
         case 'file':
         default:
-          imgpInsertion = "<a href='" + imgpFileLink + "' title='" + imgpImageTitle + "' target='_blank' >" + imgpImageElement + "</a>";
+          imgpInsertion = "<a href='" + imgpFileLink + "' " + "' target='_blank' >" + imgpImageElement + "</a>";
           break;
       }
       // wrap title and description if requested
