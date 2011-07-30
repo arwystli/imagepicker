@@ -899,7 +899,7 @@ function imagepicker_admin_users_list($dir, $label) {
 
 function imagepicker_admin_groups_list($label="") {
 
-  $max = imagepicker_variable_get('imagepicker_advanced_browser_page', 25);
+  $max = imagepicker_variable_get('imagepicker_rows_per_page', 25);
   $use_icons = imagepicker_variable_get('imagepicker_use_icons', 1);
   $rows = NULL;
   $header = array(
