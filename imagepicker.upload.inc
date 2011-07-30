@@ -12,6 +12,7 @@ module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
  */
 // iframe
 function imagepicker_upload() {
+  $content = '';
   variable_del('imagepicker_advanced_browser_pagestart');
   if (variable_get('imagepicker_upload_progress_enabled', 1)) {
     $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
@@ -22,6 +23,7 @@ function imagepicker_upload() {
 // account
 function imagepicker_user_upload() {
   global $user;
+  $content = '';
   variable_del('imagepicker_advanced_browser_pagestart');
   if (variable_get('imagepicker_upload_progress_enabled', 1)) {
     $content = imagepicker_upload_progress_get_script(variable_get('imagepicker_upload_progress_delay', 0));
