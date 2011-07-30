@@ -321,7 +321,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   }
 
   $content = "";
-  $max = imagepicker_variable_get('imagepicker_advanced_browser_page', 25);
+  $max = imagepicker_variable_get('imagepicker_rows_per_page', 25);
   $use_icons = imagepicker_variable_get('imagepicker_use_icons', 1);
 
   if (user_access('use public imagepicker') && imagepicker_variable_get('imagepicker_public_enabled', 1)) {
@@ -346,7 +346,7 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
 
   $countquery = db_select('imagepicker_user_groups', 'g');
   $countquery->addExpression('COUNT(g.gid)', 'ct');
-  $countquery->join('users', 'u', 'u.uid = g.uid');
+  $countquery->leftjoin('users', 'u', 'g.uid = u.uid');
   $countquery->condition('g.uid', $user->uid)
     ->condition('u.status', 1);
 
