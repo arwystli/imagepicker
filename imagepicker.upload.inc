@@ -13,6 +13,7 @@ module_load_include('inc', 'imagepicker', 'imagepicker.imagefuncs');
 // iframe
 function imagepicker_upload() {
 
+  $content = '';
   imagepicker_variable_del('imagepicker_advanced_browser_pagestart');
   if (imagepicker_variable_get('imagepicker_upload_progress_enabled', 1)) {
     $content = imagepicker_upload_progress_get_script(imagepicker_variable_get('imagepicker_upload_progress_delay', 0));
@@ -24,6 +25,7 @@ function imagepicker_upload() {
 function imagepicker_user_upload() {
 
   global $user;
+  $content = '';
   imagepicker_variable_del('imagepicker_advanced_browser_pagestart');
   if (imagepicker_variable_get('imagepicker_upload_progress_enabled', 1)) {
     $content = imagepicker_upload_progress_get_script(imagepicker_variable_get('imagepicker_upload_progress_delay', 0));
