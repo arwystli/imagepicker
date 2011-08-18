@@ -2776,8 +2776,11 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
   if (! $uid || ! $img_name) {
     return FALSE;
   }
+  if (strlen($img_description) > 254) {
+    $img_description = substr($img_description, 0, 254);
+  }
   $date = time();
-  $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($uid, $img_name, $img_title, $img_description, $date));
+  $result = db_query("INSERT INTO {imagepicker} (uid, img_name, img_title, img_description, img_date) VALUES ('%d', '%s', '%s', '%s', '%s')", array($uid, $img_name, check_plain($img_title), check_plain($img_description), $date));
   if ($result) {
     $nextimgid = db_last_insert_id("imagepicker", 'img_id');
     return $nextimgid;

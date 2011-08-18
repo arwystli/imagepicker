@@ -1,4 +1,8 @@
-Image Picker for D6 in 6.x-2.x, 20011-07-212
+Image Picker for D6 in 6.x-2.x, 20011-08-18
+------------------------------------
+by hutch, fixed description validation, added check_plain
+
+Image Picker for D6 in 6.x-2.x, 20011-07-21
 ------------------------------------
 by hutch, added image title option
 

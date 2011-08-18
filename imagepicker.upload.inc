@@ -117,7 +117,7 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
       '#title' => ($max_uploads == 1 ? t('Description') : t('Description for Image file %ct', array('%ct' => $ct))),
       '#rows' => 2,
       '#cols' => 80,
-      '#description' => t('Add a description for your image'),
+      '#description' => t('Add a description for your image, max. 254 characters.'),
     );
     if ($ct < $max_uploads) {
       $form['link_' . $ct] = array(
@@ -204,6 +204,11 @@ function imagepicker_upload_form_validate($form, &$form_state) {
       if ($name == 'watermark_perc_' . $ct) {
         if (! is_numeric($value) || $value < 0 || $value > 100) {
           form_set_error($name, t("JPEG quality value should be an integer between 0 and 100."));
+        }
+      }
+      if ($name == 'description_' . $ct) {
+        if (strlen($value) > 254) {
+          form_set_error($name, t("Description is too long, max. 254 characters."));
         }
       }
     }
