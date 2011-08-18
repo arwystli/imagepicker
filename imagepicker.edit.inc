@@ -35,7 +35,7 @@ function imagepicker_edit_form($form, &$form_state, $img, $src='iframe', $accoun
     '#title' => t('Description'),
     '#rows' => 2,
     '#cols' => 80,
-    '#description' => t('Edit description of your image'),
+    '#description' => t('Edit description of your image, max. 254 characters.'),
     '#default_value' => htmlspecialchars_decode($img->img_description),
   );
   if ($account) {
@@ -92,6 +92,11 @@ function imagepicker_edit_form_cancel($form, &$form_state) {
   drupal_goto($outpath);
 }
 
+function imagepicker_edit_form_validate($form, &$form_state) {
+  if (strlen($form_state['values']['description']) > 254) {
+    form_set_error('description', t("Description is too long, max. 254 characters."));
+  }
+}
 
 function imagepicker_edit_form_do($form, &$form_state) {
 
@@ -124,12 +129,15 @@ function imagepicker_edit_form_do($form, &$form_state) {
     if ($img->uid == $user->uid) {
       $title = htmlspecialchars($form_state['values']['title']);
       $description = htmlspecialchars($form_state['values']['description']);
+      if (strlen($description) > 254) {
+        $description = substr($description, 0, 254);
+      }
       $date = time();
 
       $num_updated = db_update('imagepicker')
         ->fields(array(
-          'img_title' => $title,
-          'img_description' => $description,
+          'img_title' => check_plain($title),
+          'img_description' => check_plain($description),
           'img_date' => $date,
         ))
         ->condition('img_id', $img_id)

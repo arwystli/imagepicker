@@ -1,3 +1,7 @@
+Image Picker for D7 in 7.x-1.x, 20011-08-18
+------------------------------------
+by hutch, fixed description validation, added check_plain
+
 Image Picker for D7 in 7.x-1.x, 20011-07-22
 ------------------------------------
 by hutch, added image title option
