@@ -2883,7 +2883,7 @@ function imagepicker_box() {
   if (arg(1)) {
     $a1 = arg(1);
   }
-  if (arg(2) && is_numeric(arg(2))) {
+  if (arg(2)) {
     $a2 = arg(2);
   }
   if (arg(3) && $a2) {
@@ -2897,7 +2897,7 @@ function imagepicker_box() {
     $content = imagepicker_browse_public($a2);
   }
   elseif ($a1 == 'groups') {
-    $content = imagepicker_groups();
+    $content = imagepicker_groups($a2, $a3);
   }
   elseif ($a1 == 'edit') {
     $content = imagepicker_image_edit($a2);
