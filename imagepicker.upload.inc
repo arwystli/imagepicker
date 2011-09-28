@@ -207,7 +207,7 @@ function imagepicker_upload_form_validate($form, &$form_state) {
         }
       }
       if ($name == 'description_' . $ct) {
-        if (strlen($value) > 254) {
+        if (drupal_strlen($value) > 254) {
           form_set_error($name, t("Description is too long, max. 254 characters."));
         }
       }

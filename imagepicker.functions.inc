@@ -2862,8 +2862,8 @@ function imagepicker_insert_image($uid, $img_name, $img_title="", $img_descripti
   if (! $uid || ! $img_name) {
     return FALSE;
   }
-  if (strlen($img_description) > 254) {
-    $img_description = substr($img_description, 0, 254);
+  if (drupal_strlen($img_description) > 254) {
+    $img_description = drupal_substr($img_description, 0, 254);
   }
   $nextimgid = db_insert('imagepicker')
     ->fields(

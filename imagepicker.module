@@ -711,8 +711,7 @@ function imagepicker_block_form($i) {
     '#title' => t('Block text'),
     '#default_value' => imagepicker_variable_get('imagepicker_galleryblocks_text_' . $i, ''),
     '#required' => FALSE,
-    '#description' => t("You can add some text to the block. To include the link in the text use the token '[link]' "),
-
+    '#description' => t("You can add some text to the block. To include the link in the text use the token '[link]'."),
   );
   $form['imagepicker_galleryblocks_enable_' . $i] = array(
     '#type' => 'value',
