@@ -118,6 +118,13 @@ function imagepicker_settings_form($form_state, $info) {
       '#default_value' => variable_get('imagepicker_use_relbox', 0),
     );
   }
+  $form['imagepicker_settings']['imagepicker_use_linkbox'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Provide a link textfield'),
+    '#description' => t("Setting this option will provide a textfield where the Link to 'Page' can be edited."),
+    '#return_value' => 1,
+    '#default_value' => variable_get('imagepicker_use_linkbox', 0),
+  );
   $form['imagepicker_settings']['imagepicker_use_icons'] = array(
     '#type' => 'checkbox',
     '#title' => t('Icons in tables'),

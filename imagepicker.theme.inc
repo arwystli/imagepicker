@@ -312,6 +312,7 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->imagepicker_use_cssbox) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox) ? 1 : 0),
         'use_relbox' => ((variable_get('imagepicker_use_relbox', 0) && ! isset($user->imagepicker_use_relbox) ) ? 1 : (variable_get('imagepicker_use_relbox', 0) && isset($user->imagepicker_use_relbox) && $user->imagepicker_use_relbox) ? 1 : 0),
+        'use_linkbox' => ((variable_get('imagepicker_use_linkbox', 0) && ! isset($user->imagepicker_use_linkbox) ) ? 1 : (variable_get('imagepicker_use_linkbox', 0) && isset($user->imagepicker_use_linkbox) && $user->imagepicker_use_linkbox) ? 1 : 0),
         'insert_image_title' => ((variable_get('imagepicker_insert_image_title', 0) && ! isset($user->imagepicker_insert_image_title) ) ? 1 : (isset($user->imagepicker_insert_image_title) && $user->imagepicker_insert_image_title) ? 1 : 0),
         'default_align_show' => ((variable_get('imagepicker_default_align_show', 1) && ! isset($user->imagepicker_default_align_show) ) ? 1 : (variable_get('imagepicker_default_align_show', 1) && isset($user->imagepicker_default_align_show) && $user->imagepicker_default_align_show) ? 1 : 0),
         'default_fleft' => (isset($user->imagepicker_default_fleft) ? $user->imagepicker_default_fleft : variable_get('imagepicker_default_fleft', 'style="float: left"')),
@@ -657,6 +658,10 @@ function theme_imagepicker_image_form($form) {
     $form['relbox']['#suffix'] = '</div>';
     $form['linkhide']['#prefix'] = '<div id="imgp_relbox_link_control">';
     $form['linkhide']['#suffix'] = '</div></div>';
+  }
+  if (isset($form['linkbox'])) {
+    $form['linkbox']['#prefix'] = '<div id="imgp_linkbox_control">';
+    $form['linkbox']['#suffix'] = '</div>';
   }
 
   $output .= drupal_render($form);
