@@ -89,7 +89,7 @@ function imagepicker_edit_form_cancel($form, &$form_state) {
 }
 
 function imagepicker_edit_form_validate($form, &$form_state) {
-  if (strlen($form_state['values']['description']) > 254) {
+  if (drupal_strlen($form_state['values']['description']) > 254) {
     form_set_error('description', t("Description is too long, max. 254 characters."));
   }
 }
@@ -120,8 +120,8 @@ function imagepicker_edit_form_do($form, &$form_state) {
     if ($img['uid'] == $user->uid) {
       $title = htmlspecialchars($form_state['values']['title']);
       $description = htmlspecialchars($form_state['values']['description']);
-      if (strlen($description) > 254) {
-        $description = substr($description, 0, 254);
+      if (drupal_strlen($description) > 254) {
+        $description = drupal_substr($description, 0, 254);
       }
       $date = time();
       if (db_query("UPDATE {imagepicker} SET img_title = '%s', img_description = '%s', img_date = '%s' WHERE img_id = '%d'",
