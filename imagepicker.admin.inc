@@ -119,6 +119,13 @@ function imagepicker_settings_form($form, &$form_state, $info) {
       '#default_value' => imagepicker_variable_get('imagepicker_use_relbox', 0),
     );
   }
+  $form['imagepicker_settings']['imagepicker_use_linkbox'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Provide a link textfield'),
+    '#description' => t("Setting this option will provide a textfield where the Link to 'Page' can be edited."),
+    '#return_value' => 1,
+    '#default_value' => imagepicker_variable_get('imagepicker_use_linkbox', 0),
+  );
   $form['imagepicker_settings']['imagepicker_use_icons'] = array(
     '#type' => 'checkbox',
     '#title' => t('Icons in tables'),
@@ -734,6 +741,7 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_copy_enabled', $form_state['values']['imagepicker_copy_enabled']);
   imagepicker_variable_set('imagepicker_use_full_url', $form_state['values']['imagepicker_use_full_url']);
   imagepicker_variable_set('imagepicker_use_cssbox', $form_state['values']['imagepicker_use_cssbox']);
+  imagepicker_variable_set('imagepicker_use_linkbox', $form_state['values']['imagepicker_use_linkbox']);
   imagepicker_variable_set('imagepicker_use_icons', $form_state['values']['imagepicker_use_icons']);
   imagepicker_variable_set('imagepicker_max_uploads', $form_state['values']['imagepicker_max_uploads']);
   imagepicker_variable_set('imagepicker_invoke_extra', $form_state['values']['imagepicker_invoke_extra']);
@@ -766,9 +774,9 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   if (isset($form_state['values']['imagepicker_colorbox_enable'])) {
     imagepicker_variable_set('imagepicker_colorbox_enable', $form_state['values']['imagepicker_colorbox_enable']);
     if (variable_get('colorbox_load', 0)) {
-      imagepicker_variable_set('imagepicker_advanced_colorbox', $form_state['values']['imagepicker_advanced_colorbox']);
+      imagepicker_variable_set('imagepicker_advanced_colorbox', (isset($form_state['values']['imagepicker_advanced_colorbox']) ? $form_state['values']['imagepicker_advanced_colorbox'] : imagepicker_variable_get('imagepicker_advanced_colorbox', 0)));
     }
-    imagepicker_variable_set('imagepicker_use_relbox', $form_state['values']['imagepicker_use_relbox']);
+    imagepicker_variable_set('imagepicker_use_relbox', (isset($form_state['values']['imagepicker_use_relbox']) ? $form_state['values']['imagepicker_use_relbox'] : imagepicker_variable_get('imagepicker_use_relbox', 0)));
   }
 
   if (isset($form_state['values']['imagepicker_image_enable'])) {

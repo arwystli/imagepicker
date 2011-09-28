@@ -124,7 +124,7 @@ function imagepicker_image_form($form, &$form_state, $img_id, $public = FALSE) {
         '#type' => 'textfield',
         '#title' => t('Add rel attribute'),
         '#size' => 20,
-        '#description' => t('You can add a rel tag here, it will be added to the link when colorbox is selected. Useful for creating galleries. No spaces.'),
+        '#description' => t("You can add a rel tag here, it will be added to the link when Link 'Colorbox' is selected. Useful for creating galleries. No spaces."),
       );
       $form['linkhide'] = array(
       '#type' => 'checkbox',
@@ -132,6 +132,19 @@ function imagepicker_image_form($form, &$form_state, $img_id, $public = FALSE) {
       '#description' => t('Use this on subsequent links added to a gallery.'),
       );
     }
+  }
+  // linkbox
+  if ((imagepicker_variable_get('imagepicker_use_linkbox', 0)
+    && ! imagepicker_variable_get('imagepicker_use_linkbox', 0, $user->uid))
+    || (imagepicker_variable_get('imagepicker_use_linkbox', 0)
+    && imagepicker_variable_get('imagepicker_use_linkbox', 0, $user->uid) )) {
+    $form['linkbox'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Edit Link'),
+      '#size' => 55,
+      '#description' => t("You can edit the link here. This only applies when Link 'Page' is selected."),
+      '#default_value' => '',
+    );
   }
 
   $form['insert'] = array(

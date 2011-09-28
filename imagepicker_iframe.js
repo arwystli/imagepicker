@@ -23,6 +23,52 @@
       return 'unknown';
     }
   }
+
+  Drupal.behaviors.imagepicker = {
+    attach: function(context) {
+      var use_linkbox = Drupal.settings.imagepicker_iframe.use_linkbox;
+      var use_relbox = Drupal.settings.imagepicker_iframe.use_relbox;
+      if (use_linkbox || use_relbox) {
+        if (use_linkbox) {
+          $("#edit-linkbox").val(Drupal.settings.imagepicker_iframe.imgpPageLink);
+          if (! $("#edit-link-page", context).attr('checked')) {
+            $("#imgp_linkbox_control", context).hide();
+          }
+        }
+        if (use_relbox) {
+          if (! $("#edit-link-colorbox", context).attr('checked')) {
+            $("#imgp_relbox_control", context).hide();
+          }
+        }
+        $("#edit-link-page", context).change(function() {
+          if ($(this).attr('checked')) {
+            $("#imgp_linkbox_control", context).show();
+            $("#imgp_relbox_control", context).hide();
+          }
+        });
+        $("#edit-link-none", context).change(function() {
+          if ($(this).attr('checked')) {
+            $("#imgp_linkbox_control", context).hide();
+            $("#imgp_relbox_control", context).hide();
+          }
+        });
+        $("#edit-link-file", context).change(function() {
+          if ($(this).attr('checked')) {
+            $("#imgp_linkbox_control", context).hide();
+            $("#imgp_relbox_control", context).hide();
+          }
+        });
+        $("#edit-link-colorbox", context).change(function() {
+          if ($(this).attr('checked')) {
+            $("#imgp_linkbox_control", context).hide();
+            $("#imgp_relbox_control", context).show();
+          }
+        });
+      }
+
+    }
+  }
+
 })(jQuery);
 
 // collects settings, builds HTML string
@@ -39,6 +85,7 @@ function imagepickerInsert(button) {
     var imgpImageCss = "class='imgp_img'";
     var imgpLinkRel = '';
     var imgpLinkHide = '';
+    var imgpLinkbox = '';
     var imgpInsertion;
     var imgpImageAlt = Drupal.settings.imagepicker_iframe.imgpImageAlt;
     var imgpImageTitle = Drupal.settings.imagepicker_iframe.imgpImageTitle;
@@ -55,6 +102,7 @@ function imagepickerInsert(button) {
     var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
     var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
     var use_relbox = Drupal.settings.imagepicker_iframe.use_relbox;
+    var use_linkbox = Drupal.settings.imagepicker_iframe.use_linkbox;
     var default_align_show = Drupal.settings.imagepicker_iframe.default_align_show;
     var insert_image_title = Drupal.settings.imagepicker_iframe.insert_image_title;
     var lightbox2_insert = Drupal.settings.imagepicker_iframe.lightbox2_insert;
@@ -92,6 +140,10 @@ function imagepickerInsert(button) {
           imgpLinkHide = "js-hide";
         }
       }
+    }
+    // linkbox
+    if (use_linkbox && imgpForm.linkbox.value) {
+      imgpLinkbox = imgpForm.linkbox.value;
     }
     // alignment settings
     if (default_align_show) {
@@ -177,6 +229,9 @@ function imagepickerInsert(button) {
         imgpInsertion = imgpImageElement;
         break;
       case 'page':
+        if (use_linkbox && imgpLinkbox) {
+          imgpPageLink = imgpLinkbox;
+        }
         imgpInsertion = "<a href='" + imgpPageLink + "' " + ">" + imgpImageElement + "</a>";
         break;
       case 'lightbox':

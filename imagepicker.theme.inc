@@ -274,6 +274,7 @@ function theme_imagepicker_iframe($variables) {
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => imagepicker_variable_get('imagepicker_use_cssbox', imagepicker_variable_get('imagepicker_use_cssbox', 0), $user->uid),
         'use_relbox' => imagepicker_variable_get('imagepicker_use_relbox', imagepicker_variable_get('imagepicker_use_relbox', 0), $user->uid),
+        'use_linkbox' => imagepicker_variable_get('imagepicker_use_linkbox', imagepicker_variable_get('imagepicker_use_linkbox', 0), $user->uid),
         'insert_image_title' => imagepicker_variable_get('imagepicker_insert_image_title', imagepicker_variable_get('imagepicker_insert_image_title', 0), $user->uid),
         'default_align_show' => imagepicker_variable_get('imagepicker_default_align_show', imagepicker_variable_get('imagepicker_default_align_show', 1), $user->uid),
         'default_fleft' => imagepicker_variable_get('imagepicker_default_fleft', imagepicker_variable_get('imagepicker_default_fleft', 'style="float: left"'), $user->uid),
@@ -708,6 +709,10 @@ function theme_imagepicker_image_form($variables) {
     $form['relbox']['#suffix'] = '</div>';
     $form['linkhide']['#prefix'] = '<div id="imgp_relbox_link_control">';
     $form['linkhide']['#suffix'] = '</div></div>';
+  }
+  if (isset($form['linkbox'])) {
+    $form['linkbox']['#prefix'] = '<div id="imgp_linkbox_control">';
+    $form['linkbox']['#suffix'] = '</div>';
   }
 
   $output .= drupal_render_children($form);
