@@ -1,9 +1,30 @@
-commit d072110
+commit dd22a1a
+Author: hutch <hutch@midwales.net>
+Date:   Fri Oct 7 16:33:14 2011 +0100
+
+    fixed image size bug #1302434
+
+imagepicker.theme.inc
+imagepicker_iframe.js
+
+commit 3d364b8
+Author: hutch <hutch@midwales.net>
+Date:   Wed Sep 28 16:37:28 2011 +0100
+
+    coder review cleanup
+
+imagepicker.edit.inc
+imagepicker.functions.inc
+imagepicker.module
+imagepicker.upload.inc
+
+commit 47c7b16
 Author: hutch <hutch@midwales.net>
 Date:   Wed Sep 28 11:43:32 2011 +0100
 
     added linkbox feature
 
+CHANGELOG.txt
 imagepicker.admin.inc
 imagepicker.functions.inc
 imagepicker.theme.inc
