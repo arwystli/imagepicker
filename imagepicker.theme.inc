@@ -293,7 +293,7 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
     }
 
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
-
+    $thumbinfo = image_get_info(imagepicker_get_path(FALSE, TRUE) . IMAGEPICKER_THUMBS_DIR . '/' . $img['img_name']);
     $img_title = check_plain($img['img_title']);
     $settings = array(
       'imagepicker_iframe' => array(
@@ -308,6 +308,8 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
         'imgpTemplate' => imagepicker_get_insert_template(),
         'imgpWidth' => $info['width'],
         'imgpHeight' => $info['height'],
+        'imgpThumbWidth' => $thumbinfo['width'],
+        'imgpThumbHeight' => $thumbinfo['height'],
         'isFCKeditor' => (module_exists('fckeditor') ? 'yes' : 'no' ),
         'isWysiwyg' => (module_exists('wysiwyg') ? 'yes' : 'no' ),
         'use_cssbox' => ((variable_get('imagepicker_use_cssbox', 0) && ! isset($user->imagepicker_use_cssbox) ) ? 1 : (variable_get('imagepicker_use_cssbox', 0) && isset($user->imagepicker_use_cssbox) && $user->imagepicker_use_cssbox) ? 1 : 0),

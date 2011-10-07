@@ -110,6 +110,8 @@ function imagepickerInsert(button) {
     var imgpTemplate = Drupal.settings.imagepicker_iframe.imgpTemplate;
     var imgpWidth = Drupal.settings.imagepicker_iframe.imgpWidth;
     var imgpHeight = Drupal.settings.imagepicker_iframe.imgpHeight;
+    var imgpThumbWidth = Drupal.settings.imagepicker_iframe.imgpThumbWidth;
+    var imgpThumbHeight = Drupal.settings.imagepicker_iframe.imgpThumbHeight;
     var isFCKeditor = Drupal.settings.imagepicker_iframe.isFCKeditor;
     var isWysiwyg = Drupal.settings.imagepicker_iframe.isWysiwyg;
     var use_cssbox = Drupal.settings.imagepicker_iframe.use_cssbox;
@@ -220,7 +222,12 @@ function imagepickerInsert(button) {
 
     // Create an image or span (containing title) HTML string
     if (imgpImagePath) {
-      imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth ? "width='" + imgpWidth + "'" : "") + (imgpHeight ? " height='" + imgpHeight + "'" : "") + " />";
+      if (imgpShow == 'thumb') {
+        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpThumbWidth && !presetThumbLink ? "width='" + imgpThumbWidth + "'" : "") + (imgpThumbHeight && !presetThumbLink ? " height='" + imgpThumbHeight + "'" : "") + " />";
+      }
+      else {
+        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth && !presetFileLink ? "width='" + imgpWidth + "'" : "") + (imgpHeight && !presetFileLink ? " height='" + imgpHeight + "'" : "") + " />";
+      }
     }
     else {
       imgpImageElement = "<span>" + imgpImageTitle + "</span>";
