@@ -223,10 +223,10 @@ function imagepickerInsert(button) {
     // Create an image or span (containing title) HTML string
     if (imgpImagePath) {
       if (imgpShow == 'thumb') {
-        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpThumbWidth && !presetThumbLink ? "width='" + imgpThumbWidth + "'" : "") + (imgpThumbHeight && !presetThumbLink ? " height='" + imgpThumbHeight + "'" : "") + " />";
+        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title && imgpImageTitle ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpThumbWidth && !presetThumbLink ? "width='" + imgpThumbWidth + "'" : "") + (imgpThumbHeight && !presetThumbLink ? " height='" + imgpThumbHeight + "'" : "") + " />";
       }
       else {
-        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth && !presetFileLink ? "width='" + imgpWidth + "'" : "") + (imgpHeight && !presetFileLink ? " height='" + imgpHeight + "'" : "") + " />";
+        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title && imgpImageTitle ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth && !presetFileLink ? "width='" + imgpWidth + "'" : "") + (imgpHeight && !presetFileLink ? " height='" + imgpHeight + "'" : "") + " />";
       }
     }
     else {
@@ -250,20 +250,20 @@ function imagepickerInsert(button) {
         if (use_linkbox && imgpLinkbox) {
           imgpPageLink = imgpLinkbox;
         }
-        imgpInsertion = "<a href='" + imgpPageLink + "' " + ">" + imgpImageElement + "</a>";
+        imgpInsertion = "<a href='" + imgpPageLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " >" + imgpImageElement + "</a>";
         break;
       case 'lightbox':
-        imgpInsertion = "<a href='" + imgpFileLink + "' " + "rel='" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
+        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " rel='" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
         break;
       case 'thickbox':
-        imgpInsertion = "<a href='" + imgpFileLink + "' " + "class='thickbox' >" + imgpImageElement + "</a>";
+        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " class='thickbox' >" + imgpImageElement + "</a>";
         break;
       case 'colorbox':
-        imgpInsertion = "<a href='" + imgpFileLink + "' " + "class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
+        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
         break;
       case 'file':
       default:
-        imgpInsertion = "<a href='" + imgpFileLink + "' " + "' target='_blank' >" + imgpImageElement + "</a>";
+        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " target='_blank' >" + imgpImageElement + "</a>";
         break;
     }
     // wrap title and description if requested
