@@ -1,9 +1,18 @@
-commit dd22a1a
+commit c991e24
+Author: hutch <hutch@midwales.net>
+Date:   Thu Oct 13 18:17:10 2011 +0100
+
+    fixed title attribute in insert
+
+imagepicker_iframe.js
+
+commit 82b2deb
 Author: hutch <hutch@midwales.net>
 Date:   Fri Oct 7 16:33:14 2011 +0100
 
     fixed image size bug #1302434
 
+CHANGELOG.txt
 imagepicker.theme.inc
 imagepicker_iframe.js
 
