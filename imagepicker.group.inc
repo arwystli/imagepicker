@@ -11,14 +11,17 @@ function imagepicker_groups() {
   // from iframe
   if (! arg(2)) {
     $content .= imagepicker_groups_list();
-    $content .= render(drupal_get_form('imagepicker_groups_form'));
+    $form = drupal_get_form('imagepicker_groups_form');
+    $content .= render($form);
   }
   elseif ( arg(2) == 'edit') {
     $record = imagepicker_get_user_group(arg(3));
-    $content .= render(drupal_get_form('imagepicker_groups_form', $record));
+    $form = drupal_get_form('imagepicker_groups_form', $record);
+    $content .= render($form);
   }
   elseif (arg(2) == 'delete') {
-    $content .= render(drupal_get_form('imagepicker_group_delete_form', arg(3)));
+    $form = drupal_get_form('imagepicker_group_delete_form', arg(3));
+    $content .= render($form);
   }
   elseif ( is_numeric(arg(2)) && arg(2) > 0 ) {
     imagepicker_set_user_group_state(1, arg(2));
@@ -38,14 +41,17 @@ function imagepicker_user_groups($mode="", $gid=0) {
   $content = '';
   if (empty($mode)) {
     $content = imagepicker_groups_list('account');
-    $content .= render(drupal_get_form('imagepicker_groups_form'));
+    $form = drupal_get_form('imagepicker_groups_form');
+    $content .= render($form);
   }
   elseif ($mode == 'edit') {
     $record = imagepicker_get_user_group($gid);
-    $content .= render(drupal_get_form('imagepicker_groups_form', $record));
+    $form = drupal_get_form('imagepicker_groups_form', $record);
+    $content .= render($form);
   }
   elseif ($mode == 'delete') {
-    $content .= render(drupal_get_form('imagepicker_group_delete_form', arg(3)));
+    $form = drupal_get_form('imagepicker_group_delete_form', arg(3));
+    $content .= render($form);
   }
 
   return $content;
@@ -241,7 +247,8 @@ function imagepicker_delete_user_group($gid) {
 function imagepicker_group_edit($gid) {
 
   $record = imagepicker_get_user_group($gid);
-  $content = render(drupal_get_form('imagepicker_groups_form', $record));
+  $form = drupal_get_form('imagepicker_groups_form', $record);
+  $content = render($form);
   return $content;
 }
 

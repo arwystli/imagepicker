@@ -49,7 +49,8 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
       $content .= imagepicker_user_groups();
     }
     elseif ($func == 'delete') {
-      $content .= render(drupal_get_form('imagepicker_group_delete_form', $id));
+      $form = drupal_get_form('imagepicker_group_delete_form', $id);
+      $content .= render($form);
     }
   }
   elseif ($path == 'stats') {
@@ -102,15 +103,15 @@ function imagepicker_user_view($img_id) {
       $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img->img_name);
     }
     $view = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
-    $form1 = render(drupal_get_form('imagepicker_user_image_form', $img_id));
+    $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
     // copy form
     if (imagepicker_variable_get('imagepicker_copy_enabled', 0)) {
-      $form2 = render(drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name));
+      $form2 = drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name);
     }
     // group form
     global $user;
     if (_imagepicker_has_groups($user)) {
-      $form3 = render(drupal_get_form('imagepicker_group_images_form', $img->img_id));
+      $form3 = drupal_get_form('imagepicker_group_images_form', $img->img_id);
     }
     $content = theme('imagepicker_user_view', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
   }
@@ -170,8 +171,8 @@ function imagepicker_user_image_form_edit($form, &$form_state) {
  * Menu callback; presents the configuration settings form for imagepicker user.
  */
 function imagepicker_user_config_admin() {
-
-  $content = render(drupal_get_form('imagepicker_user_config_admin_form'));
+  $form = drupal_get_form('imagepicker_user_config_admin_form');
+  $content = render($form);
   return theme('imagepicker_user_config', array('form' => $content, 'label' => '', 'help' => t('Imagepicker configuration page.'), 'message1' => '', 'message2' => ''));
 }
 

@@ -976,14 +976,14 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
       $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, $userdir) . $img->img_name);
     }
     $view = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
-    $form1 = render(drupal_get_form('imagepicker_admin_image_form', $img_id, $user));
+    $form1 = drupal_get_form('imagepicker_admin_image_form', $img_id, $user);
     // copy form
     if (imagepicker_variable_get('imagepicker_copy_enabled', 0)) {
-      $form2 = render(drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name, $user));
+      $form2 = drupal_get_form('imagepicker_copy_form', $img->img_id, $img->img_name, $user);
     }
     // group form
     if (_imagepicker_has_groups($user)) {
-      $form3 = render(drupal_get_form('imagepicker_group_images_form', $img->img_id, $user));
+      $form3 = drupal_get_form('imagepicker_group_images_form', $img->img_id, $user);
     }
     $content = theme('imagepicker_admin_view', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
   }
@@ -1340,7 +1340,8 @@ function imagepicker_admin_groups() {
     $name = $account->name;
   }
   if (imagepicker_variable_get('imagepicker_groups_enabled', 1)) {
-    $content .= render(drupal_get_form('imagepicker_group_search_form', 'groups'));
+    $form = drupal_get_form('imagepicker_group_search_form', 'groups');
+    $content .= render($form);
 
     $content .= '<p>' . t('Managing groups for !n', array('!n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
     if ($uid) {
@@ -1348,10 +1349,12 @@ function imagepicker_admin_groups() {
       if ($gid) {
         if ($gidaction == 'edit') {
           $record = imagepicker_get_user_group($gid);
-          $content .= render(drupal_get_form('imagepicker_groups_form', $record));
+          $form = drupal_get_form('imagepicker_groups_form', $record);
+          $content .= render($form);
         }
         elseif ($gidaction == 'delete') {
-          $content .= render(drupal_get_form('imagepicker_group_delete_form', $gid));
+          $form = drupal_get_form('imagepicker_group_delete_form', $gid);
+          $content .= render($form);
         }
       }
       elseif (arg(6) == 'stats') {
@@ -1359,7 +1362,8 @@ function imagepicker_admin_groups() {
       }
       else {
         $content .= imagepicker_groups_list('admin', $account, t('Groups for %name', array('%name' => $name)));
-        $content .= render(drupal_get_form('imagepicker_groups_form', 0, $account));
+        $form = drupal_get_form('imagepicker_groups_form', 0, $account);
+        $content .= render($form);
       }
     }
     else {
@@ -1421,7 +1425,8 @@ function imagepicker_admin_images() {
     $account = user_load($uid);
     $name = $account->name;
   }
-  $content .= render(drupal_get_form('imagepicker_user_search_form', 'images'));
+  $form = drupal_get_form('imagepicker_user_search_form', 'images');
+  $content .= render($form);
   $content .= '<p>' . t('Managing images for !n', array('!n' => ($name ? l($name, "user/$uid") : t('All')))) . '</p>';
   if ($uid) {
     if ($img_id) {
@@ -1430,7 +1435,8 @@ function imagepicker_admin_images() {
         $img =  _imagepicker_get_img($img_id, FALSE, $account);
         $imgsrc = imagepicker_get_image_path($img, 'browser', array('uid' => $account->uid , 'name' => $account->name) );
         $content .= theme('imagepicker_image_edit_header', array('image' => $img, 'source' => $imgsrc));
-        $content .= render(drupal_get_form('imagepicker_edit_form', $img, 'admin', $account));
+        $form = drupal_get_form('imagepicker_edit_form', $img, 'admin', $account);
+        $content .= render($form);
       }
       elseif ($imgaction == 'delete') {
         imagepicker_image_delete($img_id, $account, 'admin');
@@ -1473,11 +1479,9 @@ function imagepicker_admin_images() {
       else {
         $message = t('User %name has used %usedbytesprint and has %pl.', array('%name' => $name, '%usedbytesprint' => $usedbytesprint, '%pl' => $pl));
       }
+      $form = '';
       if (! imagepicker_variable_get('imagepicker_quota_byrole', 0) ) {
-        $form = render(drupal_get_form('imagepicker_quota_form', $account));
-      }
-      else {
-        $form = "";
+        $form = drupal_get_form('imagepicker_quota_form', $account);
       }
       $content .= theme('imagepicker_quota', array('quotaform' => $form, 'message' => $message, 'label' => $label));
     }
@@ -1614,13 +1618,16 @@ function imagepicker_admin_import() {
   if (! $importdir = imagepicker_variable_get('imagepicker_import_dir', '')) {
     drupal_set_message(t('You need to set the import folder'));
   }
-  $content = render(drupal_get_form('imagepicker_import_dir_form'));
+  $form = drupal_get_form('imagepicker_import_dir_form');
+  $content = render($form);
   if ($importdir) {
     if ($import_files = imagepicker_import_dir_check()) {
-      $content .= render(drupal_get_form('imagepicker_user_search_form', 'import'));
+      $form = drupal_get_form('imagepicker_user_search_form', 'import');
+      $content .= render($form);
       if ($uid) {
         $account = user_load($uid);
-        $content .= render(drupal_get_form('imagepicker_import_form', count($import_files), $account, TRUE));
+        $form = drupal_get_form('imagepicker_import_form', count($import_files), $account, TRUE);
+        $content .= render($form);
       }
       else {
         drupal_set_message(t('Please select a user. You have %total files to be imported', array('%total' => count($import_files)) ));

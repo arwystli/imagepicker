@@ -357,11 +357,11 @@ function theme_imagepicker_browser($variables) {
   if ($rows) {
     // forms
     if ($forms) {
-      $output .= (isset($forms['browse_search']) ? $forms['browse_search'] : '');
-      $output .= (isset($forms['browse_public']) ? $forms['browse_public'] : '');
-      $output .= (isset($forms['browse_public_groups']) ? $forms['browse_public_groups'] : '');
-      $output .= (isset($forms['browse_groups']) ? $forms['browse_groups'] : '');
-      $output .= (isset($forms['browse_order']) ? $forms['browse_order'] : '');
+      $output .= (isset($forms['browse_search']) ? render($forms['browse_search']) : '');
+      $output .= (isset($forms['browse_public']) ? render($forms['browse_public']) : '');
+      $output .= (isset($forms['browse_public_groups']) ? render($forms['browse_public_groups']) : '');
+      $output .= (isset($forms['browse_groups']) ? render($forms['browse_groups']) : '');
+      $output .= (isset($forms['browse_order']) ? render($forms['browse_order']) : '');
     }
     // help message
     $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
@@ -409,7 +409,7 @@ function theme_imagepicker_quota_message($variables) {
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($message1 ? '<div class="messages">' . $message1 . '</div>' : '') ;
   $output .= ($help ? '<div class="imgp_help">' . $help . '</div>' : '');
-  $output .= $form;
+  $output .= render($form);
   $output .= ($message2 ? '<div class="messages">' . $message2 . '</div>' : '') ;
   $output .= ($label ? '</fieldset>' : '');
 
@@ -483,7 +483,7 @@ function theme_imagepicker_quota($variables) {
   $label = $variables['label'];
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= ($message ? '<div class="messages">' . $message . '</div>' : '') ;
-  $output .= $form;
+  $output .= ($form ? render($form) : '');
   $output .= ($label ? '</fieldset>' : '');
   return $output;
 }
@@ -515,10 +515,10 @@ function theme_imagepicker_user_view($variables) {
   $output = "";
   $output .= $view;
   $output .= '<br />';
-  $output .= $form1;
+  $output .= ($form1 ? render($form1) : '');
   $output .= '<br />';
-  $output .= $form2;
-  $output .= $form3;
+  $output .= ($form2 ? render($form2) : '');
+  $output .= ($form3 ? render($form3) : '');
   return $output;
 }
 
@@ -532,10 +532,10 @@ function theme_imagepicker_admin_view($variables) {
   $output = "";
   $output .= $view;
   $output .= '<br />';
-  $output .= $form1;
+  $output .= render($form1);
   $output .= '<br />';
-  $output .= $form2;
-  $output .= $form3;
+  $output .= render($form2);
+  $output .= render($form3);
   return $output;
 }
 
@@ -559,8 +559,8 @@ function theme_imagepicker_insert($variables) {
     $output .= '<div id="imgp_img_holder">';
     $output .= '<img id="imgp_img" src="' . $imgpath . '" alt="' . (isset($img->img_title) ? check_plain($img->img_title) : t('Image') ) . '" title="' . $img->img_name . '" />';
     $output .= '</div>';
-    $output .= $form1;
-    $output .= $form2;
+    $output .= ($form1 ? render($form1) : '');
+    $output .= ($form2 ? render($form2) : '');
   }
   return $output;
 }
@@ -858,11 +858,11 @@ function theme_imagepicker_browse_admin($variables) {
   $label = $variables['label'];
   $output = ($label ? '<fieldset><legend>' . $label . '</legend>' : '');
   $output .= $pref;
-  $output .= $forms['browse_search'];
-  $output .= $forms['browse_groups'];
-  $output .= $forms['browse_public'];
-  $output .= $forms['browse_public_groups'];
-  $output .= $forms['browse_admin'];
+  $output .= ($forms['browse_search'] ? render($forms['browse_search']) : '');
+  $output .= ($forms['browse_groups'] ? render($forms['browse_groups']) : '');
+  $output .= ($forms['browse_public'] ? render($forms['browse_public']) : '');
+  $output .= ($forms['browse_public_groups'] ? render($forms['browse_public_groups']) : '');
+  $output .= ($forms['browse_admin'] ? render($forms['browse_admin']) : '');
   $output .= $suff;
   $output .= ($label ? '</fieldset>' : '');
   return $output;
