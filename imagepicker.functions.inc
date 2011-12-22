@@ -254,7 +254,12 @@ function imagepicker_image_page($img_id, $preset = FALSE) {
   if ($img && is_array($img) && count($img)) {
 
     drupal_add_css(IMAGEPICKER_PATH .'/imagepicker.css');
-    drupal_set_title($img['img_title']);
+    $title = (isset($img['img_title']) && $img['img_title'] ? htmlspecialchars_decode($img['img_title'], ENT_QUOTES) : '');
+    if ($title) {
+      $title = $title . ' | ' . variable_get('site_name', 'Drupal');
+      drupal_set_title($title);
+    }
+
     // js link
     $account = user_load(array('uid' => $img['uid']));
     $link = (isset($account->imagepicker_default_pagelink) ? $account->imagepicker_default_pagelink : variable_get('imagepicker_default_pagelink', 1));
@@ -504,9 +509,9 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
   $rowct = 0;
   while ($row = db_fetch_array($result)) {
     // img_id img_name  img_title       img_description
-    $img_name = check_plain($row['img_name']);
+    $img_name = $row['img_name'];
     $img_id = $row['img_id'];
-    $description = check_plain($row['img_description']);
+    $description = $row['img_description'];
     $img_date = format_date($row['img_date'], variable_get('imagepicker_dateformat_default', 'medium'));
 
     if ( drupal_strlen($description) > 30 ) {
@@ -524,7 +529,7 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
       $imglink = l($img_name, $imgpath . $img_id);
       $listlink = l($row['name'], $listpath);
       $form['img_name'][$img_id] = array('#value' => $imglink);
-      $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
+      $form['img_title'][$img_id] = array('#value' => $row['img_title']);
       $form['img_desc'][$img_id] = array('#value' => $description);
       $form['img_list'][$img_id] = array('#value' => $listlink);
       $form['img_date'][$img_id] = array('#value' => $img_date);
@@ -537,7 +542,7 @@ function imagepicker_browse_admin_form(&$form_state, $src="iframe", $account=FAL
       $editlink = ($use_icons ? _imagepicker_get_icon('edit', $editpath . $img_id, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $img_id));
       $deletelink = ($use_icons ? _imagepicker_get_icon('delete', $deletepath . $img_id, array('title' => t('Delete'))) : l(t('Delete'), $deletepath . $img_id));
       $form['img_name'][$img_id] = array('#value' => $imglink);
-      $form['img_title'][$img_id] = array('#value' => check_plain($row['img_title']));
+      $form['img_title'][$img_id] = array('#value' => $row['img_title']);
       $form['img_desc'][$img_id] = array('#value' => $description);
       $form['img_date'][$img_id] = array('#value' => $img_date);
       $form['img_edit'][$img_id] = array('#value' => $editlink);
@@ -2965,7 +2970,7 @@ function imagepicker_uploadprogress_callback($progress_key='') {
 
 function imagepicker_get_insert_template() {
   $file = IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . IMAGEPICKER_INSERT_TEMPLATE;
-  $t = "<div class='imgp_title'>__TITLE__</div>__INSERT__<div class='imgp_desc'>__DESC__</div>";
+  $t = '<div class="imgp_title">__TITLE__</div>__INSERT__<div class="imgp_desc">__DESC__</div>';
   $template = '';
   if ( file_exists($file) ) {
     // for php 4

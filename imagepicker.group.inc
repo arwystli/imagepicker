@@ -174,7 +174,7 @@ function imagepicker_groups_form_submit($form, &$form_state) {
 function imagepicker_insert_user_group($record) {
   if (db_query(
     "INSERT INTO {imagepicker_user_groups} (uid, group_name, group_description, public, avail_roles) VALUES (%d, '%s', '%s', %d, '%s')",
-    array($record['uid'], $record['group_name'], $record['group_description'], $record['public'], $record['avail_roles']))) {
+    array($record['uid'], check_plain($record['group_name']), check_plain($record['group_description']), $record['public'], $record['avail_roles']))) {
     drupal_set_message(t('Group was successfully created'));
   }
   else {
@@ -185,7 +185,7 @@ function imagepicker_insert_user_group($record) {
 function imagepicker_update_user_group($record) {
   if (db_query(
     "UPDATE {imagepicker_user_groups} SET group_name='%s', group_description='%s', public=%d, avail_roles='%s' WHERE gid = %d",
-    array($record['group_name'], $record['group_description'], $record['public'], $record['avail_roles'], $record['gid']))) {
+    array(check_plain($record['group_name']), check_plain($record['group_description']), $record['public'], $record['avail_roles'], $record['gid']))) {
     drupal_set_message(t('Group was successfully updated'));
   }
   else {
@@ -333,8 +333,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
   while ($row = db_fetch_array($result)) {
     if (user_access('use public imagepicker') && variable_get('imagepicker_public_enabled', 1)) {
       $row_data = array(
-        check_plain($row['group_name']),
-        check_plain($row['group_description']),
+        $row['group_name'],
+        $row['group_description'],
         ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
         (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
         ($row['public'] ? t('Yes') : t('No')),
@@ -344,8 +344,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
     }
     else {
       $row_data = array(
-        check_plain($row['group_name']),
-        check_plain($row['group_description']),
+        $row['group_name'],
+        $row['group_description'],
         ($row['ct'] && $browsepath ?  l($row['ct'], $browsepath . $row['gid']) : $row['ct']),
         (($enabledlist && in_array($row['gid'], $enabledlist)) ? t('selected') : ''),
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row['gid'], array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row['gid'])),

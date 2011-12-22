@@ -25,7 +25,7 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
     '#type' => 'textfield',
     '#title' => t('Title'),
     '#description' => t('Edit title of your image'),
-    '#default_value' => htmlspecialchars_decode($img['img_title']),
+    '#default_value' => htmlspecialchars_decode($img['img_title'], ENT_QUOTES),
   );
   $form['description'] = array(
     '#type' => 'textarea',
@@ -33,7 +33,7 @@ function imagepicker_edit_form(&$form_state, $img, $src='iframe', $account=FALSE
     '#rows' => 2,
     '#cols' => 80,
     '#description' => t('Edit description of your image, max. 254 characters.'),
-    '#default_value' => htmlspecialchars_decode($img['img_description']),
+    '#default_value' => htmlspecialchars_decode($img['img_description'], ENT_QUOTES),
   );
   if ($account) {
     $form['account'] = array(
@@ -118,8 +118,8 @@ function imagepicker_edit_form_do($form, &$form_state) {
   $img = db_fetch_array($result);
   if ($img) {
     if ($img['uid'] == $user->uid) {
-      $title = htmlspecialchars($form_state['values']['title']);
-      $description = htmlspecialchars($form_state['values']['description']);
+      $title = $form_state['values']['title'];
+      $description = $form_state['values']['description'];
       if (drupal_strlen($description) > 254) {
         $description = drupal_substr($description, 0, 254);
       }

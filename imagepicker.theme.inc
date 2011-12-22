@@ -294,11 +294,11 @@ function theme_imagepicker_iframe($content, $img='', $public=FALSE) {
 
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img['img_name']);
     $thumbinfo = image_get_info(imagepicker_get_path(FALSE, TRUE) . IMAGEPICKER_THUMBS_DIR . '/' . $img['img_name']);
-    $img_title = check_plain($img['img_title']);
+    $img_title = $img['img_title'];
     $settings = array(
       'imagepicker_iframe' => array(
-        'imgpImageAlt' => ($img['img_title'] ? addslashes($img_title) : t('Image') ),
-        'imgpImageTitle' => ($img['img_title'] ? addslashes($img_title) : ''),
+        'imgpImageAlt' => ($img_title ? $img_title : t('Image') ),
+        'imgpImageTitle' => ($img_title ? htmlspecialchars_decode($img_title, ENT_QUOTES) : ''),
         'imgpImageDesc' => preg_replace("/(\n|\r)/", '', nl2br($img['img_description'])),
         'imgpFileLink' => imagepicker_get_image_path($img, 'full', ($public ? array('name' => $img['name'], 'uid' => $img['uid'] ) : FALSE)),
         'imgpPresetFileLink' => $presetfilelink,
@@ -470,7 +470,7 @@ function theme_imagepicker_view($img, $imgpath, $info, $exifinfo='') {
 
 function theme_imagepicker_image_edit_header($image, $source) {
   $output = '<div class="imgp_help">'. t('Edit image details') . '</div>';
-  $output .= '<div id="imgp_img_holder"><img src="'. $source .'" alt="'. check_plain($image['img_title']) .'" /></div>';
+  $output .= '<div id="imgp_img_holder"><img src="'. $source .'" alt="'. $image['img_title'] .'" /></div>';
   return $output;
 }
 
@@ -520,13 +520,13 @@ function theme_imagepicker_insert($img='', $public=FALSE, $form1='', $form2='') 
     $imgpath = imagepicker_get_image_path($img, 'browser', ($public ? array('name' => $img['name'] , 'uid' => $img['uid']) : FALSE ));
     $output .= '<div class="imgp_help">'. t('Choose the settings you want, place the cursor in the Body box above and Insert image.') .'</div>';
     if ($img['img_title']) {
-      $output .= '<div id="imgp_img_holder_title">'. check_plain($img['img_title']) .'</div>';
+      $output .= '<div id="imgp_img_holder_title">'. $img['img_title'] .'</div>';
     }
     if ($img['img_description']) {
       $output .= '<div id="imgp_img_holder_description">'. nl2br($img['img_description']) .'</div>';
     }
     $output .= '<div id="imgp_img_holder">';
-    $output .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. check_plain($img['img_title']) .'" title="'. $img['img_name'] .'" />';
+    $output .= '<img id="imgp_img" src="'. $imgpath .'" alt="'. $img['img_title'] .'" title="'. $img['img_name'] .'" />';
     $output .= '</div>';
     $output .= $form1;
     $output .= $form2;
