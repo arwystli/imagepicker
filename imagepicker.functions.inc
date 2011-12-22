@@ -267,7 +267,12 @@ function imagepicker_image_page($img_id, $preset = FALSE) {
   if ($img && is_object($img) && count($img)) {
 
     drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
-    drupal_set_title($img->img_title);
+    $title = (isset($img->img_title) && $img->img_title ? htmlspecialchars_decode($img->img_title, ENT_QUOTES) : '');
+    if ($title) {
+      $title = $title . ' | ' . variable_get('site_name', 'Drupal');
+      drupal_set_title($title);
+    }
+
     // js link
     $account = user_load($img->uid);
     $link = imagepicker_variable_get('imagepicker_default_pagelink', imagepicker_variable_get('imagepicker_default_pagelink', 1), $account->uid);
@@ -509,9 +514,9 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
   $options = array();
   // iterate
   foreach ($records AS $row) {
-    $img_name = check_plain($row->img_name);
+    $img_name = $row->img_name;
     $img_id = $row->img_id;
-    $description = check_plain($row->img_description);
+    $description = $row->img_description;
     $img_date = format_date($row->img_date, $fmt);
     if (drupal_strlen($description) > IMAGEPICKER_DESC_LEN) {
       $description = drupal_substr($description, 0, IMAGEPICKER_DESC_LEN) . '...';
@@ -530,7 +535,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
 
       $options[$img_id] = array(
         'img_name' => $imglink,
-        'img_title' => check_plain($row->img_title),
+        'img_title' => $row->img_title,
         'img_desc' => $description,
         'img_list' => $listlink,
         'img_date' => $img_date,
@@ -545,7 +550,7 @@ function imagepicker_browse_admin_form($form, &$form_state, $src="iframe", $acco
 
       $options[$img_id] = array(
         'img_name' => $imglink,
-        'img_title' => check_plain($row->img_title),
+        'img_title' => $row->img_title,
         'img_desc' => $description,
         'img_date' => $img_date,
         'img_actions' => "$editlink $deletelink",
@@ -3066,7 +3071,7 @@ function imagepicker_file_unmanaged_move($s, $d, $r = FILE_EXISTS_RENAME) {
 
 function imagepicker_get_insert_template() {
   $file = IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . IMAGEPICKER_INSERT_TEMPLATE;
-  $t = "<div class='imgp_title'>__TITLE__</div>__INSERT__<div class='imgp_desc'>__DESC__</div>";
+  $t = '<div class="imgp_title">__TITLE__</div>__INSERT__<div class="imgp_desc">__DESC__</div>';
   $template = '';
   if ( file_exists($file) ) {
     $template = file_get_contents($file);

@@ -11,7 +11,7 @@ very easy way. To set up it follow next 5 steps and you should be done.
 	1. Installation
 Upload whole imagepicker directory into sites/all/modules
 Login to Drupal site with a user which has an administrative rights and go to
-Administer > Site building > Modules. Scroll down to Other modules section, you
+Administer > Site building > Modules. Scroll down to Media modules section, you
 should now see Imagepicker module listed there. Tick it and press the button to
 save configuration. Imagepicker module will create it's directory structure in
 your files directory (configurable via Administer > Site configuration > File

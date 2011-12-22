@@ -1,9 +1,37 @@
-commit c991e24
+commit 8589890
+Author: hutch <hutch@midwales.net>
+Date:   Thu Dec 22 12:42:44 2011 +0000
+
+    fixed htmlspecialchars in title bug
+
+imagepicker.edit.inc
+imagepicker.functions.inc
+imagepicker.group.inc
+imagepicker.theme.inc
+imagepicker_iframe.js
+imagepicker_insert_template.txt.example
+readme.txt
+
+commit 84a1cd9
+Author: hutch <hutch@midwales.net>
+Date:   Mon Dec 5 22:06:26 2011 +0000
+
+    fixed strict warning messages in render()
+
+imagepicker.admin.inc
+imagepicker.edit.inc
+imagepicker.functions.inc
+imagepicker.group.inc
+imagepicker.theme.inc
+imagepicker.user.inc
+
+commit b6dcfb8
 Author: hutch <hutch@midwales.net>
 Date:   Thu Oct 13 18:17:10 2011 +0100
 
     fixed title attribute in insert
 
+CHANGELOG.txt
 imagepicker_iframe.js
 
 commit 82b2deb

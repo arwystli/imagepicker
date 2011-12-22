@@ -192,8 +192,8 @@ function imagepicker_insert_user_group($record) {
   if (db_insert('imagepicker_user_groups')
     ->fields(array(
       'uid' => $record['uid'],
-      'group_name' => $record['group_name'],
-      'group_description' => $record['group_description'],
+      'group_name' => check_plain($record['group_name']),
+      'group_description' => check_plain($record['group_description']),
       'public' => $record['public'],
        'avail_roles' => (isset($record['avail_roles']) ? $record['avail_roles'] : 'all'),
     ))
@@ -210,8 +210,8 @@ function imagepicker_update_user_group($record) {
 
   if (db_update('imagepicker_user_groups')
     ->fields(array(
-      'group_name' => $record['group_name'],
-      'group_description' => $record['group_description'],
+      'group_name' => check_plain($record['group_name']),
+      'group_description' => check_plain($record['group_description']),
       'public' => $record['public'],
        'avail_roles' => (isset($record['avail_roles']) ? $record['avail_roles'] : 'all'),
     ))
@@ -379,8 +379,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
     $rowct = $row->ct;
     if (user_access('use public imagepicker') && imagepicker_variable_get('imagepicker_public_enabled', 1)) {
       $row_data = array(
-        check_plain($row->group_name),
-        check_plain($row->group_description),
+        $row->group_name,
+        $row->group_description,
         ($rowct && $browsepath ?  l(format_plural($rowct, '1 image', '@count images'), $browsepath . $row->gid) : t('No images')),
         (($enabledlist && in_array($row->gid, $enabledlist)) ? t('selected') : ''),
         ($row->public ? t('Yes') : t('No')),
@@ -390,8 +390,8 @@ function imagepicker_groups_list($src=FALSE, $account=FALSE, $label="") {
     }
     else {
       $row_data = array(
-        check_plain($row->group_name),
-        check_plain($row->group_description),
+        $row->group_name,
+        $row->group_description,
         ($rowct && $browsepath ?  l(format_plural($rowct, '1 image', '@count images'), $browsepath . $row->gid) : t('No images')),
         (($enabledlist && in_array($row->gid, $enabledlist)) ? t('selected') : ''),
         ($use_icons ? _imagepicker_get_icon('edit', $editpath . $row->gid, array('title' => t('Edit'))) : l(t('Edit'), $editpath . $row->gid)),

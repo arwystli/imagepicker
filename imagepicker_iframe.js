@@ -82,7 +82,7 @@ function imagepickerInsert(button) {
     var imgpImagePath;
     var imgpImageElement;
     var imgpImageStyle;
-    var imgpImageCss = "class='imgp_img'";
+    var imgpImageCss = 'class="imgp_img"';
     var imgpLinkRel = '';
     var imgpLinkHide = '';
     var imgpLinkbox = '';
@@ -137,9 +137,9 @@ function imagepickerInsert(button) {
     if (use_relbox) {
       // get rel value
       if (imgpForm.relbox.value) {
-        imgpLinkRel = "rel='" + imgpForm.relbox.value + "' ";
+        imgpLinkRel = 'rel="' + imgpForm.relbox.value + '"';
         if (imgpForm.linkhide.checked) {
-          imgpLinkHide = "js-hide";
+          imgpLinkHide = 'js-hide';
         }
       }
     }
@@ -212,14 +212,14 @@ function imagepickerInsert(button) {
     // Create an image or span (containing title) HTML string
     if (imgpImagePath) {
       if (imgpShow == 'thumb') {
-        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title && imgpImageTitle ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpThumbWidth && !presetThumbLink ? "width='" + imgpThumbWidth + "'" : "") + (imgpThumbHeight && !presetThumbLink ? " height='" + imgpThumbHeight + "'" : "") + " />";
+        imgpImageElement = '<img src="' + imgpImagePath + '" alt="' + imgpImageAlt + '" ' + (insert_image_title && imgpImageTitle ? 'title="' + imgpImageTitle + '" ' : '') + imgpImageStyle + ' ' + imgpImageCss + ' ' + (imgpThumbWidth && !presetThumbLink ? 'width="' + imgpThumbWidth + '"' : '') + (imgpThumbHeight && !presetThumbLink ? ' height="' + imgpThumbHeight + '"' : '') + ' />';
       }
       else {
-        imgpImageElement = "<img src='" + imgpImagePath + "' alt='" + imgpImageAlt + "' " + (insert_image_title && imgpImageTitle ? "title='" + imgpImageTitle + "' " : "") + imgpImageStyle + " " + imgpImageCss + " " + (imgpWidth && !presetFileLink ? "width='" + imgpWidth + "'" : "") + (imgpHeight && !presetFileLink ? " height='" + imgpHeight + "'" : "") + " />";
+        imgpImageElement = '<img src="' + imgpImagePath + '" alt="' + imgpImageAlt + '" ' + (insert_image_title && imgpImageTitle ? 'title="' + imgpImageTitle + '" ' : '') + imgpImageStyle + ' ' + imgpImageCss + ' ' + (imgpWidth && !presetFileLink ? 'width="' + imgpWidth + '"' : '') + (imgpHeight && !presetFileLink ? ' height="' + imgpHeight + '"' : '') + ' />';
       }
     }
     else {
-      imgpImageElement = "<span>" + imgpImageTitle + "</span>";
+      imgpImageElement = '<span>' + imgpImageTitle + '</span>';
     }
 
     // imagecache
@@ -239,17 +239,17 @@ function imagepickerInsert(button) {
         if (use_linkbox && imgpLinkbox) {
           imgpPageLink = imgpLinkbox;
         }
-        imgpInsertion = "<a href='" + imgpPageLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " >" + imgpImageElement + "</a>";
+        imgpInsertion = '<a href="' + imgpPageLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' >' + imgpImageElement + '</a>';
         break;
       case 'lightbox':
-        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " rel='" + lightbox2_insert + "' >" + imgpImageElement + "</a>";
+        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' rel="' + lightbox2_insert + '" >' + imgpImageElement + '</a>';
         break;
       case 'colorbox':
-        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " class='colorbox " + imgpLinkHide + "' " + imgpLinkRel + ">" + imgpImageElement + "</a>";
+        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' class="colorbox ' + imgpLinkHide + '" ' + imgpLinkRel + '>' + imgpImageElement + '</a>';
         break;
       case 'file':
       default:
-        imgpInsertion = "<a href='" + imgpFileLink + "'" + (imgpImageTitle ? " title='" + imgpImageTitle + "'" : "") + " target='_blank' >" + imgpImageElement + "</a>";
+        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' target="_blank" >' + imgpImageElement + '</a>';
         break;
     }
     // wrap title and description if requested
