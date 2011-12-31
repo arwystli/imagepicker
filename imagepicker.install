@@ -176,6 +176,15 @@ function imagepicker_schema() {
 }
 
 /**
+  * Implements hook_enable()
+  */
+function imagepicker_enable() {
+
+  drupal_set_message(st('Thank you for installing Imagepicker. To set it up please visit the <a href="@url">configuration page</a>.', array('@url' => url('admin/config/media/imagepicker'))), 'status');
+
+}
+
+/**
  * Implements hook_uninstall().
  */
 function imagepicker_uninstall() {
