@@ -2799,7 +2799,7 @@ function imagepicker_copy_form_submit($form, &$form_state) {
         $imagescaled = imagepicker_scale_image($source, IMAGEPICKER_FILE_SCHEME . $dest, $scaleto);
 
         // if watermark is enabled just apply to destdir image, not orig or the thumbs
-        if ( $form_state['values']['watermark'] ) {
+        if (isset($form_state['values']['watermark']) && $form_state['values']['watermark']) {
           if (! imagepicker_watermark_do($dest, $user)) {
             drupal_set_message(t('Error while watermarking an uploaded image.'), 'error');
           }
