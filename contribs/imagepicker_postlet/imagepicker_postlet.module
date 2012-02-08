@@ -415,12 +415,14 @@ function imagepicker_postlet_check_ok() {
   $postlet_ok = TRUE;
   if (variable_get('imagepicker_postlet_byrole', 0)) {
     global $user;
-    $roleid = variable_get('imagepicker_postlet_role', 2);
-    if (imagepicker_user_has_role($roleid, $user) && $user->uid > 1) {
-      $postlet_ok = TRUE;
-    }
-    else {
-      $postlet_ok = FALSE;
+    if ($user->uid > 1) {
+      $roleid = variable_get('imagepicker_postlet_role', 2);
+      if (imagepicker_user_has_role($roleid, $user)) {
+        $postlet_ok = TRUE;
+      }
+      else {
+        $postlet_ok = FALSE;
+      }
     }
   }
   return $postlet_ok;

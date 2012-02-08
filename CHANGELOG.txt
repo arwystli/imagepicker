@@ -1,9 +1,18 @@
-commit b817ef3
+commit 06b3d22
+Author: hutch <hutch@midwales.net>
+Date:   Wed Feb 8 15:38:47 2012 +0000
+
+    fixed postlet update bug #1136260
+
+contribs/imagepicker_postlet/imagepicker_postlet.module
+
+commit ded47ad
 Author: hutch <hutch@midwales.net>
 Date:   Thu Dec 22 12:40:50 2011 +0000
 
     fixed htmlspecialchars in title bug
 
+CHANGELOG.txt
 imagepicker.edit.inc
 imagepicker.functions.inc
 imagepicker.group.inc
