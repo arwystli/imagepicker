@@ -44,6 +44,16 @@ function imagepicker_scale_elem($default = NULL) {
     '#default_value' => ($default != NULL ? $default : imagepicker_variable_get('imagepicker_default_scale', '')),
   );
 }
+function imagepicker_max_scale_elem($default = NULL) {
+  return array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum Scale'),
+    '#description' => t('Configure the maximum scale or size. leave empty for no maximum scale'),
+    '#size' => 10,
+    '#required' => FALSE,
+    '#default_value' => ($default != NULL ? $default : imagepicker_variable_get('imagepicker_max_scale', '')),
+  );
+}
 function imagepicker_fleft_elem($default = NULL) {
   return array(
     '#type' => 'textfield',

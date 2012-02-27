@@ -1,9 +1,37 @@
-commit 8589890
+commit 19f14c1
+Author: hutch <hutch@midwales.net>
+Date:   Mon Feb 27 20:09:31 2012 +0000
+
+    added max size feature
+
+imagepicker.admin.inc
+imagepicker.form-elements.inc
+imagepicker.functions.inc
+imagepicker.upload.inc
+
+commit 61abb4b
+Author: hutch <hutch@midwales.net>
+Date:   Sat Dec 31 11:20:39 2011 +0000
+
+    notice avoidance in copy form
+
+imagepicker.functions.inc
+
+commit f0b077e
+Author: hutch <hutch@midwales.net>
+Date:   Sat Dec 31 10:52:38 2011 +0000
+
+    added hook_enable
+
+imagepicker.install
+
+commit 803641c
 Author: hutch <hutch@midwales.net>
 Date:   Thu Dec 22 12:42:44 2011 +0000
 
     fixed htmlspecialchars in title bug
 
+CHANGELOG.txt
 imagepicker.edit.inc
 imagepicker.functions.inc
 imagepicker.group.inc

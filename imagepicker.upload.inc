@@ -265,6 +265,20 @@ function imagepicker_upload_form_submit($form, &$form_state) {
               $file = $imagemoved;
               // $source is absolute
               $source = $origdir . $file;
+              // enforce a max size
+              $max_scale = imagepicker_variable_get('imagepicker_max_scale', '');
+              if ($max_scale) {
+                if ($scaleto && $scaleto > $max_scale) {
+                  $scaleto = $max_scale;
+                }
+                else {
+                  if ($info = image_get_info($source)) {
+                    if ($info['width'] > $max_scale || $info['height'] > $max_scale ) {
+                      $scaleto = $max_scale;
+                    }
+                  }
+                }
+              }
               if ($scaleto) {
                 $imagescaled = imagepicker_scale_image($source, IMAGEPICKER_FILE_SCHEME . $destdirscheme . $file, $scaleto);
               }
