@@ -2722,6 +2722,15 @@ function imagepicker_copy_form_submit($form, &$form_state) {
         if (! file_exists($source) ) {
           $source = $destdir . $img['img_name'];
         }
+        // enforce a max size
+        $max_scale = variable_get('imagepicker_max_scale', '');
+        if ($max_scale) {
+          if ($info = image_get_info($source)) {
+            if ($info['width'] > $max_scale || $info['height'] > $max_scale ) {
+              $scaleto = $max_scale;
+            }
+          }
+        }
         $imagescaled = imagepicker_scale_image($source, $dest, $scaleto);
 
         // if watermark is enabled just apply to destdir image, not orig or the thumbs

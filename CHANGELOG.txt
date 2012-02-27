@@ -1,9 +1,22 @@
-commit 06b3d22
+commit 3fa2816
+Author: hutch <hutch@midwales.net>
+Date:   Mon Feb 27 20:08:04 2012 +0000
+
+    added max size feature
+
+contribs/imagepicker_postlet/imagepicker_postlet.module
+imagepicker.admin.inc
+imagepicker.form-elements.inc
+imagepicker.functions.inc
+imagepicker.upload.inc
+
+commit e6dcbc6
 Author: hutch <hutch@midwales.net>
 Date:   Wed Feb 8 15:38:47 2012 +0000
 
     fixed postlet update bug #1136260
 
+CHANGELOG.txt
 contribs/imagepicker_postlet/imagepicker_postlet.module
 
 commit ded47ad

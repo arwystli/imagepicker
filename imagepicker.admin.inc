@@ -141,6 +141,9 @@ function imagepicker_settings_form($form_state, $info) {
     '#default_value' => variable_get('imagepicker_max_uploads', 1),
     '#options' => $max_uploads,
   );
+
+  $form['imagepicker_settings']['imagepicker_max_scale'] = imagepicker_max_scale_elem(variable_get('imagepicker_max_scale', ''));
+
   $form['imagepicker_settings']['imagepicker_invoke_extra'] = array(
     '#type' => 'checkbox',
     '#title' => t('Invoke external imagepicker hook'),
@@ -654,6 +657,9 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   }
   if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
+  }
+  if (drupal_strlen($form_state['values']['imagepicker_max_scale']) && ! is_numeric($form_state['values']['imagepicker_max_scale'])) {
+    form_set_error('imagepicker_max_scale', t('The Maximum Scale field must be a number'));
   }
   if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1 ) {
     form_set_error('imagepicker_rows_per_page', t('The rows per page field must be greater than one.'));
