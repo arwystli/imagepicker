@@ -258,6 +258,8 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
     $context['sandbox']['max'] = count($selected);
     $context['sandbox']['images'] = $selected;
   }
+  // enforce a max size
+  $max_scale = variable_get('imagepicker_max_scale', '');
   // Process images by groups of 5.
   $max = variable_get('imagepicker_import_max', 5);
   $count = min($max, count($context['sandbox']['images']));
@@ -276,6 +278,20 @@ function imagepicker_import_batch($form_state, $selected, $options, $account, &$
         $file = basename($source);
         $orig = $options['origdir'] . $file;
         $scaleto = ($form_state['values']['scale'] !="" ? $form_state['values']['scale'] : FALSE );
+
+        if ($max_scale) {
+          if ($scaleto && $scaleto > $max_scale) {
+            $scaleto = $max_scale;
+          }
+          else {
+            if ($info = image_get_info($source)) {
+              if ($info['width'] > $max_scale || $info['height'] > $max_scale ) {
+                $scaleto = $max_scale;
+              }
+            }
+          }
+        }
+
         if ($scaleto) {
           $imagescaled = imagepicker_scale_image($orig, $options['destdir'] . $file, $scaleto);
         }

@@ -1,9 +1,19 @@
-commit 3fa2816
+commit c88c91b
+Author: hutch <hutch@midwales.net>
+Date:   Mon Mar 5 09:57:48 2012 +0000
+
+    fixed max_scale in import
+
+imagepicker.import.inc
+imagepicker.upload.inc
+
+commit 548bd5f
 Author: hutch <hutch@midwales.net>
 Date:   Mon Feb 27 20:08:04 2012 +0000
 
     added max size feature
 
+CHANGELOG.txt
 contribs/imagepicker_postlet/imagepicker_postlet.module
 imagepicker.admin.inc
 imagepicker.form-elements.inc

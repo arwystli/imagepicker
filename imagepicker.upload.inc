@@ -74,12 +74,18 @@ function imagepicker_upload_form($form_state, $account=FALSE, $admin = FALSE) {
       '#description' => t('Size in pixels of thumbnail\'s bigger side'),
       '#required' => TRUE,
     );
+    // enforce a max size
+    $max_scale = variable_get('imagepicker_max_scale', '');
+    $max_msg = '';
+    if ($max_scale) {
+      $max_msg = t('Maximum !t', array('!t' => $max_scale . 'px enforced'));
+    }
     $form['scale_' . $ct] = array(
       '#type' => 'textfield',
       '#title' => t('Scale image'),
       '#size' => 10,
       '#default_value' => (isset($user->imagepicker_default_scale) ? $user->imagepicker_default_scale : variable_get('imagepicker_default_scale', '')),
-      '#description' => t('Scale image to this size in pixels if not left empty'),
+      '#description' => t('Scale image to this size in pixels if not left empty. !m', array('!m' => $max_msg)),
     );
     if ( imagepicker_image_check_functions(TRUE) && variable_get('imagepicker_watermark_enable', 0)) {
       if (! variable_get('imagepicker_watermark_image', '')
