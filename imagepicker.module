@@ -759,6 +759,8 @@ function imagepicker_form_alter(&$form, &$form_state, $form_id) {
       // we pick this up in theme_imagepicker which hands it to imagepicker_iframe.js
       $node_lang = imagepicker_variable_get('imagepicker_node_lang', '');
       $node_language = (isset($node->language) ? $node->language : 'und');
+      // issue 1470672
+      $node_language = (isset($node->body[$node_language]) ? $node_language : 'und');
       if (! $node_lang || $node_lang != $node_language) {
         imagepicker_variable_set('imagepicker_node_lang', $node_language);
         // don't know what the number is for, so hardwire it for now

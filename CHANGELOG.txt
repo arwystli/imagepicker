@@ -1,9 +1,26 @@
-commit 19f14c1
+commit 54184fe
+Author: hutch <hutch@midwales.net>
+Date:   Tue Mar 6 21:38:07 2012 +0000
+
+    issue 1470672 language hack
+
+imagepicker.module
+
+commit c9f8ef6
+Author: hutch <hutch@midwales.net>
+Date:   Mon Mar 5 00:03:04 2012 +0000
+
+    fixed max_scale in import
+
+imagepicker.import.inc
+
+commit b0d1f92
 Author: hutch <hutch@midwales.net>
 Date:   Mon Feb 27 20:09:31 2012 +0000
 
     added max size feature
 
+CHANGELOG.txt
 imagepicker.admin.inc
 imagepicker.form-elements.inc
 imagepicker.functions.inc
