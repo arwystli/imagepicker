@@ -2,6 +2,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * upload functions
  */
 
@@ -71,15 +74,21 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
       '#title' => t('Thumbnail size'),
       '#size' => 10,
       '#default_value' => imagepicker_variable_get('imagepicker_default_thumbnail_size', imagepicker_variable_get('imagepicker_default_thumbnail_size', 100), $user->uid),
-      '#description' => t('Size in pixels of thumbnail\'s bigger side'),
+      '#description' => t("Size in pixels of thumbnail's bigger side"),
       '#required' => TRUE,
     );
+    // enforce a max size
+    $max_scale = imagepicker_variable_get('imagepicker_max_scale', '');
+    $max_msg = '';
+    if ($max_scale) {
+      $max_msg = t('Maximum !t', array('!t' => $max_scale . 'px enforced'));
+    }
     $form['scale_' . $ct] = array(
       '#type' => 'textfield',
       '#title' => t('Scale image'),
       '#size' => 10,
       '#default_value' => imagepicker_variable_get('imagepicker_default_scale', imagepicker_variable_get('imagepicker_default_scale', ''), $user->uid),
-      '#description' => t('Scale image to this size in pixels if not left empty'),
+      '#description' => t('Scale image to this size in pixels if not left empty. !m', array('!m' => $max_msg)),
     );
     if ( imagepicker_image_check_functions(TRUE) && imagepicker_variable_get('imagepicker_watermark_enable', 0)) {
       if (! imagepicker_variable_get('imagepicker_watermark_image', '')
@@ -465,4 +474,3 @@ function imagepicker_upload_progress_get_script($delay) {
 function imagepicker_upload_progress_busy() {
   return '<div id="imagepicker-sending" style="display: none;"></div>';
 }
-

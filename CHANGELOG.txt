@@ -1,9 +1,18 @@
-commit 39a430c
+commit c7f2a6f
+Author: hutch <hutch@midwales.net>
+Date:   Thu Mar 8 22:33:52 2012 +0000
+
+    added max_scale message in upload form
+
+imagepicker.upload.inc
+
+commit 007cc94
 Author: hutch <hutch@midwales.net>
 Date:   Thu Mar 8 21:56:00 2012 +0000
 
     fixed DIRECTORY_SEPARATOR bug in url strings
 
+CHANGELOG.txt
 imagepicker.module
 
 commit fe69a81
