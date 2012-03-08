@@ -1,9 +1,18 @@
-commit 54184fe
+commit 39a430c
+Author: hutch <hutch@midwales.net>
+Date:   Thu Mar 8 21:56:00 2012 +0000
+
+    fixed DIRECTORY_SEPARATOR bug in url strings
+
+imagepicker.module
+
+commit fe69a81
 Author: hutch <hutch@midwales.net>
 Date:   Tue Mar 6 21:38:07 2012 +0000
 
     issue 1470672 language hack
 
+CHANGELOG.txt
 imagepicker.module
 
 commit c9f8ef6
