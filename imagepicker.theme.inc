@@ -255,7 +255,7 @@ function theme_imagepicker_iframe($variables) {
     }
 
     $info = image_get_info(imagepicker_get_path(FALSE, TRUE) . $img->img_name);
-    $thumbinfo = image_get_info(imagepicker_get_path(FALSE, TRUE) . IMAGEPICKER_THUMBS_DIR . '/' . $img->img_name);
+    $thumbinfo = image_get_info(imagepicker_get_path(FALSE, TRUE) . IMAGEPICKER_THUMBS_DIR . DIRECTORY_SEPARATOR . $img->img_name);
     $img_title = $img->img_title;
     $settings = array(
       'imagepicker_iframe' => array(

@@ -1,9 +1,18 @@
-commit c7f2a6f
+commit 22c0e90
+Author: hutch <hutch@midwales.net>
+Date:   Fri Mar 9 11:48:31 2012 +0000
+
+    another DIRECTORY_SEPARATOR fix in theme
+
+imagepicker.theme.inc
+
+commit b16028b
 Author: hutch <hutch@midwales.net>
 Date:   Thu Mar 8 22:33:52 2012 +0000
 
     added max_scale message in upload form
 
+CHANGELOG.txt
 imagepicker.upload.inc
 
 commit 007cc94
