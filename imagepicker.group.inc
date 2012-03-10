@@ -2,6 +2,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * contains the functions for group management
  */
 
@@ -411,4 +414,3 @@ function imagepicker_get_group_images_count($gid) {
   $row = $query->execute()->fetchObject();
   return $row->ct;
 }
-

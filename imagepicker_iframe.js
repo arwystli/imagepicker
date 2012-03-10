@@ -1,6 +1,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * Provides javascript for insertion of html from iframe to the body in the parent.
  */
 
@@ -370,4 +373,3 @@ function imagepicker_insertAtCursor(myField, myValue) {
     myField.value += myValue;
   }
 }
-

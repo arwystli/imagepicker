@@ -1,9 +1,43 @@
-commit 22c0e90
+commit 13ae709
+Author: hutch <hutch@midwales.net>
+Date:   Sat Mar 10 17:55:15 2012 +0000
+
+    added views to imagepicker
+
+handlers/imagepicker_colorbox_handler_field_colorbox.inc
+handlers/imagepicker_views_handler_field_avail_roles.inc
+handlers/imagepicker_views_handler_field_image_url.inc
+handlers/imagepicker_views_handler_filter_avail_roles.inc
+handlers/imagepicker_views_handler_filter_group_id.inc
+handlers/imagepicker_views_handler_filter_group_name.inc
+imagepicker.admin.inc
+imagepicker.css
+imagepicker.edit.inc
+imagepicker.form-elements.inc
+imagepicker.functions.inc
+imagepicker.group.inc
+imagepicker.imagefuncs.inc
+imagepicker.info
+imagepicker.install
+imagepicker.js
+imagepicker.module
+imagepicker.theme.inc
+imagepicker.tpl.php
+imagepicker.user.inc
+imagepicker_iframe.js
+imagepicker_upload.js
+imagepicker_upload_link.js
+views/README.txt
+views/imagepicker.views.inc
+views/imagepicker.views_default.inc
+
+commit 8246b79
 Author: hutch <hutch@midwales.net>
 Date:   Fri Mar 9 11:48:31 2012 +0000
 
     another DIRECTORY_SEPARATOR fix in theme
 
+CHANGELOG.txt
 imagepicker.theme.inc
 
 commit b16028b

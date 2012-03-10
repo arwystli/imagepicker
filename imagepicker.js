@@ -1,9 +1,11 @@
 
 /**
  * @file
- * Javascript functions for progress bar anf form enhancement
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
  *
- * By Bob Hutchinson for imagepicker upload form
+ * Javascript functions for progress bar and form enhancement
+ *
 */
 
 (function ($) {
@@ -73,6 +75,27 @@
           $("#wrap-imagepicker-blocks", context).hide();
         }
       });
+
+      if ($("#edit-imagepicker-image-enable", context).attr('checked') ) {
+        $(".form-item-imagepicker-image-default-show", context).show();
+        $(".form-item-imagepicker-image-default-link", context).show();
+      }
+      else {
+        $(".form-item-imagepicker-image-default-show", context).hide();
+        $(".form-item-imagepicker-image-default-link", context).hide();
+      }
+      $("#edit-imagepicker-image-enable", context).change(function() {
+        if ($(this).attr('checked')) {
+          $(".form-item-imagepicker-image-default-show", context).show();
+          $(".form-item-imagepicker-image-default-link", context).show();
+        }
+        else {
+          $(".form-item-imagepicker-image-default-show", context).hide();
+          $(".form-item-imagepicker-image-default-link", context).hide();
+        }
+      });
+
+
 
     }
   };

@@ -2,6 +2,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * Contains the functions pertaining to editing image information
  */
 
@@ -187,4 +190,3 @@ function _imagepicker_edit_img($img_id, $src='iframe', $account=FALSE) {
 
   return $content;
 }
-

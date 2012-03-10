@@ -2,6 +2,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * Enables permitted roles to upload images for insertion into configured nodes.
  */
 
@@ -70,6 +73,16 @@ function imagepicker_init() {
     module_load_include('inc', 'imagepicker', 'imagepicker.theme');
     module_load_include('inc', 'imagepicker', 'imagepicker.form-elements');
   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function imagepicker_views_api() {
+  return array(
+    'api' => 3,
+    'path' => IMAGEPICKER_PATH . '/views',
+  );
 }
 
 /**
@@ -1131,4 +1144,3 @@ function imagepicker_get_files_directory($system_only = FALSE) {
   $dir = $drupaldir . DIRECTORY_SEPARATOR . IMAGEPICKER_FILES_DIR;
   return $dir;
 }
-

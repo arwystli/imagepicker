@@ -2,6 +2,9 @@
 
 /**
  * @file
+ * @author Bob Hutchinson http://drupal.org/user/52366
+ * @copyright GNU GPL
+ *
  * my imagepicker in my account
  */
 function imagepicker_user_page($uid, $path="", $func="", $id=0) {
@@ -611,4 +614,3 @@ function imagepicker_user_config_admin_form_delete($form, &$form_state) {
     drupal_set_message(t('Watermark File deleted'));
   }
 }
-
