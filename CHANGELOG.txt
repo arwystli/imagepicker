@@ -1,9 +1,18 @@
-commit 13ae709
+commit 86a127f
+Author: hutch <hutch@midwales.net>
+Date:   Tue Apr 10 21:47:44 2012 +0100
+
+    improved Wysiwyg API support
+
+imagepicker_iframe.js
+
+commit 9910805
 Author: hutch <hutch@midwales.net>
 Date:   Sat Mar 10 17:55:15 2012 +0000
 
     added views to imagepicker
 
+CHANGELOG.txt
 handlers/imagepicker_colorbox_handler_field_colorbox.inc
 handlers/imagepicker_views_handler_field_avail_roles.inc
 handlers/imagepicker_views_handler_field_image_url.inc

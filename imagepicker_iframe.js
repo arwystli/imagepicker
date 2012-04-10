@@ -242,17 +242,17 @@ function imagepickerInsert(button) {
         if (use_linkbox && imgpLinkbox) {
           imgpPageLink = imgpLinkbox;
         }
-        imgpInsertion = '<a href="' + imgpPageLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' >' + imgpImageElement + '</a>';
+        imgpInsertion = '<a href="' + imgpPageLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + '>' + imgpImageElement + '</a>';
         break;
       case 'lightbox':
-        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' rel="' + lightbox2_insert + '" >' + imgpImageElement + '</a>';
+        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' rel="' + lightbox2_insert + '">' + imgpImageElement + '</a>';
         break;
       case 'colorbox':
         imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' class="colorbox ' + imgpLinkHide + '" ' + imgpLinkRel + '>' + imgpImageElement + '</a>';
         break;
       case 'file':
       default:
-        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' target="_blank" >' + imgpImageElement + '</a>';
+        imgpInsertion = '<a href="' + imgpFileLink + '"' + (imgpImageTitle ? ' title="' + imgpImageTitle + '"' : '') + ' target="_blank">' + imgpImageElement + '</a>';
         break;
     }
     // wrap title and description if requested
@@ -307,6 +307,17 @@ function imagepickerInsert(button) {
           jobdone = true;
         }
       }
+
+      // Wysiwyg API
+      if (! jobdone && typeof(win.Drupal.wysiwyg.instances[inst].editor) !== "undefined") {
+        if (win.Drupal.wysiwyg.instances[inst].editor !== "none") {
+          if (typeof(win.Drupal.wysiwyg.instances[inst].insert) !== "undefined") {
+            win.Drupal.wysiwyg.instances[inst].insert(imgpInsertion);
+            jobdone = true;
+          }
+        }
+      }
+
     }
     // older ckeditor
     if (! jobdone && win.Drupal.ckeditorInstance && win.Drupal.ckeditorInsertHtml) {
