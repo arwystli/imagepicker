@@ -4,7 +4,7 @@
  * @file
  * @author Bob Hutchinson http://drupal.org/user/52366
  * @copyright GNU GPL
- * 
+ *
  * admin settings functions
  */
 
@@ -630,14 +630,14 @@ function imagepicker_settings_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
     form_set_error('imagepicker_default_browser_thumbnail_size', t('The Browser Thumbnail field must be a number'));
   }
-  if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
-    form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
+  if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && (! is_numeric($form_state['values']['imagepicker_default_scale']) || $form_state['values']['imagepicker_default_scale'] < 1)) {
+    form_set_error('imagepicker_default_scale', t('The Scale field must be a number greater than 0 or left empty'));
   }
-  if (drupal_strlen($form_state['values']['imagepicker_max_scale']) && ! is_numeric($form_state['values']['imagepicker_max_scale'])) {
-    form_set_error('imagepicker_max_scale', t('The Maximum Scale field must be a number'));
+  if (drupal_strlen($form_state['values']['imagepicker_max_scale']) && (! is_numeric($form_state['values']['imagepicker_max_scale']) || $form_state['values']['imagepicker_max_scale'] < 1)) {
+    form_set_error('imagepicker_max_scale', t('The Maximum Scale field must be a number greater than 0 or left empty'));
   }
-  if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1 ) {
-    form_set_error('imagepicker_rows_per_page', t('The rows per page field must be greater than one.'));
+  if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1) {
+    form_set_error('imagepicker_rows_per_page', t('The rows per page field must be greater than 0.'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_default_fleft'])) {
     form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));

@@ -2740,9 +2740,8 @@ function imagepicker_copy_form_validate($form, &$form_state) {
   if ( $img->img_name == $form_state['values']['imagepicker_copy'] ) {
     form_set_error('imagepicker_copy', t('You cannot copy a file onto itself'));
   }
-
-  if (!preg_match('/^[0-9]{0,3}$/', $form_state['values']['scale'])) {
-    form_set_error($name, t('Scale value should be an integer between 1 and 999 or leave it empty if you don\'t want to scale your image.'));
+  if (drupal_strlen($form_state['values']['scale']) && (! is_numeric($form_state['values']['scale']) ||  $form_state['values']['scale'] < 1)) {
+    form_set_error($name, t("Scale value should be an integer greater than 0 or leave it empty if you don't want to scale your image."));
   }
 }
 

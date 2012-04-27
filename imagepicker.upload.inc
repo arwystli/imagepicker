@@ -206,8 +206,8 @@ function imagepicker_upload_form_validate($form, &$form_state) {
         }
       }
       if ( $name == 'scale_' . $ct ) {
-        if (!preg_match('/^[0-9]{0,3}$/', $value)) {
-          form_set_error($name, t("Scale value should be an integer between 1 and 999 or leave it empty if you don't want to scale your image."));
+        if (drupal_strlen($value) && (! is_numeric($value) || $value < 1)) {
+          form_set_error($name, t("Scale value should be an integer greater than 0 or leave it empty if you don't want to scale your image."));
         }
       }
       if ($name == 'watermark_perc_' . $ct) {

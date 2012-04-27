@@ -401,7 +401,7 @@ function imagepicker_user_config_admin_form_validate($form, &$form_state) {
   if (! is_numeric($form_state['values']['imagepicker_default_thumbnail_size'])) {
     form_set_error('imagepicker_default_thumbnail_size', t('The Thumbnail field must be a number'));
   }
-  if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && ! is_numeric($form_state['values']['imagepicker_default_scale'])) {
+  if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && (! is_numeric($form_state['values']['imagepicker_default_scale']) || $form_state['values']['imagepicker_default_scale'] < 1)) {
     form_set_error('imagepicker_default_scale', t('The Scale field must be a number'));
   }
 
