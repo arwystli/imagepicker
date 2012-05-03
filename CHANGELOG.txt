@@ -1,9 +1,18 @@
-commit 77c977c
+commit 9c1b931
+Author: hutch <hutch@midwales.net>
+Date:   Thu May 3 09:59:36 2012 +0100
+
+    removed attempted fix for disappearing imagepicker
+
+imagepicker.functions.inc
+
+commit f08627d
 Author: hutch <hutch@midwales.net>
 Date:   Thu May 3 01:33:06 2012 +0100
 
     put include to theme file in imagepicker box.
 
+CHANGELOG.txt
 imagepicker.functions.inc
 
 commit 0e20931
