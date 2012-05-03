@@ -2976,6 +2976,10 @@ function _imagepicker_get_icon($name, $url = NULL, $attributes = array(), $exten
 }
 // all iframe links pass through here
 function imagepicker_box() {
+
+  // a somewhat half-baked attempt to avoid the disappearing imagepicker error
+  module_load_include('inc', 'imagepicker', 'imagepicker.theme');
+
   $a1 = FALSE;
   $a2 = 0;
   $a3 = FALSE;
