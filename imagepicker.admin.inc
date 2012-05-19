@@ -36,7 +36,8 @@ function imagepicker_settings_page($op = NULL) {
  */
 function imagepicker_settings_form($form, &$form_state, $info) {
 
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_jspath']);
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
 
   // default settings
@@ -604,6 +605,47 @@ function imagepicker_settings_form($form, &$form_state, $info) {
     $form['imagepicker_blocks']['close'] = array('#markup' => '');
   }
 
+  $form['imagepicker_jspaths'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Javascript paths'),
+    '#description' => t('For advanced users who want to supply their own javascript.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    // This will store all the defaults in one variable.
+  );
+  $form['imagepicker_jspaths']['imagepicker_jspath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path to imagepicker javascript file'),
+    '#description' => t('Where the imagepicker javascript file is located.'),
+    '#size' => 60,
+    '#required' => TRUE,
+    '#default_value' => $imagepicker_jspaths['imagepicker_jspath'],
+  );
+  $form['imagepicker_jspaths']['imagepicker_iframe_jspath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path to imagepicker iframe javascript file'),
+    '#description' => t('Where the imagepicker javascript iframe file is located.'),
+    '#size' => 60,
+    '#required' => TRUE,
+    '#default_value' => $imagepicker_jspaths['imagepicker_iframe_jspath'],
+  );
+  $form['imagepicker_jspaths']['imagepicker_upload_jspath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path to imagepicker upload javascript file'),
+    '#description' => t('Where the imagepicker javascript upload file is located.'),
+    '#size' => 60,
+    '#required' => TRUE,
+    '#default_value' => $imagepicker_jspaths['imagepicker_upload_jspath'],
+  );
+  $form['imagepicker_jspaths']['imagepicker_upload_link_jspath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path to imagepicker upload link javascript file'),
+    '#description' => t('Where the imagepicker javascript upload link file is located.'),
+    '#size' => 60,
+    '#required' => TRUE,
+    '#default_value' => $imagepicker_jspaths['imagepicker_upload_link_jspath'],
+  );
+
   $form = system_settings_form($form);
   unset($form['#submit']);
   $form['#submit'][] = 'imagepicker_settings_form_submit';
@@ -619,74 +661,74 @@ function imagepicker_settings_form_validate($form, &$form_state) {
 
   global $user;
   if (! drupal_strlen($form_state['values']['imagepicker_default_thumbnail_size'])) {
-    form_set_error('imagepicker_default_thumbnail_size', t('You must fill in the Thumbnail field'));
+    form_set_error('imagepicker_defaults][imagepicker_default_thumbnail_size', t('You must fill in the Thumbnail field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_default_thumbnail_size'])) {
-    form_set_error('imagepicker_default_thumbnail_size', t('The Thumbnail field must be a number'));
+    form_set_error('imagepicker_defaults][imagepicker_default_thumbnail_size', t('The Thumbnail field must be a number'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
-    form_set_error('imagepicker_default_browser_thumbnail_size', t('You must fill in the Browser Thumbnail field'));
+    form_set_error('imagepicker_browser][imagepicker_default_browser_thumbnail_size', t('You must fill in the Browser Thumbnail field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_default_browser_thumbnail_size'])) {
-    form_set_error('imagepicker_default_browser_thumbnail_size', t('The Browser Thumbnail field must be a number'));
+    form_set_error('imagepicker_browser][imagepicker_default_browser_thumbnail_size', t('The Browser Thumbnail field must be a number'));
   }
   if (drupal_strlen($form_state['values']['imagepicker_default_scale']) && (! is_numeric($form_state['values']['imagepicker_default_scale']) || $form_state['values']['imagepicker_default_scale'] < 1)) {
-    form_set_error('imagepicker_default_scale', t('The Scale field must be a number greater than 0 or left empty'));
+    form_set_error('imagepicker_defaults][imagepicker_default_scale', t('The Scale field must be a number greater than 0 or left empty'));
   }
   if (drupal_strlen($form_state['values']['imagepicker_max_scale']) && (! is_numeric($form_state['values']['imagepicker_max_scale']) || $form_state['values']['imagepicker_max_scale'] < 1)) {
-    form_set_error('imagepicker_max_scale', t('The Maximum Scale field must be a number greater than 0 or left empty'));
+    form_set_error('imagepicker_settings][imagepicker_max_scale', t('The Maximum Scale field must be a number greater than 0 or left empty'));
   }
   if (! is_numeric($form_state['values']['imagepicker_rows_per_page']) || $form_state['values']['imagepicker_rows_per_page'] < 1) {
-    form_set_error('imagepicker_rows_per_page', t('The rows per page field must be greater than 0.'));
+    form_set_error('imagepicker_defaults][imagepicker_rows_per_page', t('The rows per page field must be greater than 0.'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_default_fleft'])) {
-    form_set_error('imagepicker_default_fleft', t('You must fill in the Left alignment field'));
+    form_set_error('imagepicker_align][imagepicker_default_fleft', t('You must fill in the Left alignment field'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_default_fright'])) {
-    form_set_error('imagepicker_default_fright', t('You must fill in the Right alignment field'));
+    form_set_error('imagepicker_align][imagepicker_default_fright', t('You must fill in the Right alignment field'));
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_iframe_height'])) {
-    form_set_error('imagepicker_advanced_iframe_height', t('The Iframe height must be a number'));
+    form_set_error('imagepicker_iframe][imagepicker_advanced_iframe_height', t('The Iframe height must be a number'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_width'])) {
-    form_set_error('imagepicker_advanced_iframe_width', t('You must fill in the Iframe width'));
+    form_set_error('imagepicker_iframe][imagepicker_advanced_iframe_width', t('You must fill in the Iframe width'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_advanced_iframe_border'])) {
-    form_set_error('imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
+    form_set_error('imagepicker_iframe][imagepicker_advanced_iframe_border', t('You must fill in the Iframe border'));
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_browser_columns']) || $form_state['values']['imagepicker_advanced_browser_columns'] < 0) {
-    form_set_error('imagepicker_advanced_browser_columns', t('The browser columns must be a positive number or zero'));
+    form_set_error('imagepicker_browser][imagepicker_advanced_browser_columns', t('The browser columns must be a positive number or zero'));
   }
   if (! is_numeric($form_state['values']['imagepicker_advanced_browser_page']) || $form_state['values']['imagepicker_advanced_browser_page'] < 0) {
-    form_set_error('imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
+    form_set_error('imagepicker_browser][imagepicker_advanced_browser_page', t('The browser page must be a positive number or zero'));
   }
   if (! is_numeric($form_state['values']['imagepicker_upload_progress_delay']) || $form_state['values']['imagepicker_upload_progress_delay'] < 0) {
-    form_set_error('imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
+    form_set_error('imagepicker_progress][imagepicker_upload_progress_delay', t('The progress delay must be a positive number or zero'));
   }
   if (isset($form_state['values']['imagepicker_uploadprogress_interval'])) {
     if ( ! is_numeric($form_state['values']['imagepicker_uploadprogress_interval']) || $form_state['values']['imagepicker_uploadprogress_interval'] < 1) {
-      form_set_error('imagepicker_uploadprogress_interval', t('The progress interval must be a positive number'));
+      form_set_error('imagepicker_progress][imagepicker_uploadprogress_interval', t('The progress interval must be a positive number'));
     }
   }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_align'])) {
-    form_set_error('imagepicker_insert_defaults_align', t('You must fill in the default align field'));
+    form_set_error('imagepicker_insert_defaults][imagepicker_insert_defaults_align', t('You must fill in the default align field'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_show'])) {
-    form_set_error('imagepicker_insert_defaults_show', t('You must fill in the default show field'));
+    form_set_error('imagepicker_insert_defaults][imagepicker_insert_defaults_show', t('You must fill in the default show field'));
   }
   if (! drupal_strlen($form_state['values']['imagepicker_insert_defaults_link'])) {
-    form_set_error('imagepicker_insert_defaults_link', t('You must fill in the default link field'));
+    form_set_error('imagepicker_insert_defaults][imagepicker_insert_defaults_link', t('You must fill in the default link field'));
   }
 
   // watermark settings
   if (imagepicker_image_check_functions()) {
     if (isset($form_state['values']['imagepicker_watermark_enable']) && $form_state['values']['imagepicker_watermark_enable']) {
       if (! empty($form_state['values']['imagepicker_watermark_image']) && ! file_exists($form_state['values']['imagepicker_watermark_image'])) {
-        form_set_error('imagepicker_watermark_image', t('This file does not exist or has invalid path: %file.', array('%file' => $form_state['values']['imagepicker_watermark_image'])));
+        form_set_error('imagepicker_watermark][imagepicker_watermark_image', t('This file does not exist or has invalid path: %file.', array('%file' => $form_state['values']['imagepicker_watermark_image'])));
       }
       if ($form_state['values']['imagepicker_watermark_scaling']) {
         if (! is_numeric($form_state['values']['imagepicker_watermark_scaling_percentage']) || $form_state['values']['imagepicker_watermark_scaling_percentage'] <= 0 || $form_state['values']['imagepicker_watermark_scaling_percentage'] >= 100) {
-          form_set_error('imagepicker_watermark_scaling_percentage', t('Please enter a number between 1 and 100 for scaling percentage.'));
+          form_set_error('imagepicker_watermark][imagepicker_watermark_scaling_percentage', t('Please enter a number between 1 and 100 for scaling percentage.'));
         }
         elseif ($form_state['values']['imagepicker_watermark_scaling_percentage'] < 10 || ($form_state['values']['imagepicker_watermark_min_width'] < 50 && $form_state['values']['imagepicker_watermark_min_width'] > 0)) {
           // we do not disable scaling for low values, e.g. if the user chooses to scale down to 1%, we just warn
@@ -694,23 +736,36 @@ function imagepicker_settings_form_validate($form, &$form_state) {
             array('@percentage' => $form_state['values']['imagepicker_watermark_scaling_percentage'], '@min_width' => $form_state['values']['imagepicker_watermark_min_width'])));
         }
         if (intval($form_state['values']['imagepicker_watermark_min_width']) < 0) {
-          form_set_error('imagepicker_watermark_min_width', t('Please enter a positive number for minimum width.'));
+          form_set_error('imagepicker_watermark][imagepicker_watermark_min_width', t('Please enter a positive number for minimum width.'));
         }
       }
     }
   }
 
   if (! empty($form_state['values']['imagepicker_exifinfo_external']) && ! is_executable($form_state['values']['imagepicker_exifinfo_external'])) {
-    form_set_error('imagepicker_exifinfo_external', t('file does not exist or is not executable'));
+    form_set_error('imagepicker_exif][imagepicker_exifinfo_external', t('file does not exist or is not executable'));
   }
 
   if (isset($form_state['values']['imagepicker_lightbox2_enable']) && $form_state['values']['imagepicker_lightbox2_enable']) {
     if (! drupal_strlen($form_state['values']['imagepicker_lightbox2_insert'])) {
-      form_set_error('imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
+      form_set_error('imagepicker_module][imagepicker_lightbox2_insert', t('You must fill in the Lightbox2 insert'));
     }
   }
   if (! is_numeric($form_state['values']['imagepicker_import_max']) || ($form_state['values']['imagepicker_import_max'] < 1 || $form_state['values']['imagepicker_import_max'] > 100 )) {
-    form_set_error('imagepicker_import_max', t('The Import batch size must be must be a positive number.'));
+    form_set_error('imagepicker_import][imagepicker_import_max', t('The Import batch size must be must be a positive number.'));
+  }
+
+  if (empty($form_state['values']['imagepicker_jspath']) || ! file_exists($form_state['values']['imagepicker_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_jspath', t('field is empty or file does not exist'));
+  }
+  if (empty($form_state['values']['imagepicker_iframe_jspath']) || ! file_exists($form_state['values']['imagepicker_iframe_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_iframe_jspath', t('field is empty or file does not exist'));
+  }
+  if (empty($form_state['values']['imagepicker_upload_jspath']) || ! file_exists($form_state['values']['imagepicker_upload_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_upload_jspath', t('field is empty or file does not exist'));
+  }
+  if (empty($form_state['values']['imagepicker_upload_link_jspath']) || ! file_exists($form_state['values']['imagepicker_upload_link_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_upload_link_jspath', t('field is empty or file does not exist'));
   }
 
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
@@ -829,6 +884,11 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_import_enabled', $form_state['values']['imagepicker_import_enabled']);
   imagepicker_variable_set('imagepicker_import_delete', $form_state['values']['imagepicker_import_delete']);
   imagepicker_variable_set('imagepicker_import_max', $form_state['values']['imagepicker_import_max']);
+
+  imagepicker_variable_set('imagepicker_jspath', $form_state['values']['imagepicker_jspath']);
+  imagepicker_variable_set('imagepicker_iframe_jspath', $form_state['values']['imagepicker_iframe_jspath']);
+  imagepicker_variable_set('imagepicker_upload_jspath', $form_state['values']['imagepicker_upload_jspath']);
+  imagepicker_variable_set('imagepicker_upload_link_jspath', $form_state['values']['imagepicker_upload_link_jspath']);
 
   if (isset($form_state['values']['imagepicker_galleryblocks_enabled'])) {
     // gallery blocks
@@ -974,8 +1034,8 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
   $form1 = NULL;
   $form2 = NULL;
   $form3 = NULL;
-
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_jspath']);
   $img = _imagepicker_get_img($img_id, FALSE, $user);
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', $userdir);
@@ -1317,7 +1377,8 @@ function imagepicker_delete_olduser_dirs($old_uid) {
 function imagepicker_admin_groups() {
 
   drupal_add_css(IMAGEPICKER_PATH . '/imagepicker.css');
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_jspath']);
   module_load_include('inc', 'imagepicker', 'imagepicker.group');
   $content = '';
   $action = '';

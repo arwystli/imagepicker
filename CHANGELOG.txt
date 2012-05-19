@@ -1,9 +1,22 @@
-commit 9c1b931
+commit 7ac7740
+Author: hutch <hutch@midwales.net>
+Date:   Sat May 19 12:39:18 2012 +0100
+
+    fixed form_error, added javascript paths
+
+imagepicker.admin.inc
+imagepicker.functions.inc
+imagepicker.group.inc
+imagepicker.upload.inc
+imagepicker.user.inc
+
+commit b0dd731
 Author: hutch <hutch@midwales.net>
 Date:   Thu May 3 09:59:36 2012 +0100
 
     removed attempted fix for disappearing imagepicker
 
+CHANGELOG.txt
 imagepicker.functions.inc
 
 commit f08627d

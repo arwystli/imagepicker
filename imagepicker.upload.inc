@@ -41,7 +41,8 @@ function imagepicker_upload_form($form, &$form_state, $account=FALSE, $admin = F
   // multiple uploads
   $max_uploads = imagepicker_variable_get('imagepicker_max_uploads', 1);
   $settings = array('imagepicker_upload_link' => array('max_uploads' => $max_uploads));
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_upload_link.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_upload_link_jspath']);
   drupal_add_js($settings, 'setting');
 
   if ($account) {
@@ -467,7 +468,8 @@ function imagepicker_upload_progress_get_script($delay) {
     );
   }
 
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_upload.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_upload_jspath']);
   drupal_add_js($settings, 'setting');
 }
 

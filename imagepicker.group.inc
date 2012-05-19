@@ -9,7 +9,8 @@
  */
 
 function imagepicker_groups() {
-  drupal_add_js(IMAGEPICKER_PATH . '/imagepicker.js');
+  $imagepicker_jspaths = imagepicker_jspaths_get();
+  drupal_add_js($imagepicker_jspaths['imagepicker_jspath']);
   $content = '';
   // from iframe
   if (! arg(2)) {
