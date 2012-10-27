@@ -1,9 +1,18 @@
-commit c88c91b
+commit 3c6cc90
+Author: hutch <hutch@midwales.net>
+Date:   Sat Oct 27 17:15:35 2012 +0100
+
+    fixed bug when public is not enabled
+
+imagepicker.group.inc
+
+commit 1733c3e
 Author: hutch <hutch@midwales.net>
 Date:   Mon Mar 5 09:57:48 2012 +0000
 
     fixed max_scale in import
 
+CHANGELOG.txt
 imagepicker.import.inc
 imagepicker.upload.inc
 
