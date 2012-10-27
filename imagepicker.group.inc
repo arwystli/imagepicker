@@ -122,6 +122,9 @@ function imagepicker_groups_form($form, &$form_state, $record=FALSE, $account=FA
       }
     }
   }
+  else {
+    $form['groupsave']['group_public'] = array('#type' => 'value', '#value' => 0);
+  }
 
   if ($account) {
     $form['groupsave']['account'] = array(
