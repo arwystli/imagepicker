@@ -1,9 +1,20 @@
-commit 3c6cc90
+commit 1d6f3ce
+Author: hutch <hutch@midwales.net>
+Date:   Mon Oct 29 23:01:57 2012 +0000
+
+    added theme to block, set theme.inc so it always loads
+
+imagepicker.css
+imagepicker.module
+imagepicker.theme.inc
+
+commit 1351af2
 Author: hutch <hutch@midwales.net>
 Date:   Sat Oct 27 17:15:35 2012 +0100
 
     fixed bug when public is not enabled
 
+CHANGELOG.txt
 imagepicker.group.inc
 
 commit 1733c3e

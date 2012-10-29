@@ -40,9 +40,9 @@ function imagepicker_perm() {
  */
 function imagepicker_init() {
   global $user;
+  module_load_include('inc', 'imagepicker', 'imagepicker.theme');
   if ($user->uid > 0) {
     module_load_include('inc', 'imagepicker', 'imagepicker.functions');
-    module_load_include('inc', 'imagepicker', 'imagepicker.theme');
     module_load_include('inc', 'imagepicker', 'imagepicker.form-elements');
   }
 }
@@ -623,7 +623,7 @@ function imagepicker_display_block($i) {
 
     $ct++;
   }
-  return $content;
+  return theme('imagepicker_display_block', $content);
 
 }
 

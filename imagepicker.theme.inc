@@ -255,7 +255,11 @@ function imagepicker_theme() {
         'form' => NULL,
       ),
     ),
-
+    'imagepicker_display_block' => array(
+      'arguments' => array(
+        'content' => '',
+      ),
+    ),
   );
 }
 
@@ -894,3 +898,8 @@ function theme_imagepicker_admin_orphans_form($form) {
   return $output;
 }
 
+function theme_imagepicker_display_block($content) {
+  $output = '';
+  $output .= '<div class="imgp_display_block">' . $content . '</div>';
+  return $output;
+}
