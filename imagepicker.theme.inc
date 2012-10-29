@@ -215,6 +215,11 @@ function imagepicker_theme() {
     'imagepicker_admin_orphans_form' => array(
       'render element' => 'form',
     ),
+    'imagepicker_display_block' => array(
+      'variables' => array(
+        'content' => '',
+      ),
+    ),
 
   );
 }
@@ -916,5 +921,12 @@ function theme_imagepicker_admin_orphans_form($variables) {
   $form['msg']['#prefix'] = '<div class="messages">';
   $form['msg']['#suffix'] = '</div>';
   $output .= drupal_render_children($form);
+  return $output;
+}
+
+function theme_imagepicker_display_block($variables) {
+  $content = $variables['content'];
+  $output = '';
+  $output .= '<div class="imgp_display_block">' . $content . '</div>';
   return $output;
 }
