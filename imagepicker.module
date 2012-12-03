@@ -884,8 +884,8 @@ function imagepicker_get_all_groups($override = NULL) {
 function imagepicker_get_colorbox_perms() {
   global $user;
   if ((module_exists('colorbox')
-    && imagepicker_variable_get('imagepicker_advanced_colorbox', 0, $user->uid)
-    && imagepicker_variable_get('imagepicker_advanced_colorbox', 0 )
+    && (imagepicker_variable_get('imagepicker_account_enabled', 0) && imagepicker_variable_get('imagepicker_user_config_enable', 0) ? imagepicker_variable_get('imagepicker_advanced_colorbox', 0, $user->uid) : TRUE)
+    && imagepicker_variable_get('imagepicker_advanced_colorbox', 0)
     && variable_get('colorbox_load', 0))
     ) {
     return TRUE;

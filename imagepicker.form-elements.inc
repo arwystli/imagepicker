@@ -110,7 +110,7 @@ function imagepicker_colorbox_elem($default = NULL) {
   return array(
       '#type' => 'checkbox',
       '#title' => t('Colorbox Iframe'),
-      '#description' => t('Use colorbox iframe instead of the builtin one.'),
+      '#description' => t('Use Colorbox iframe instead of the builtin one. Requires Colorbox load to be enabled.'),
       '#return_value' => 1,
       '#default_value' => (is_numeric($default) ? $default : imagepicker_variable_get('imagepicker_advanced_colorbox', 0)),
     );

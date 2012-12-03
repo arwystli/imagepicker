@@ -1,9 +1,19 @@
-commit 551ae92
+commit 011c868
+Author: hutch <hutch@midwales.net>
+Date:   Mon Dec 3 10:51:26 2012 +0000
+
+    improved permissions handling for colorbox iframe
+
+imagepicker.form-elements.inc
+imagepicker.module
+
+commit 2567bbe
 Author: hutch <hutch@midwales.net>
 Date:   Mon Nov 5 15:01:10 2012 +0000
 
     moved all theming functions into imagepicker.module
 
+CHANGELOG.txt
 imagepicker.module
 imagepicker.theme.inc
 
