@@ -1,9 +1,19 @@
-commit 1d6f3ce
+commit 1c3b17f
+Author: hutch <hutch@midwales.net>
+Date:   Thu Jan 17 10:58:43 2013 +0000
+
+    moved all theming into main module file
+
+imagepicker.module
+imagepicker.theme.inc
+
+commit 7ade2a0
 Author: hutch <hutch@midwales.net>
 Date:   Mon Oct 29 23:01:57 2012 +0000
 
     added theme to block, set theme.inc so it always loads
 
+CHANGELOG.txt
 imagepicker.css
 imagepicker.module
 imagepicker.theme.inc
