@@ -179,13 +179,13 @@ function imagepickerInsert(button) {
     var presetFileLink = false;
     if (imgpForm.presets_show) {
       if (imgpForm.presets_show.value && imgpPresetFileLink) {
-        presetFileLink = imgpPresetFileLink.replace('__PRESET__', imgpForm.presets_show.value);
+        presetFileLink = imgpPresetFileLink[imgpForm.presets_show.value];
       }
     }
     var presetThumbLink = false;
     if (imgpForm.presets_show) {
       if (imgpForm.presets_show.value && imgpPresetThumbLink) {
-        presetThumbLink = imgpPresetThumbLink.replace('__PRESET__', imgpForm.presets_show.value);
+        presetThumbLink = imgpPresetThumbLink[imgpForm.presets_show.value];
       }
     }
 
@@ -228,7 +228,7 @@ function imagepickerInsert(button) {
     // imagecache
     if (imgpForm.presets_link) {
       if (imgpForm.presets_link.value) {
-        imgpFileLink = imgpPresetFileLink.replace('__PRESET__', imgpForm.presets_link.value);
+        imgpFileLink = imgpPresetFileLink[imgpForm.presets_link.value];
         imgpPageLink = imgpPageLink + '/' + imgpForm.presets_link.value;
       }
     }

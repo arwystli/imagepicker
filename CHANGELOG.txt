@@ -1,9 +1,19 @@
-commit 011c868
+commit b16934b
+Author: hutch <hutch@midwales.net>
+Date:   Wed May 8 09:20:58 2013 +0100
+
+    fixed presets
+
+imagepicker.module
+imagepicker_iframe.js
+
+commit 9fc6259
 Author: hutch <hutch@midwales.net>
 Date:   Mon Dec 3 10:51:26 2012 +0000
 
     improved permissions handling for colorbox iframe
 
+CHANGELOG.txt
 imagepicker.form-elements.inc
 imagepicker.module
 
