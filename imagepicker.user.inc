@@ -16,7 +16,7 @@ function imagepicker_user_page($uid, $path="", $func="", $id=0) {
   // path/func/id
   if ($path == 'images') {
     if ( ($func == 'browse' || $func == 'browseadmin') && is_numeric($id) && $id > 0) {
-      $content .= imagepicker_user_view($id);
+      $content .= imagepicker_userview($id);
     }
     elseif ($func == 'edit' && is_numeric($id) && $id > 0) {
       module_load_include('inc', 'imagepicker', 'imagepicker.edit');
@@ -91,7 +91,7 @@ function imagepicker_user_browse_admin() {
   return $content;
 }
 
-function imagepicker_user_view($img_id) {
+function imagepicker_userview($img_id) {
 
   $imagepicker_jspaths = imagepicker_jspaths_get();
   drupal_add_js($imagepicker_jspaths['imagepicker_jspath']);
@@ -107,7 +107,7 @@ function imagepicker_user_view($img_id) {
     if ($info['extension'] != 'gif' ) {
       $exifinfo = imagepicker_get_exifinfo(imagepicker_get_path(FALSE, TRUE) . $img->img_name);
     }
-    $view = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
+    $view = theme('imagepicker_fview', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info, 'exifinfo' => $exifinfo));
     $form1 = drupal_get_form('imagepicker_user_image_form', $img_id);
     // copy form
     if (imagepicker_variable_get('imagepicker_copy_enabled', 0)) {
@@ -118,7 +118,7 @@ function imagepicker_user_view($img_id) {
     if (_imagepicker_has_groups($user)) {
       $form3 = drupal_get_form('imagepicker_group_images_form', $img->img_id);
     }
-    $content = theme('imagepicker_user_view', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
+    $content = theme('imagepicker_userview', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
@@ -133,7 +133,7 @@ function imagepicker_user_view_public($img_id) {
   if ($img) {
     $imgpath = imagepicker_get_image_path($img, 'full', array('uid' => $img->uid ));
     $info = image_get_info(imagepicker_get_path(FALSE, array('uid' => $img->uid)) . $img->img_name);
-    $content = theme('imagepicker_view', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info));
+    $content = theme('imagepicker_fview', array('img' => $img, 'imgpath' => $imgpath, 'info' => $info));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');

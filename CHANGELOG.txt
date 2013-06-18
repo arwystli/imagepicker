@@ -1,9 +1,20 @@
-commit b16934b
+commit fc64f9b
+Author: hutch <hutch@midwales.net>
+Date:   Tue Jun 18 23:28:45 2013 +0100
+
+    fixed hook clash see#2022629
+
+imagepicker.admin.inc
+imagepicker.module
+imagepicker.user.inc
+
+commit d0b410d
 Author: hutch <hutch@midwales.net>
 Date:   Wed May 8 09:20:58 2013 +0100
 
     fixed presets
 
+CHANGELOG.txt
 imagepicker.module
 imagepicker_iframe.js
 

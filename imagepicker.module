@@ -1215,7 +1215,7 @@ function imagepicker_theme() {
         'help' => "",
       ),
     ),
-    'imagepicker_view' => array(
+    'imagepicker_fview' => array(
       'variables' => array(
         'img' => array(),
         'imgpath' => "",
@@ -1245,7 +1245,7 @@ function imagepicker_theme() {
         'message2' => "",
       ),
     ),
-    'imagepicker_user_view' => array(
+    'imagepicker_userview' => array(
       'variables' => array(
         'view' => "",
         'form1' => NULL,
@@ -1253,7 +1253,7 @@ function imagepicker_theme() {
         'form3' => NULL,
       ),
     ),
-    'imagepicker_admin_view' => array(
+    'imagepicker_adminview' => array(
       'variables' => array(
         'view' => "",
         'form1' => NULL,
@@ -1576,7 +1576,7 @@ function theme_imagepicker_quota_message($variables) {
   return $output;
 }
 
-function theme_imagepicker_view($variables) {
+function theme_imagepicker_fview($variables) {
 
   $img = $variables['img'];
   $imgpath = $variables['imgpath'];
@@ -1665,7 +1665,7 @@ function theme_imagepicker_user_config($variables) {
   return $output;
 }
 
-function theme_imagepicker_user_view($variables) {
+function theme_imagepicker_userview($variables) {
 
   $view = $variables['view'];
   $form1 = $variables['form1'];
@@ -1682,7 +1682,7 @@ function theme_imagepicker_user_view($variables) {
   return $output;
 }
 
-function theme_imagepicker_admin_view($variables) {
+function theme_imagepicker_adminview($variables) {
 
   $view = $variables['view'];
   $form1 = $variables['form1'];

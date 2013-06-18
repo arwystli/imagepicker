@@ -1021,7 +1021,7 @@ function imagepicker_admin_groups_list($label="") {
   return theme('imagepicker_list', array('header' => $header, 'rows' => $rows, 'max' => $max, 'message' => t('No groups found.'), 'pref' => $pref, 'suff' => $suff, 'label' => $label));
 }
 
-function imagepicker_admin_view($img_id, $account = FALSE) {
+function imagepicker_adminview($img_id, $account = FALSE) {
 
   if ($account) {
     $user = $account;
@@ -1054,7 +1054,7 @@ function imagepicker_admin_view($img_id, $account = FALSE) {
     if (_imagepicker_has_groups($user)) {
       $form3 = drupal_get_form('imagepicker_group_images_form', $img->img_id, $user);
     }
-    $content = theme('imagepicker_admin_view', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
+    $content = theme('imagepicker_adminview', array('view' => $view, 'form1' => $form1, 'form2' => $form2, 'form3' => $form3));
   }
   else {
     drupal_set_message(t('Image not found.'), 'error');
@@ -1512,7 +1512,7 @@ function imagepicker_admin_images() {
         imagepicker_image_delete($img_id, $account, 'admin');
       }
       else {
-        $content .= imagepicker_admin_view($img_id, $account);
+        $content .= imagepicker_adminview($img_id, $account);
       }
     }
     elseif ($imgaction == 'upload') {
