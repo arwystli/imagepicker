@@ -1,9 +1,18 @@
-commit fc64f9b
+commit b43239f
+Author: hutch <hutch@midwales.net>
+Date:   Sat Jul 6 09:23:02 2013 +0100
+
+    added file renaming regex, see #2035537
+
+imagepicker.upload.inc
+
+commit c7eed62
 Author: hutch <hutch@midwales.net>
 Date:   Tue Jun 18 23:28:45 2013 +0100
 
     fixed hook clash see#2022629
 
+CHANGELOG.txt
 imagepicker.admin.inc
 imagepicker.module
 imagepicker.user.inc
