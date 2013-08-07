@@ -3097,10 +3097,10 @@ function imagepicker_get_insert_template() {
 function imagepicker_jspaths_get() {
 
   $defaults = array(
-    'imagepicker_jspath' => IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . 'imagepicker.js',
-    'imagepicker_iframe_jspath' => IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . 'imagepicker_iframe.js',
-    'imagepicker_upload_jspath' => IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . 'imagepicker_upload.js',
-    'imagepicker_upload_link_jspath' => IMAGEPICKER_PATH . DIRECTORY_SEPARATOR . 'imagepicker_upload_link.js',
+    'imagepicker_jspath' => IMAGEPICKER_PATH . '/' . 'imagepicker.js',
+    'imagepicker_iframe_jspath' => IMAGEPICKER_PATH . '/' . 'imagepicker_iframe.js',
+    'imagepicker_upload_jspath' => IMAGEPICKER_PATH . '/' . 'imagepicker_upload.js',
+    'imagepicker_upload_link_jspath' => IMAGEPICKER_PATH . '/' . 'imagepicker_upload_link.js',
   );
   $settings['imagepicker_jspath'] = imagepicker_variable_get('imagepicker_jspath', $defaults['imagepicker_jspath']);
   $settings['imagepicker_iframe_jspath'] = imagepicker_variable_get('imagepicker_iframe_jspath', $defaults['imagepicker_iframe_jspath']);

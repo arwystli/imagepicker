@@ -1,9 +1,26 @@
-commit b43239f
+commit b236f38
+Author: hutch <hutch@midwales.net>
+Date:   Wed Aug 7 22:25:09 2013 +0100
+
+    fixed path bug in windows
+
+imagepicker.functions.inc
+
+commit c1d361b
+Author: hutch <hutch@midwales.net>
+Date:   Wed Aug 7 22:24:42 2013 +0100
+
+    better regex
+
+imagepicker.upload.inc
+
+commit f253098
 Author: hutch <hutch@midwales.net>
 Date:   Sat Jul 6 09:23:02 2013 +0100
 
     added file renaming regex, see #2035537
 
+CHANGELOG.txt
 imagepicker.upload.inc
 
 commit c7eed62
