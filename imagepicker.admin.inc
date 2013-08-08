@@ -611,7 +611,6 @@ function imagepicker_settings_form($form, &$form_state, $info) {
     '#description' => t('For advanced users who want to supply their own javascript.'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    // This will store all the defaults in one variable.
   );
   $form['imagepicker_jspaths']['imagepicker_jspath'] = array(
     '#type' => 'textfield',
@@ -644,6 +643,13 @@ function imagepicker_settings_form($form, &$form_state, $info) {
     '#size' => 60,
     '#required' => TRUE,
     '#default_value' => $imagepicker_jspaths['imagepicker_upload_link_jspath'],
+  );
+  $form['imagepicker_jspaths']['imagepicker_jspath_reset'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Reset'),
+    '#description' => t('Reset the paths to the defaults.'),
+    '#return_value' => 1,
+    '#default_value' => 0,
   );
 
   $form = system_settings_form($form);
@@ -755,17 +761,17 @@ function imagepicker_settings_form_validate($form, &$form_state) {
     form_set_error('imagepicker_import][imagepicker_import_max', t('The Import batch size must be must be a positive number.'));
   }
 
-  if (empty($form_state['values']['imagepicker_jspath']) || ! file_exists($form_state['values']['imagepicker_jspath'])) {
-    form_set_error('imagepicker_jspaths][imagepicker_jspath', t('field is empty or file does not exist'));
+  if (empty($form_state['values']['imagepicker_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_jspath', t('field is empty'));
   }
-  if (empty($form_state['values']['imagepicker_iframe_jspath']) || ! file_exists($form_state['values']['imagepicker_iframe_jspath'])) {
-    form_set_error('imagepicker_jspaths][imagepicker_iframe_jspath', t('field is empty or file does not exist'));
+  if (empty($form_state['values']['imagepicker_iframe_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_iframe_jspath', t('field is empty'));
   }
-  if (empty($form_state['values']['imagepicker_upload_jspath']) || ! file_exists($form_state['values']['imagepicker_upload_jspath'])) {
-    form_set_error('imagepicker_jspaths][imagepicker_upload_jspath', t('field is empty or file does not exist'));
+  if (empty($form_state['values']['imagepicker_upload_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_upload_jspath', t('field is empty'));
   }
-  if (empty($form_state['values']['imagepicker_upload_link_jspath']) || ! file_exists($form_state['values']['imagepicker_upload_link_jspath'])) {
-    form_set_error('imagepicker_jspaths][imagepicker_upload_link_jspath', t('field is empty or file does not exist'));
+  if (empty($form_state['values']['imagepicker_upload_link_jspath'])) {
+    form_set_error('imagepicker_jspaths][imagepicker_upload_link_jspath', t('field is empty'));
   }
 
   if ($form_state['values']['imagepicker_show_browse_order_form'] != 1) {
@@ -885,10 +891,20 @@ function imagepicker_settings_form_submit($form, &$form_state) {
   imagepicker_variable_set('imagepicker_import_delete', $form_state['values']['imagepicker_import_delete']);
   imagepicker_variable_set('imagepicker_import_max', $form_state['values']['imagepicker_import_max']);
 
-  imagepicker_variable_set('imagepicker_jspath', $form_state['values']['imagepicker_jspath']);
-  imagepicker_variable_set('imagepicker_iframe_jspath', $form_state['values']['imagepicker_iframe_jspath']);
-  imagepicker_variable_set('imagepicker_upload_jspath', $form_state['values']['imagepicker_upload_jspath']);
-  imagepicker_variable_set('imagepicker_upload_link_jspath', $form_state['values']['imagepicker_upload_link_jspath']);
+  if ($form_state['values']['imagepicker_jspath_reset']) {
+    $imagepicker_jspaths = imagepicker_jspaths_get(TRUE);
+    unset($form_state['values']['imagepicker_jspath_reset']);
+    imagepicker_variable_set('imagepicker_jspath', $imagepicker_jspaths['imagepicker_jspath']);
+    imagepicker_variable_set('imagepicker_iframe_jspath', $imagepicker_jspaths['imagepicker_iframe_jspath']);
+    imagepicker_variable_set('imagepicker_upload_jspath', $imagepicker_jspaths['imagepicker_upload_jspath']);
+    imagepicker_variable_set('imagepicker_upload_link_jspath', $imagepicker_jspaths['imagepicker_upload_link_jspath']);
+  }
+  else {
+    imagepicker_variable_set('imagepicker_jspath', $form_state['values']['imagepicker_jspath']);
+    imagepicker_variable_set('imagepicker_iframe_jspath', $form_state['values']['imagepicker_iframe_jspath']);
+    imagepicker_variable_set('imagepicker_upload_jspath', $form_state['values']['imagepicker_upload_jspath']);
+    imagepicker_variable_set('imagepicker_upload_link_jspath', $form_state['values']['imagepicker_upload_link_jspath']);
+  }
 
   if (isset($form_state['values']['imagepicker_galleryblocks_enabled'])) {
     // gallery blocks

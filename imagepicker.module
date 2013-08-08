@@ -1449,7 +1449,8 @@ function theme_imagepicker_iframe($variables) {
       ),
     );
     drupal_add_js($settings, 'setting');
-    drupal_add_js(IMAGEPICKER_PATH . '/imagepicker_iframe.js');
+    $jspaths = imagepicker_jspaths_get();
+    drupal_add_js($jspaths['imagepicker_iframe_jspath']);
   }
   return $content;
 }

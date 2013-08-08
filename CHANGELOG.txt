@@ -1,9 +1,20 @@
-commit b236f38
+commit 03a208d
+Author: hutch <hutch@midwales.net>
+Date:   Thu Aug 8 08:53:51 2013 +0100
+
+    added reset to js paths
+
+imagepicker.admin.inc
+imagepicker.functions.inc
+imagepicker.module
+
+commit bbc9f6b
 Author: hutch <hutch@midwales.net>
 Date:   Wed Aug 7 22:25:09 2013 +0100
 
     fixed path bug in windows
 
+CHANGELOG.txt
 imagepicker.functions.inc
 
 commit c1d361b
