@@ -1,9 +1,18 @@
-commit 03a208d
+commit 6302034
+Author: hutch <hutch@midwales.net>
+Date:   Fri Mar 6 08:49:31 2015 +0000
+
+    fix issue #2447043
+
+imagepicker.module
+
+commit 7ced3b5
 Author: hutch <hutch@midwales.net>
 Date:   Thu Aug 8 08:53:51 2013 +0100
 
     added reset to js paths
 
+CHANGELOG.txt
 imagepicker.admin.inc
 imagepicker.functions.inc
 imagepicker.module

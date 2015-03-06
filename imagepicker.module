@@ -967,8 +967,6 @@ function imagepicker_file_download($filepath) {
       return -1;
     }
   }
-  // Not our file; let someone else decide.
-  return NULL;
 }
 
 /**
