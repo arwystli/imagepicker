@@ -1,9 +1,18 @@
-commit 6302034
+commit 4d16415
+Author: hutch <hutch@arwystli.net>
+Date:   Tue Mar 1 16:36:38 2016 +0000
+
+    added LICENSE.txt
+
+LICENSE.txt
+
+commit 40d33e5
 Author: hutch <hutch@midwales.net>
 Date:   Fri Mar 6 08:49:31 2015 +0000
 
     fix issue #2447043
 
+CHANGELOG.txt
 imagepicker.module
 
 commit 7ced3b5
